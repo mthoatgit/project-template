@@ -26,10 +26,15 @@ can demo it after merge. Required.>
 ## Functional Requirements
 
 <Bullets with stable IDs (e.g. `CUST-001`, `XFER-007`). IDs never change
-once assigned. Tasks and tests reference IDs, never file paths. Required.>
+once assigned. Tasks and tests reference IDs, never file paths.
+**Each requirement MUST have an indented `Acceptance:` line** describing
+the observable behavior that proves it — at the same abstraction level
+as the requirement itself (product framing OK, tech stack NOT). Required.>
 
 - **<REQ-ID>** — <one-line requirement>
+  **Acceptance:** <observable, testable behavior — no tech stack>
 - **<REQ-ID>** — <one-line requirement>
+  **Acceptance:** <observable behavior>
 
 ## Non-Functional Requirements
 
@@ -37,7 +42,11 @@ once assigned. Tasks and tests reference IDs, never file paths. Required.>
 > NFRs. Do not invent placeholder NFRs. Cross-cutting NFRs go in
 > `docs/specs/cross-cutting/`, not here.
 
+<Same `Acceptance:` rule as functional requirements — each NFR must have
+an observable acceptance line.>
+
 - **<NFR-ID>** — <one-line constraint or quality attribute>
+  **Acceptance:** <observable behavior that proves compliance>
 
 ## Dependencies
 

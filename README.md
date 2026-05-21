@@ -59,6 +59,7 @@ docs/
   specs/                         Phase 1 — Requirements (Epics + per-Epic specs)
     README.md                    Index template (Goal, Domain, Tech Stack, Epic Index)
     epics/_TEMPLATE.md           Epic spec blueprint (copied per Epic)
+    cross-cutting/_TEMPLATE.md   Cross-cutting NFRs blueprint (copied per concern)
   architecture/
     system-design.md             Phase 2 — System design template
   adr/
