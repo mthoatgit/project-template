@@ -1,0 +1,23 @@
+{
+  "model": "claude-opus-4-7",
+  "permissions": {
+    "defaultMode": "bypassPermissions",
+    "deny": [
+      "Bash(git push --force*)",
+      "PowerShell(git push --force*)"
+    ],
+    "allow": [
+      "Bash",
+      "PowerShell",
+      "Write",
+      "Edit",
+      "Read",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch",
+      "TodoWrite"
+    ]
+  },
+  "skipDangerousModePermissionPrompt": true
+}
