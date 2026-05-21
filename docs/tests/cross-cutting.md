@@ -1,3 +1,7 @@
+---
+status: template
+---
+
 # Cross-Cutting Tests
 
 > **Template file.** Use this for tests that span multiple modules or

@@ -1,3 +1,7 @@
+---
+status: template
+---
+
 # Requirements
 
 > **Template file.** Replace every `<PLACEHOLDER>` and the example rows

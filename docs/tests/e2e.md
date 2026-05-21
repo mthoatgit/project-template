@@ -1,3 +1,7 @@
+---
+status: template
+---
+
 # End-to-End Tests
 
 > **Template file.** A single happy-path test that exercises the full

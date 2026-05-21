@@ -1,3 +1,7 @@
+---
+status: template
+---
+
 # Test Strategy
 
 > **Template file.** Replace placeholders to describe the test approach

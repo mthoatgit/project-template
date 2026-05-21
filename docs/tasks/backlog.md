@@ -1,3 +1,7 @@
+---
+status: template
+---
+
 # Task Backlog
 
 > **Template file.** Index of all tasks, grouped by Epic. Each row links

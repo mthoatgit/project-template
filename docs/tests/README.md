@@ -1,3 +1,7 @@
+---
+status: template
+---
+
 # Test Plan
 
 > **Template file.** Index of the test plan. The plan is split per Epic

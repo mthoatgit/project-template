@@ -1,3 +1,7 @@
+---
+status: template
+---
+
 # System Design
 
 > **Template file.** Produced and maintained during the Architecture
