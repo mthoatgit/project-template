@@ -26,9 +26,10 @@ expected shape — the `workflow-*` skills fill them in.
 | # | Phase | Skill | Where decisions get written | What gets decided |
 |---|---|---|---|---|
 | 0 | **Concept** | `workflow-concept` | `docs/concept.md` | Problem, users, rough scope, candidate Epics. **No tech.** |
-| 1 | **Requirements** | `workflow-requirements` | `docs/specs/README.md` + `docs/specs/epics/E<N>-*.md` | **Tech stack**, Epic list, per-Epic functional & non-functional requirements (stable IDs). |
-| 2 | **Architecture** | `workflow-architecture` | `docs/architecture/system-design.md` + `docs/adr/<NNNN>-*.md` | System design, ADRs for non-obvious decisions. |
-| 3 | **Tasks** | `workflow-tasks` | `docs/tasks/epics/E<N>/T<NN>-*.md` + `docs/tasks/backlog.md` + Tasks section in each Epic spec | Atomic tasks per Epic, Epic-level acceptance criteria. |
+| 1 | **Requirements** | `workflow-requirements` | `docs/specs/README.md` + `docs/specs/epics/E<N>-*.md` | Epic list, per-Epic functional & non-functional requirements (stable IDs **+ Acceptance line each**). No tech. |
+| 1.5 | **Spike** *(optional)* | `workflow-spike` | `spike/<slug>` branch (tagged) + `docs/adr/<NNNN>-*.md` | De-risk one technical question before architecture. Skip unless there's real uncertainty. |
+| 2 | **Architecture** | `workflow-architecture` | `docs/architecture/system-design.md` + `docs/adr/<NNNN>-*.md` | **Tech stack** (incl. `0001-tech-stack`), system design, ADRs. |
+| 3 | **Tasks** | `workflow-tasks` | `docs/tasks/epics/E<N>/T<NN>-*.md` + `docs/tasks/backlog.md` + Tasks section in each Epic spec | Atomic tasks per Epic, Epic-level + task-level acceptance criteria. |
 | 4 | **Tests** | `workflow-tests` | `docs/tests/epics/E<N>-*.md` + `strategy.md`, `cross-cutting.md`, `e2e.md` | Test plan and scenarios per Epic. |
 | 5 | **Implementation** | `workflow-implementation` | code + commits + PR | One Epic per branch (`epic/<n>-<slug>`), one task per commit, one PR per Epic. |
 
@@ -40,7 +41,9 @@ expected shape — the `workflow-*` skills fill them in.
 ... approve ...
 (workflow-requirements activates) ← Phase 1 — fills docs/specs/README.md + per-Epic spec files
 ... approve ...
-(workflow-architecture activates) ← Phase 2 — fills system-design.md + ADRs
+/spike "<question>"               ← Phase 1.5 (OPTIONAL) — de-risk a tech question, produces an ADR
+... (skip if no real uncertainty) ...
+(workflow-architecture activates) ← Phase 2 — picks tech stack, fills system-design.md + ADRs
 ... approve ...
 (workflow-tasks activates)        ← Phase 3 — task files per Epic
 ... approve ...

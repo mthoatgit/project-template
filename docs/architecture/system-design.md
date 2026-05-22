@@ -17,6 +17,24 @@ trade-off behind it.>
 
 ---
 
+## Tech Stack
+
+<Quick reference for the chosen stack. This is where the tech stack is
+decided (Phase 2) — NOT in the requirements. For a non-trivial choice,
+record the decision, rationale, and rejected alternatives in
+`docs/adr/0001-tech-stack.md` and keep this table as the at-a-glance
+mirror. Mandated/forbidden tech (a constraint, not a choice) comes from
+`docs/concept.md` → Constraints.>
+
+| Layer | Choice | ADR |
+|---|---|---|
+| <Language / runtime> | <e.g. Java 21> | <0001> |
+| <Framework> | <e.g. Spring Boot 3> | <0001> |
+| <Persistence> | <e.g. PostgreSQL> | <0001> |
+| <Build tool> | <e.g. Gradle> | <0001> |
+
+---
+
 ## Component Overview
 
 ```

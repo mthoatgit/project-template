@@ -17,12 +17,10 @@ it let them do, why does it matter.>
 <Short statement of the domain — e.g. "Retail Banking", "Workforce
 Scheduling", "Document Signing". One line.>
 
-## Tech Stack
-
-| Component  | Technology         |
-|---|---|
-| <Layer>    | <Choice>           |
-| <Layer>    | <Choice>           |
+<!-- Tech stack is NOT decided here. It is an architecture decision —
+made in Phase 2 and recorded in docs/architecture/system-design.md +
+docs/adr/0001-tech-stack.md. Mandated/forbidden tech (a constraint, not
+a choice) belongs in docs/concept.md → Constraints. -->
 
 ## Out of Scope (for now)
 
