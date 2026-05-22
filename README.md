@@ -12,9 +12,10 @@ stubs that delegate to [mthoatgit/workflows](https://github.com/mthoatgit/workfl
 2. Add the OAuth secret: **Settings → Secrets and variables → Actions →**
    `CLAUDE_CODE_OAUTH_TOKEN`.
 3. Open the project in your IDE with Claude Code installed.
-4. Write a project-specific `CLAUDE.md` at the root (code layout,
-   stack-specific commands, gotchas). Replace or delete this `README.md`
-   once your project is real.
+4. Run **`/init-project`** — it fills in the root `CLAUDE.md` template
+   (project name, stack, commands), replaces this `README.md` with a
+   real project README, and points you to the Concept Phase. You can
+   also do these steps manually if you prefer.
 
 ### The phased flow
 
@@ -34,6 +35,7 @@ expected shape — the `workflow-*` skills fill them in.
 ### Typical first session
 
 ```text
+/init-project "<name>"            ← One-time bootstrap — CLAUDE.md + README
 /concept "<one-line idea>"        ← Phase 0 — conversational, fills docs/concept.md
 ... approve ...
 (workflow-requirements activates) ← Phase 1 — fills docs/specs/README.md + per-Epic spec files
@@ -51,6 +53,7 @@ expected shape — the `workflow-*` skills fill them in.
 ## What's inside
 
 ```
+CLAUDE.md                        Project-specific context template (filled by /init-project)
 .claude/settings.json            Claude Code permissions + model default
 .github/workflows/               Stubs delegating to mthoatgit/workflows@v1
 .gitignore                       Generic ignores + comment block for stack-specific entries
