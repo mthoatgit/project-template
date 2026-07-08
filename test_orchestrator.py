@@ -816,9 +816,27 @@ def test_build_write_tests_prompt_contains_task_and_doc():  # REQ-30
     assert TASK["id"] in prompt
     assert TASK["content"] in prompt
     assert "# Scenarios" in prompt
-    assert "assert False" in prompt      # explicitly forbidden
-    assert "NotImplementedError" in prompt
+    # Neutral, cross-language prohibitions — no "pytest.skip" / "assert False"
+    # baked in.
+    assert "always-true" in prompt.lower()
+    assert "test-skipping" in prompt.lower()
     assert "production" in prompt.lower() or "source" in prompt.lower()
+
+
+def test_build_write_tests_prompt_is_language_neutral():  # REQ-30
+    """The prompt must not force pytest / Python vocabulary onto tasks in
+    other ecosystems (Flutter, Java, Rust, ...). Language-specific tokens
+    only appear as examples of *what the unimplemented marker looks like*,
+    never as commands."""
+    prompt = build_write_tests_prompt(TASK, "# doc")
+
+    # Forbidden as prescriptions:
+    assert "pytest.skip" not in prompt        # Python-only skip mechanism
+    # Language markers may appear only in the "for example" list, alongside
+    # at least one other ecosystem. Verify the list is present.
+    assert "NotImplementedError" in prompt    # Python example
+    assert "UnimplementedError" in prompt     # Dart example
+    assert "UnsupportedOperationException" in prompt  # Java example
 
 
 # ─────────────────────────────────────────────────────────────
