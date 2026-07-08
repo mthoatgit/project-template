@@ -180,8 +180,8 @@ def test_extract_failure_count(output, expected):  # REQ-05, REQ-06, REQ-07
 #  REQ-09  passes after fix attempt
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_passes_on_first_attempt(mock_claude, mock_tests):  # REQ-08
     mock_claude.return_value = (0, "implemented")
     mock_tests.return_value  = (True, "1 passed in 0.1s")
@@ -191,8 +191,8 @@ def test_passes_on_first_attempt(mock_claude, mock_tests):  # REQ-08
     assert mock_tests.call_count  == 1
 
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_passes_after_one_retry(mock_claude, mock_tests):  # REQ-09
     mock_claude.return_value = (0, "fixed")
     mock_tests.side_effect   = [
@@ -209,8 +209,8 @@ def test_passes_after_one_retry(mock_claude, mock_tests):  # REQ-09
 #  REQ-10  criterion 1 — identical output
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_exit_identical_output(mock_claude, mock_tests):  # REQ-10
     mock_claude.return_value = (0, "")
     mock_tests.return_value  = (False, "3 failed, AssertionError")
@@ -224,8 +224,8 @@ def test_exit_identical_output(mock_claude, mock_tests):  # REQ-10
 #  REQ-12  criterion 2 — streak resets on progress
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_exit_stuck_streak(mock_claude, mock_tests):  # REQ-11
     mock_claude.return_value = (0, "tweaked code")
     mock_tests.side_effect = [
@@ -239,8 +239,8 @@ def test_exit_stuck_streak(mock_claude, mock_tests):  # REQ-11
     assert mock_tests.call_count == STUCK_STREAK_THRESHOLD + 1
 
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_stuck_streak_resets_on_progress(mock_claude, mock_tests):  # REQ-12
     mock_claude.return_value = (0, "fixed")
     mock_tests.side_effect = [
@@ -258,8 +258,8 @@ def test_stuck_streak_resets_on_progress(mock_claude, mock_tests):  # REQ-12
 #  REQ-13  criterion 3 — regression
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_exit_regression(mock_claude, mock_tests):  # REQ-13
     mock_claude.return_value = (0, "attempted fix")
     mock_tests.side_effect = [
@@ -275,8 +275,8 @@ def test_exit_regression(mock_claude, mock_tests):  # REQ-13
 #  REQ-14  criterion 4 — max iterations
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_exit_max_iterations(mock_claude, mock_tests):  # REQ-14
     max_iter = 3
     mock_claude.return_value = (0, "incremental fix")
@@ -320,8 +320,8 @@ def test_build_critic_prompt_covers_design_not_style():  # REQ-16
     assert "formatting" in prompt.lower() or "indentation" in prompt.lower()
 
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_critic_runs_after_tests_pass(mock_claude, mock_tests):  # REQ-15
     # First call: implementation; second call: critic review
     mock_claude.side_effect = [
@@ -359,8 +359,8 @@ def task_content_present(prompt: str) -> bool:
     return TASK["content"] in prompt
 
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_critic_rejection_triggers_reimplementation_with_feedback(mock_claude, mock_tests):  # REQ-18
     weakness = "- Uses procedural style instead of appropriate OOP pattern"
     mock_claude.side_effect = [
@@ -383,8 +383,8 @@ def test_critic_rejection_triggers_reimplementation_with_feedback(mock_claude, m
 #  REQ-19  critic stuck detection — same feedback twice
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_critic_loop_aborts_on_repeated_feedback(mock_claude, mock_tests):  # REQ-19
     weakness = "- Wrong abstraction level throughout"
     mock_claude.side_effect = [
@@ -405,8 +405,8 @@ def test_critic_loop_aborts_on_repeated_feedback(mock_claude, mock_tests):  # RE
 #  REQ-20  critic loop max iterations
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_critic_loop_max_iterations(mock_claude, mock_tests):  # REQ-20
     max_critic = 2
     mock_claude.side_effect = [
@@ -424,8 +424,8 @@ def test_critic_loop_max_iterations(mock_claude, mock_tests):  # REQ-20
     assert mock_claude.call_count == (max_critic + 1) * 2
 
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_critic_loop_fails_if_ralph_loop_fails(mock_claude, mock_tests):  # REQ-20
     mock_claude.return_value = (0, "")
     mock_tests.return_value = (False, "3 failed, identical every time")
@@ -547,7 +547,7 @@ _RESUME_TASKS = [
 ]
 
 
-@patch("orchestrator.get_completed_task_ids")
+@patch("orchestrator.git_ops.get_completed_task_ids")
 def test_resume_check_no_prior_commits_returns_all(mock_ids):  # REQ-23
     mock_ids.return_value = []
 
@@ -557,8 +557,8 @@ def test_resume_check_no_prior_commits_returns_all(mock_ids):  # REQ-23
     assert context is None
 
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.get_completed_task_ids")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.git_ops.get_completed_task_ids")
 def test_resume_check_green_tests_skip_completed(mock_ids, mock_tests):  # REQ-23
     mock_ids.return_value = ["T01-alpha"]
     mock_tests.return_value = (True, "2 passed")
@@ -574,10 +574,10 @@ def test_resume_check_green_tests_skip_completed(mock_ids, mock_tests):  # REQ-2
 #  REQ-24  resume_check: failing tests → reset last commit, return context
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.git_reset_hard")
-@patch("orchestrator.get_last_orchestrator_task_id")
-@patch("orchestrator.run_tests")
-@patch("orchestrator.get_completed_task_ids")
+@patch("orchestrator.git_ops.git_reset_hard")
+@patch("orchestrator.git_ops.get_last_orchestrator_task_id")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.git_ops.get_completed_task_ids")
 def test_resume_check_failing_tests_resets_and_returns_context(
     mock_ids, mock_tests, mock_last_id, mock_reset,
 ):  # REQ-24
@@ -620,8 +620,8 @@ def test_implement_prompt_with_both_revert_and_critic_feedback():  # REQ-24 + RE
 #  REQ-25  task marked failed if retry with revert context still cannot fix
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.run_claude")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
 def test_task_marked_failed_when_retry_cannot_fix(mock_claude, mock_tests):  # REQ-25
     mock_claude.return_value = (0, "")
     mock_tests.return_value = (False, "5 failed, tests still broken")
@@ -639,12 +639,12 @@ def test_task_marked_failed_when_retry_cannot_fix(mock_claude, mock_tests):  # R
 #  REQ-21  main() commits after each successfully completed task
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.git_commit_task")
-@patch("orchestrator.critic_loop")
-@patch("orchestrator.resume_check")
-@patch("orchestrator.find_test_doc")
-@patch("orchestrator.load_tasks")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.git_ops.git_commit_task")
+@patch("orchestrator.loops.critic_loop")
+@patch("orchestrator.git_ops.resume_check")
+@patch("orchestrator.tasks.find_test_doc")
+@patch("orchestrator.tasks.load_tasks")
 def test_main_commits_after_each_successful_task(
     mock_load, mock_find_doc, mock_resume, mock_critic, mock_commit, mock_tests, tmp_path,
 ):  # REQ-21
@@ -747,7 +747,7 @@ def test_parse_reset_time_returns_future_datetime():  # REQ-28
 
 
 @patch("orchestrator.subprocess.Popen")
-@patch("orchestrator.handle_session_limit")
+@patch("orchestrator.claude.handle_session_limit")
 def test_run_claude_detects_session_limit_and_retries(mock_handle, mock_popen):  # REQ-28
     from orchestrator import run_claude
     limit_msg = "You've hit your session limit · resets 11:40am (Europe/Berlin)\n"
@@ -761,8 +761,8 @@ def test_run_claude_detects_session_limit_and_retries(mock_handle, mock_popen): 
     assert output == "done"
 
 
-@patch("orchestrator.sys.exit")
-@patch("orchestrator.parse_reset_time", return_value=None)
+@patch("orchestrator.claude.sys.exit")
+@patch("orchestrator.claude.parse_reset_time", return_value=None)
 def test_handle_session_limit_exits_2_when_unparseable(mock_parse, mock_exit):  # REQ-28
     from orchestrator import handle_session_limit
     handle_session_limit("session limit hit, no time info")
@@ -928,8 +928,8 @@ def test_detect_task_test_files_returns_dart_and_python(monkeypatch, tmp_path): 
 #  REQ-31  write_tests_phase: fails task when no files created
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.detect_task_test_files", return_value=[])
-@patch("orchestrator.run_claude", return_value=(0, "wrote nothing"))
+@patch("orchestrator.runner.detect_task_test_files", return_value=[])
+@patch("orchestrator.claude.run_claude", return_value=(0, "wrote nothing"))
 def test_write_tests_phase_fails_when_no_files_created(mock_claude, mock_detect):  # REQ-31
     cmd, ok = write_tests_phase(TASK, "pytest tests/", "# doc", "/project")
 
@@ -941,12 +941,12 @@ def test_write_tests_phase_fails_when_no_files_created(mock_claude, mock_detect)
 #  REQ-34  main() runs final verification after all tasks
 # ─────────────────────────────────────────────────────────────
 
-@patch("orchestrator.run_tests")
-@patch("orchestrator.git_commit_task")
-@patch("orchestrator.critic_loop")
-@patch("orchestrator.resume_check")
-@patch("orchestrator.find_test_doc")
-@patch("orchestrator.load_tasks")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.git_ops.git_commit_task")
+@patch("orchestrator.loops.critic_loop")
+@patch("orchestrator.git_ops.resume_check")
+@patch("orchestrator.tasks.find_test_doc")
+@patch("orchestrator.tasks.load_tasks")
 def test_main_runs_final_verification(
     mock_load, mock_find_doc, mock_resume, mock_critic, mock_commit, mock_tests, tmp_path,
 ):  # REQ-34
@@ -1058,9 +1058,9 @@ def test_update_task_status_rejects_invalid_status(tmp_path):  # REQ-38
         update_task_status(str(tmp_path), "T01-build", "wip")
 
 
-@patch("orchestrator.update_task_status")
-@patch("orchestrator.run_claude")
-@patch("orchestrator.run_tests")
+@patch("orchestrator.status.update_task_status")
+@patch("orchestrator.claude.run_claude")
+@patch("orchestrator.runner.run_tests")
 def test_critic_loop_flips_status_to_done_on_success(  # REQ-38
     mock_tests, mock_claude, mock_update, tmp_path,
 ):
@@ -1076,9 +1076,9 @@ def test_critic_loop_flips_status_to_done_on_success(  # REQ-38
     assert (str(tmp_path), TASK["id"], "done") in calls
 
 
-@patch("orchestrator.update_task_status")
-@patch("orchestrator.run_claude")
-@patch("orchestrator.run_tests")
+@patch("orchestrator.status.update_task_status")
+@patch("orchestrator.claude.run_claude")
+@patch("orchestrator.runner.run_tests")
 def test_critic_loop_flips_status_to_action_needed_on_failure(  # REQ-38
     mock_tests, mock_claude, mock_update, tmp_path,
 ):
@@ -1104,7 +1104,7 @@ def test_default_test_cmd_constant_shape():  # REQ-40
     assert DEFAULT_TEST_CMD == "python scripts/test.py"
 
 
-@patch("orchestrator.find_test_doc")
+@patch("orchestrator.tasks.find_test_doc")
 def test_main_errors_when_default_test_cmd_and_no_scripts_test_py(mock_find, tmp_path):  # REQ-40
     """Default --test-cmd but no scripts/test.py → exit 1 with an actionable message."""
     mock_find.return_value = MagicMock(name="doc.md", read_text=lambda **kw: "not a template")
@@ -1118,13 +1118,13 @@ def test_main_errors_when_default_test_cmd_and_no_scripts_test_py(mock_find, tmp
         "--tasks", str(tmp_path / "docs" / "tasks" / "epics" / "E1"),
         "--project-dir", str(tmp_path),
     ]):
-        with patch("orchestrator.resume_check", return_value=([{"id": "T01-foo", "content": "x"}], None)):
+        with patch("orchestrator.git_ops.resume_check", return_value=([{"id": "T01-foo", "content": "x"}], None)):
             with pytest.raises(SystemExit) as exc_info:
                 main()
     assert exc_info.value.code == 1
 
 
-@patch("orchestrator.find_test_doc")
+@patch("orchestrator.tasks.find_test_doc")
 def test_main_accepts_explicit_override_when_no_scripts_test_py(mock_find, tmp_path):  # REQ-40
     """If --test-cmd is passed explicitly, missing scripts/test.py is fine."""
     mock_find.return_value = MagicMock(name="doc.md", read_text=lambda **kw: "not a template")
@@ -1139,7 +1139,7 @@ def test_main_accepts_explicit_override_when_no_scripts_test_py(mock_find, tmp_p
         "--project-dir", str(tmp_path),
     ]):
         # Short-circuit before the run — resume_check reports nothing to do.
-        with patch("orchestrator.resume_check", return_value=([], None)):
+        with patch("orchestrator.git_ops.resume_check", return_value=([], None)):
             with pytest.raises(SystemExit) as exc_info:
                 main()
     assert exc_info.value.code == 0
@@ -1168,25 +1168,28 @@ def _make_git_repo(tmp_path, initial_files: dict):
     _git(tmp_path, "commit", "-q", "-m", "seed")
 
 
-def test_revert_touched_protected_files_reverts_orchestrator_py(tmp_path):  # REQ-39
+def test_revert_touched_protected_files_reverts_orchestrator_module(tmp_path):  # REQ-39
+    """Editing a file under orchestrator/ triggers a revert; unrelated files don't."""
     from orchestrator import _revert_touched_protected_files
+    (tmp_path / "orchestrator").mkdir()
     _make_git_repo(tmp_path, {
-        "orchestrator.py": "original\n",
-        "backend.py": "original\n",
+        "orchestrator/config.py": "MAX = 5\n",
+        "backend.py":             "original\n",
     })
-    (tmp_path / "orchestrator.py").write_text("HIJACKED\n", encoding="utf-8")
+    (tmp_path / "orchestrator" / "config.py").write_text("MAX = 999  # HIJACKED\n", encoding="utf-8")
 
     reverted = _revert_touched_protected_files(str(tmp_path))
 
-    assert reverted == ["orchestrator.py"]
-    assert (tmp_path / "orchestrator.py").read_text(encoding="utf-8") == "original\n"
+    assert reverted == ["orchestrator/config.py"]
+    assert (tmp_path / "orchestrator" / "config.py").read_text(encoding="utf-8") == "MAX = 5\n"
 
 
 def test_revert_touched_protected_files_ignores_other_changes(tmp_path):  # REQ-39
     from orchestrator import _revert_touched_protected_files
+    (tmp_path / "orchestrator").mkdir()
     _make_git_repo(tmp_path, {
-        "orchestrator.py": "original\n",
-        "backend.py": "original\n",
+        "orchestrator/config.py": "MAX = 5\n",
+        "backend.py":             "original\n",
     })
     (tmp_path / "backend.py").write_text("legitimate change\n", encoding="utf-8")
 
@@ -1198,24 +1201,26 @@ def test_revert_touched_protected_files_ignores_other_changes(tmp_path):  # REQ-
 
 def test_revert_touched_protected_files_reverts_both_when_both_touched(tmp_path):  # REQ-39
     from orchestrator import _revert_touched_protected_files
+    (tmp_path / "orchestrator").mkdir()
     _make_git_repo(tmp_path, {
-        "orchestrator.py": "orch original\n",
-        "test_orchestrator.py": "test original\n",
+        "orchestrator/main.py":   "main original\n",
+        "test_orchestrator.py":   "test original\n",
     })
-    (tmp_path / "orchestrator.py").write_text("orch HIJACKED\n", encoding="utf-8")
+    (tmp_path / "orchestrator" / "main.py").write_text("main HIJACKED\n", encoding="utf-8")
     (tmp_path / "test_orchestrator.py").write_text("test HIJACKED\n", encoding="utf-8")
 
     reverted = _revert_touched_protected_files(str(tmp_path))
 
-    assert reverted == ["orchestrator.py", "test_orchestrator.py"]
-    assert (tmp_path / "orchestrator.py").read_text(encoding="utf-8") == "orch original\n"
+    assert reverted == ["orchestrator/main.py", "test_orchestrator.py"]
+    assert (tmp_path / "orchestrator" / "main.py").read_text(encoding="utf-8") == "main original\n"
     assert (tmp_path / "test_orchestrator.py").read_text(encoding="utf-8") == "test original\n"
 
 
 def test_revert_touched_protected_files_no_git_repo_returns_empty(tmp_path):  # REQ-39
     from orchestrator import _revert_touched_protected_files
     # tmp_path is not a git repo
-    (tmp_path / "orchestrator.py").write_text("anything\n", encoding="utf-8")
+    (tmp_path / "orchestrator").mkdir()
+    (tmp_path / "orchestrator" / "config.py").write_text("anything\n", encoding="utf-8")
     assert _revert_touched_protected_files(str(tmp_path)) == []
 
 
