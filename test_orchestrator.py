@@ -23,7 +23,6 @@ def _mock_popen(returncode=0, output=""):
 
 from orchestrator import (
     build_implement_prompt,
-    build_task_test_cmd,
     build_write_tests_prompt,
     critic_loop,
     detect_task_test_files,
@@ -41,6 +40,7 @@ from orchestrator import (
     STUCK_STREAK_THRESHOLD,
     update_task_status,
     write_tests_phase,
+    _looks_like_test_file,
 )
 
 TASK = {"id": "T01-test", "content": "Implement foo", "path": "tasks/T01.md"}
@@ -852,25 +852,58 @@ def test_detect_task_test_files_returns_empty_when_none(mock_run):  # REQ-31
 
 
 # ─────────────────────────────────────────────────────────────
-#  REQ-33  build_task_test_cmd: scopes test command to specific files
+#  REQ-31  _looks_like_test_file: language-agnostic detection
 # ─────────────────────────────────────────────────────────────
 
-@pytest.mark.parametrize("test_cmd, files, expected_contains", [
-    ("pytest tests/",          ["tests/test_config.py"], "tests/test_config.py"),
-    ("python -m pytest tests/",["tests/test_model.py"],  "tests/test_model.py"),
-    ("pytest",                 ["tests/test_foo.py"],    "tests/test_foo.py"),
-    # Subdir-prefixed: previously produced "backend/backend/tests/..." because
-    # the regex only replaced "tests/" and left "backend/" in front.
-    ("python -m pytest backend/tests/ -v",
-                               ["backend/tests/test_health.py"], "backend/tests/test_health.py"),
+@pytest.mark.parametrize("path", [
+    "backend/tests/test_health.py",              # pytest — test_X.py under tests/
+    "backend/test_module.py",                    # pytest — test_X.py at any depth
+    "src/module_test.py",                        # pytest — X_test.py convention
+    "frontend/test/widget_test.dart",            # Flutter — X_test.dart under test/
+    "lib/service/service_test.dart",             # Flutter — X_test.dart anywhere
+    "pkg/module_test.go",                        # Go — X_test.go
+    "src/lib/mod_test.rs",                       # Rust — X_test.rs
+    "src/main/java/com/x/FooTest.java",          # JUnit — XTest.java
+    "src/main/kotlin/com/x/FooTest.kt",          # JUnit / Kotest
+    "src/Foo.Tests.cs",                          # NUnit — X.Tests.cs (via Test dir? no — via suffix)
+    "web/components/button.test.tsx",            # Jest — X.test.tsx
+    "web/services/api.spec.ts",                  # Jasmine / Angular — X.spec.ts
+    "app/__tests__/user.js",                     # Jest __tests__ dir
+    "spec/models/user_spec.rb",                  # RSpec — spec/ dir
 ])
-def test_build_task_test_cmd_scopes_to_files(test_cmd, files, expected_contains):  # REQ-33
-    result = build_task_test_cmd(test_cmd, files)
+def test_looks_like_test_file_true(path):  # REQ-31
+    assert _looks_like_test_file(path) is True, f"expected {path} to be a test file"
 
-    assert expected_contains in result
-    assert "tests/" not in result.replace(expected_contains, "")
-    # No path duplication ("backend/backend/") after substitution.
-    assert "backend/backend/" not in result
+
+@pytest.mark.parametrize("path", [
+    "backend/src/main.py",                       # source
+    "backend/src/config.py",                     # source
+    "frontend/lib/main.dart",                    # Flutter entry
+    "frontend/lib/models/task.dart",             # Flutter model
+    "docs/tests/epics/E1-foundation.md",         # docs — not source
+    "src/testing_utils.py",                      # helper, not a test
+    "README.md",
+])
+def test_looks_like_test_file_false(path):  # REQ-31
+    assert _looks_like_test_file(path) is False, f"expected {path} to NOT be a test file"
+
+
+def test_detect_task_test_files_returns_dart_and_python(monkeypatch, tmp_path):  # REQ-31
+    """End-to-end via detect_task_test_files: mix of Python + Dart + noise."""
+    import orchestrator
+    def fake_run(cmd, **kwargs):
+        if cmd[:3] == ["git", "diff", "--name-only"]:
+            return MagicMock(stdout="backend/tests/test_config.py\nsrc/config.py\n")
+        if cmd[:3] == ["git", "ls-files", "--others"]:
+            return MagicMock(stdout="frontend/test/widget_test.dart\n")
+        return MagicMock(stdout="")
+    monkeypatch.setattr(orchestrator.subprocess, "run", fake_run)
+
+    result = detect_task_test_files(str(tmp_path))
+
+    assert "backend/tests/test_config.py" in result
+    assert "frontend/test/widget_test.dart" in result
+    assert "src/config.py" not in result
 
 
 # ─────────────────────────────────────────────────────────────

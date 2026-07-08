@@ -334,12 +334,21 @@ class _ProgressFilter:
 #          to write real tests based on the task spec and test design
 #          doc. The prompt forbids stubs and production code.
 #  REQ-31  After test writing, detect uncommitted test files (via git
-#          diff + untracked) and build a task-scoped test command.
-#          Mark the task as failed if no test files were created.
-#  REQ-32  Run the task-scoped tests before implementation to verify
-#          they FAIL. Log a WARNING if they unexpectedly pass.
-#  REQ-33  The Ralph Loop uses the task-scoped test command, not the
-#          full --test-cmd, for correctness checking.
+#          diff + untracked). Detection is language-agnostic: files
+#          under a *tests?/specs?/__tests__* directory OR whose base
+#          name follows a common test-file convention
+#          (test_X.<ext>, X_test.<ext>, XTest.<ext>, X.test.<ext>,
+#          X.spec.<ext>) — pytest, Flutter, Go, Rust, JUnit, NUnit,
+#          Jest / Jasmine, etc. Mark the task as failed if no such
+#          files were created.
+#  REQ-32  Run --test-cmd before implementation to verify the newly
+#          written tests FAIL. Log a WARNING if they unexpectedly pass.
+#  REQ-33  The orchestrator is framework-agnostic: --test-cmd is a
+#          project-owned command that runs *all* tests (of any
+#          language). The orchestrator does NOT scope tests to
+#          specific files. If a project mixes languages, the user
+#          supplies a wrapper (`python run_tests.py`, `./test.sh`,
+#          `make test`, ...) that dispatches internally.
 #  REQ-34  After all tasks complete, run the full --test-cmd as final
 #          verification and include the result in the summary.
 #  REQ-35  'python' / 'python3' at the start of --test-cmd is replaced
@@ -1051,8 +1060,46 @@ def build_write_tests_prompt(task: dict, test_doc_content: str) -> str:
     )
 
 
+# Language-agnostic test-file detection (REQ-31).
+# A path counts as a test file if it has a source-code extension AND either
+# lives under a well-known test directory OR its base name matches a common
+# test-file naming convention. The extension gate keeps docs/tests/*.md and
+# similar noise out. Together these cover pytest, Flutter/Dart, Go, Rust,
+# JUnit / Kotest, NUnit, Jest / Jasmine, RSpec, and most other ecosystems.
+_SOURCE_EXTENSIONS = frozenset({
+    "py", "dart", "go", "rs", "java", "kt", "kts", "scala", "cs", "swift",
+    "ts", "tsx", "js", "jsx", "mts", "cts", "mjs", "cjs",
+    "rb", "php", "clj", "cljs", "ex", "exs", "elm",
+})
+
+_TEST_PATH_PATTERNS = [
+    re.compile(r"(?:^|/)(?:tests?|specs?|__tests__)/", re.IGNORECASE),
+    re.compile(r"/test_[^/]+\.\w+$", re.IGNORECASE),          # test_X.<ext>
+    re.compile(r"_test\.\w+$", re.IGNORECASE),                # X_test.<ext>
+    re.compile(r"Test\.[A-Za-z0-9]+$"),                       # XTest.<ext>   (case-sensitive)
+    re.compile(r"Tests\.[A-Za-z0-9]+$"),                      # XTests.<ext>  (case-sensitive)
+    re.compile(r"\.(?:test|spec)\.\w+$", re.IGNORECASE),      # X.test.<ext>, X.spec.<ext>
+]
+
+
+def _looks_like_test_file(path: str) -> bool:
+    """Heuristic used by detect_task_test_files. Path separators normalised
+    to '/' before matching so the same patterns cover Windows and Unix.
+    Non-code file extensions (.md, .txt, ...) are rejected up front so that
+    documentation about tests (e.g. docs/tests/*.md) is not misclassified."""
+    p = path.replace("\\", "/")
+    ext = p.rsplit(".", 1)[-1].lower() if "." in p.rsplit("/", 1)[-1] else ""
+    if ext not in _SOURCE_EXTENSIONS:
+        return False
+    return any(pat.search(p) for pat in _TEST_PATH_PATTERNS)
+
+
 def detect_task_test_files(project_dir: str) -> list[str]:
-    """Return test files added or modified since the last commit (REQ-31)."""
+    """Return test files added or modified since the last commit (REQ-31).
+
+    Language-agnostic: any path recognised by _looks_like_test_file across
+    the "git diff" set plus the "untracked" set is returned.
+    """
     modified = subprocess.run(
         ["git", "diff", "--name-only"],
         cwd=project_dir, capture_output=True, text=True, encoding="utf-8",
@@ -1063,17 +1110,7 @@ def detect_task_test_files(project_dir: str) -> list[str]:
         cwd=project_dir, capture_output=True, text=True, encoding="utf-8",
     ).stdout.splitlines()
 
-    return [
-        f for f in modified + untracked
-        if re.search(r"[/\\]test_[^/\\]+\.py$", f)
-    ]
-
-
-def build_task_test_cmd(test_cmd: str, test_files: list[str]) -> str:
-    """Replace the test directory in test_cmd with specific test files (REQ-33)."""
-    files_str = " ".join(test_files)
-    scoped = re.sub(r"\S*\btests[/\\]?\S*", files_str, test_cmd)
-    return scoped.strip() if scoped != test_cmd else f"{test_cmd} {files_str}".strip()
+    return [f for f in modified + untracked if _looks_like_test_file(f)]
 
 
 def write_tests_phase(
@@ -1093,12 +1130,14 @@ def write_tests_phase(
     if not test_files:
         print("  [ERROR] No test files were created — aborting task")
         return test_cmd, False
-
-    task_test_cmd = build_task_test_cmd(test_cmd, test_files)
     print(f"  Created: {', '.join(test_files)}")
 
-    print(f"\n[Verify]  {task_test_cmd}")
-    passed, verify_output = run_tests(task_test_cmd, project_dir)
+    # Framework-agnostic: the project's --test-cmd runs *all* tests. New
+    # tests are the only ones that should be failing at this point — if
+    # the pre-run tree was green, a red run here means our new tests are
+    # failing as expected.
+    print(f"\n[Verify]  {test_cmd}")
+    passed, verify_output = run_tests(test_cmd, project_dir)
     if passed:
         print("  [WARNING] Tests pass before implementation — proceeding anyway")
     else:
@@ -1106,7 +1145,7 @@ def write_tests_phase(
         count_str = str(fail_count) if fail_count is not None else "?"
         print(f"  [OK] {count_str} test(s) failing as expected")
 
-    return task_test_cmd, True
+    return test_cmd, True
 
 
 # ── Loops ─────────────────────────────────────────────────────
