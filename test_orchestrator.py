@@ -1078,6 +1078,56 @@ def test_critic_loop_flips_status_to_action_needed_on_failure(  # REQ-38
 
 
 # ─────────────────────────────────────────────────────────────
+#  REQ-40  --test-cmd defaults to 'python scripts/test.py'
+# ─────────────────────────────────────────────────────────────
+
+def test_default_test_cmd_constant_shape():  # REQ-40
+    from orchestrator import DEFAULT_TEST_CMD
+    assert DEFAULT_TEST_CMD == "python scripts/test.py"
+
+
+@patch("orchestrator.find_test_doc")
+def test_main_errors_when_default_test_cmd_and_no_scripts_test_py(mock_find, tmp_path):  # REQ-40
+    """Default --test-cmd but no scripts/test.py → exit 1 with an actionable message."""
+    mock_find.return_value = MagicMock(name="doc.md", read_text=lambda **kw: "not a template")
+    (tmp_path / "docs" / "tasks" / "epics" / "E1").mkdir(parents=True)
+    (tmp_path / "docs" / "tasks" / "epics" / "E1" / "T01-foo.md").write_text("do stuff", encoding="utf-8")
+    # tmp_path does NOT have scripts/test.py
+
+    from orchestrator import main
+    with patch("sys.argv", [
+        "orchestrator.py",
+        "--tasks", str(tmp_path / "docs" / "tasks" / "epics" / "E1"),
+        "--project-dir", str(tmp_path),
+    ]):
+        with patch("orchestrator.resume_check", return_value=([{"id": "T01-foo", "content": "x"}], None)):
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+    assert exc_info.value.code == 1
+
+
+@patch("orchestrator.find_test_doc")
+def test_main_accepts_explicit_override_when_no_scripts_test_py(mock_find, tmp_path):  # REQ-40
+    """If --test-cmd is passed explicitly, missing scripts/test.py is fine."""
+    mock_find.return_value = MagicMock(name="doc.md", read_text=lambda **kw: "not a template")
+    (tmp_path / "docs" / "tasks" / "epics" / "E1").mkdir(parents=True)
+    (tmp_path / "docs" / "tasks" / "epics" / "E1" / "T01-foo.md").write_text("do stuff", encoding="utf-8")
+
+    from orchestrator import main
+    with patch("sys.argv", [
+        "orchestrator.py",
+        "--tasks", str(tmp_path / "docs" / "tasks" / "epics" / "E1"),
+        "--test-cmd", "pytest -v",  # explicit override, no scripts/test.py needed
+        "--project-dir", str(tmp_path),
+    ]):
+        # Short-circuit before the run — resume_check reports nothing to do.
+        with patch("orchestrator.resume_check", return_value=([], None)):
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+    assert exc_info.value.code == 0
+
+
+# ─────────────────────────────────────────────────────────────
 #  REQ-39  Protected-file guardrail
 # ─────────────────────────────────────────────────────────────
 
