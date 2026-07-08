@@ -346,6 +346,17 @@ class _ProgressFilter:
 #          with sys.executable so Windows App-Execution-Alias stubs
 #          (Microsoft Store) never intercept the test run.
 #  Task-status file
+#  Protected-file guardrail
+#  REQ-39  Claude must never modify orchestrator.py or test_orchestrator.py.
+#          Two layers of defence:
+#          (a) All code-writing prompts (implement, fix, write tests) carry
+#              an explicit off-limits notice listing PROTECTED_FILES.
+#          (b) After every run_claude call, any modifications to those
+#              files in the working tree are reverted via
+#              'git checkout HEAD -- <file>' and a WARNING is printed.
+#          The Critic prompt is exempt — the Critic returns text only and
+#          does not write files.
+#
 #  REQ-38  docs/tasks/index.md is the single source of truth for task
 #          status. Format: a single aligned Markdown table with columns
 #          'ID | Epic | Title | Status', one row per task. As each task
@@ -407,6 +418,11 @@ MAX_ERROR_CHARS = 6000
 
 # Prefix used in git commit messages to identify orchestrator commits.
 GIT_COMMIT_PREFIX = "[orchestrator]"
+
+# Files that Claude must never modify — the orchestrator's own tooling.
+# run_claude() reverts any changes to these after every Claude call, and the
+# code-writing prompts include an explicit off-limits notice (REQ-39).
+PROTECTED_FILES = ("orchestrator.py", "test_orchestrator.py")
 
 # ─────────────────────────────────────────────────────────────
 
@@ -557,12 +573,42 @@ def handle_session_limit(message: str) -> None:
     print("[SESSION LIMIT] Woke up — resuming\n")
 
 
+def _revert_touched_protected_files(project_dir: str) -> list[str]:
+    """Revert any modifications to PROTECTED_FILES in the working tree (REQ-39).
+
+    Compares against HEAD so any diff — from Claude, from an editor, from any
+    source — is undone. Returns the list of files that were reverted (empty
+    if none were touched, or if the project has no git repo). Untracked files
+    are ignored (git checkout can't revert them, and PROTECTED_FILES are
+    always tracked in a project that ships them).
+    """
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-only", "HEAD", "--"] + list(PROTECTED_FILES),
+            cwd=project_dir, capture_output=True, text=True, encoding="utf-8",
+        )
+    except Exception:
+        return []  # git unavailable, cwd missing, or subprocess mocked in tests
+    if result.returncode != 0:
+        return []  # not a git repo — nothing to guard
+    touched = [f for f in result.stdout.splitlines() if f in PROTECTED_FILES]
+    if not touched:
+        return []
+    subprocess.run(
+        ["git", "checkout", "HEAD", "--"] + touched,
+        cwd=project_dir, capture_output=True, text=True,
+    )
+    return sorted(touched)
+
+
 def run_claude(prompt: str, project_dir: str) -> tuple[int, str]:
     """Call the Claude Code CLI in non-interactive (print) mode.
 
     Output is streamed line-by-line (prefixed with '  │ ') so the log file
     updates in real time during long Claude calls instead of staying silent
     for several minutes.
+
+    After every call, PROTECTED_FILES modifications are reverted (REQ-39).
     """
     while True:
         proc = subprocess.Popen(
@@ -583,6 +629,12 @@ def run_claude(prompt: str, project_dir: str) -> tuple[int, str]:
         if proc.returncode != 0 and _SESSION_LIMIT_MARKER in output.lower():
             handle_session_limit(output)
             continue
+        reverted = _revert_touched_protected_files(project_dir)
+        if reverted:
+            print(
+                f"  [!] GUARDRAIL: reverted Claude edits to protected file(s): "
+                f"{', '.join(reverted)}"
+            )
         return proc.returncode, output
 
 
@@ -803,6 +855,16 @@ def resume_check(
 
 # ── Prompt builders ───────────────────────────────────────────
 
+_PROTECTED_FILES_NOTICE = (
+    "IMPORTANT — the following files are the orchestrator's own tooling "
+    "and are OFF-LIMITS. You MUST NOT create, modify, or delete them:\n"
+    + "".join(f"  - {f}\n" for f in PROTECTED_FILES)
+    + "If you believe a change to one of them is required to complete this "
+    "task, STOP and explain the reason in plain text as your response — "
+    "do NOT edit them. Any edit will be automatically reverted."
+)
+
+
 def build_implement_prompt(
     task: dict,
     critic_feedback: str | None = None,
@@ -844,11 +906,13 @@ def build_implement_prompt(
         )
 
     sections.append(f"## Task ID: {task['id']}\n\n{task['content']}")
-    return "\n\n".join(sections)
+    return _PROTECTED_FILES_NOTICE + "\n\n" + "\n\n".join(sections)
 
 
 def build_fix_prompt(task: dict, errors: str, iteration: int) -> str:
-    return f"""The implementation of task '{task['id']}' failed the tests (attempt {iteration}).
+    return f"""{_PROTECTED_FILES_NOTICE}
+
+The implementation of task '{task['id']}' failed the tests (attempt {iteration}).
 Analyze the test output below, identify the root cause, and fix the code.
 
 ## Test Failures:
@@ -970,6 +1034,7 @@ def find_test_doc(tasks_path: str, project_dir: str) -> "Path":
 
 def build_write_tests_prompt(task: dict, test_doc_content: str) -> str:
     return (
+        f"{_PROTECTED_FILES_NOTICE}\n\n"
         f"Read the task specification and test design document, "
         f"then write the tests for this task.\n\n"
         f"Rules:\n"

@@ -719,7 +719,9 @@ def test_run_claude_passes_dangerously_skip_permissions(mock_popen):  # REQ-27
 
     run_claude("implement this", "/project")
 
-    cmd = mock_popen.call_args[0][0]
+    # First Popen call is the claude CLI (later calls come from the REQ-39
+    # protected-file guardrail that runs 'git diff' / 'git checkout').
+    cmd = mock_popen.call_args_list[0][0][0]
     assert "--dangerously-skip-permissions" in cmd
     assert "-p" in cmd
     assert "implement this" in cmd
@@ -1040,3 +1042,105 @@ def test_critic_loop_flips_status_to_action_needed_on_failure(  # REQ-38
     calls = [c.args for c in mock_update.call_args_list]
     assert (str(tmp_path), TASK["id"], "in progress") in calls
     assert (str(tmp_path), TASK["id"], "action needed") in calls
+
+
+# ─────────────────────────────────────────────────────────────
+#  REQ-39  Protected-file guardrail
+# ─────────────────────────────────────────────────────────────
+
+import subprocess as _real_subprocess
+
+
+def _git(cwd, *args):
+    return _real_subprocess.run(
+        ["git", "-c", "user.name=t", "-c", "user.email=t@t", *args],
+        cwd=cwd, capture_output=True, text=True, check=True,
+    )
+
+
+def _make_git_repo(tmp_path, initial_files: dict):
+    """Init a real git repo in tmp_path with the given files committed."""
+    _git(tmp_path, "init", "-q")
+    for name, content in initial_files.items():
+        (tmp_path / name).write_text(content, encoding="utf-8")
+    _git(tmp_path, "add", "-A")
+    _git(tmp_path, "commit", "-q", "-m", "seed")
+
+
+def test_revert_touched_protected_files_reverts_orchestrator_py(tmp_path):  # REQ-39
+    from orchestrator import _revert_touched_protected_files
+    _make_git_repo(tmp_path, {
+        "orchestrator.py": "original\n",
+        "backend.py": "original\n",
+    })
+    (tmp_path / "orchestrator.py").write_text("HIJACKED\n", encoding="utf-8")
+
+    reverted = _revert_touched_protected_files(str(tmp_path))
+
+    assert reverted == ["orchestrator.py"]
+    assert (tmp_path / "orchestrator.py").read_text(encoding="utf-8") == "original\n"
+
+
+def test_revert_touched_protected_files_ignores_other_changes(tmp_path):  # REQ-39
+    from orchestrator import _revert_touched_protected_files
+    _make_git_repo(tmp_path, {
+        "orchestrator.py": "original\n",
+        "backend.py": "original\n",
+    })
+    (tmp_path / "backend.py").write_text("legitimate change\n", encoding="utf-8")
+
+    reverted = _revert_touched_protected_files(str(tmp_path))
+
+    assert reverted == []
+    assert (tmp_path / "backend.py").read_text(encoding="utf-8") == "legitimate change\n"
+
+
+def test_revert_touched_protected_files_reverts_both_when_both_touched(tmp_path):  # REQ-39
+    from orchestrator import _revert_touched_protected_files
+    _make_git_repo(tmp_path, {
+        "orchestrator.py": "orch original\n",
+        "test_orchestrator.py": "test original\n",
+    })
+    (tmp_path / "orchestrator.py").write_text("orch HIJACKED\n", encoding="utf-8")
+    (tmp_path / "test_orchestrator.py").write_text("test HIJACKED\n", encoding="utf-8")
+
+    reverted = _revert_touched_protected_files(str(tmp_path))
+
+    assert reverted == ["orchestrator.py", "test_orchestrator.py"]
+    assert (tmp_path / "orchestrator.py").read_text(encoding="utf-8") == "orch original\n"
+    assert (tmp_path / "test_orchestrator.py").read_text(encoding="utf-8") == "test original\n"
+
+
+def test_revert_touched_protected_files_no_git_repo_returns_empty(tmp_path):  # REQ-39
+    from orchestrator import _revert_touched_protected_files
+    # tmp_path is not a git repo
+    (tmp_path / "orchestrator.py").write_text("anything\n", encoding="utf-8")
+    assert _revert_touched_protected_files(str(tmp_path)) == []
+
+
+@pytest.mark.parametrize("builder,extra_args", [
+    ("build_implement_prompt", ()),
+    ("build_write_tests_prompt", ("test design content",)),
+])
+def test_code_writing_prompts_include_protection_notice(builder, extra_args):  # REQ-39
+    import orchestrator
+    fn = getattr(orchestrator, builder)
+    prompt = fn(TASK, *extra_args)
+    assert "orchestrator.py" in prompt
+    assert "test_orchestrator.py" in prompt
+    assert "OFF-LIMITS" in prompt or "off-limits" in prompt.lower()
+
+
+def test_build_fix_prompt_includes_protection_notice():  # REQ-39
+    from orchestrator import build_fix_prompt
+    prompt = build_fix_prompt(TASK, "some test output", 1)
+    assert "orchestrator.py" in prompt
+    assert "test_orchestrator.py" in prompt
+
+
+def test_build_critic_prompt_does_not_include_protection_notice():  # REQ-39
+    # The Critic returns text only, doesn't write code — the notice would be
+    # noise. Assert it's absent to pin the design choice.
+    from orchestrator import build_critic_prompt
+    prompt = build_critic_prompt(TASK)
+    assert "OFF-LIMITS" not in prompt
