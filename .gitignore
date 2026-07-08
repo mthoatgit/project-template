@@ -5,7 +5,10 @@
 .idea/
 .vscode/
 *.swp
+
+# OS
 .DS_Store
+Thumbs.db
 
 # Local API testing tools (e.g. Bruno collections kept out of source control)
 bruno/
@@ -14,7 +17,19 @@ bruno/
 *.log
 
 # --- Stack-specific entries ---
-# Add language- / framework-specific ignores below (Gradle, Node, Python, ...)
+
+# Python (the orchestrator package itself is Python — these apply here and
+# get carried into every project spawned from the template)
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+dist/
+.pytest_cache/
+
+# Add other language- / framework-specific ignores below as needed
+# (Gradle, Node, ...)
 # Examples:
 #   # Java / Gradle
 #   *.class
@@ -25,8 +40,3 @@ bruno/
 #   # Node
 #   node_modules/
 #   dist/
-#
-#   # Python
-#   __pycache__/
-#   *.pyc
-#   .venv/
