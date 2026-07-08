@@ -17,7 +17,6 @@ status: template
 > One task per file.
 
 **Epic:** E<N> — <Epic Name>
-**Status:** draft
 
 ## Goal
 

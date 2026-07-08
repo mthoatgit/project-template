@@ -29,7 +29,7 @@ expected shape — the `workflow-*` skills fill them in.
 | 1 | **Requirements** | `workflow-requirements` | `docs/specs/README.md` + `docs/specs/epics/E<N>-*.md` | Epic list, per-Epic functional & non-functional requirements (stable IDs **+ Acceptance line each**). No tech. |
 | 1.5 | **Spike** *(optional)* | `workflow-spike` | `spike/<slug>` branch (tagged) + `docs/adr/<NNNN>-*.md` | De-risk one technical question before architecture. Skip unless there's real uncertainty. |
 | 2 | **Architecture** | `workflow-architecture` | `docs/architecture/system-design.md` + `docs/adr/<NNNN>-*.md` | **Tech stack** (incl. `0001-tech-stack`), system design, ADRs. |
-| 3 | **Tasks** | `workflow-tasks` | `docs/tasks/epics/E<N>/T<NN>-*.md` + `docs/tasks/backlog.md` + Tasks section in each Epic spec | Atomic tasks per Epic, Epic-level + task-level acceptance criteria. |
+| 3 | **Tasks** | `workflow-tasks` | `docs/tasks/epics/E<N>/T<NN>-*.md` + `docs/tasks/index.md` + Tasks section in each Epic spec | Atomic tasks per Epic, Epic-level + task-level acceptance criteria. |
 | 4 | **Tests** | `workflow-tests` | `docs/tests/epics/E<N>-*.md` + `strategy.md`, `cross-cutting.md`, `e2e.md` | Test plan and scenarios per Epic. |
 | 5 | **Implementation** | `workflow-implementation` | code + commits + PR | One Epic per branch (`epic/<n>-<slug>`), one task per commit, one PR per Epic. |
 
@@ -72,7 +72,7 @@ docs/
     README.md                    ADR index template
     _TEMPLATE.md                 ADR blueprint (copied per decision)
   tasks/
-    backlog.md                   Phase 3 — Task index template
+    index.md                     Phase 3 — Aligned Markdown task table (single source of truth for status)
     epics/_TEMPLATE.md           Task blueprint (copied per task)
   tests/
     README.md                    Phase 4 — Test plan index template
