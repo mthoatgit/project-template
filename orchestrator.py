@@ -1007,7 +1007,7 @@ def detect_task_test_files(project_dir: str) -> list[str]:
 def build_task_test_cmd(test_cmd: str, test_files: list[str]) -> str:
     """Replace the test directory in test_cmd with specific test files (REQ-33)."""
     files_str = " ".join(test_files)
-    scoped = re.sub(r"\btests/?\S*", files_str, test_cmd)
+    scoped = re.sub(r"\S*\btests[/\\]?\S*", files_str, test_cmd)
     return scoped.strip() if scoped != test_cmd else f"{test_cmd} {files_str}".strip()
 
 

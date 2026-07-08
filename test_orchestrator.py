@@ -857,12 +857,18 @@ def test_detect_task_test_files_returns_empty_when_none(mock_run):  # REQ-31
     ("pytest tests/",          ["tests/test_config.py"], "tests/test_config.py"),
     ("python -m pytest tests/",["tests/test_model.py"],  "tests/test_model.py"),
     ("pytest",                 ["tests/test_foo.py"],    "tests/test_foo.py"),
+    # Subdir-prefixed: previously produced "backend/backend/tests/..." because
+    # the regex only replaced "tests/" and left "backend/" in front.
+    ("python -m pytest backend/tests/ -v",
+                               ["backend/tests/test_health.py"], "backend/tests/test_health.py"),
 ])
 def test_build_task_test_cmd_scopes_to_files(test_cmd, files, expected_contains):  # REQ-33
     result = build_task_test_cmd(test_cmd, files)
 
     assert expected_contains in result
     assert "tests/" not in result.replace(expected_contains, "")
+    # No path duplication ("backend/backend/") after substitution.
+    assert "backend/backend/" not in result
 
 
 # ─────────────────────────────────────────────────────────────
