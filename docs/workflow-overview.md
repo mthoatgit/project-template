@@ -45,7 +45,7 @@ it and go straight from Requirements to Architecture.
 
 ```mermaid
 flowchart TD
-    S1["/start-epic &lt;N&gt;<br/>reads Epic file + tasks<br/>outputs confirmation block"] -->|user: "go"| S2["create branch<br/>epic/&lt;n&gt;-&lt;slug&gt; from main"]
+    S1["/start-epic &lt;N&gt;<br/>reads Epic file + tasks<br/>outputs confirmation block"] -->|user confirms go| S2["create branch<br/>epic/&lt;n&gt;-&lt;slug&gt; from main"]
     S2 --> S3["/scaffold &lt;N&gt;<br/>empty skeletons only, no logic<br/>commit: [scaffold] E&lt;N&gt;"]
     S3 --> S4["orchestrator.py starts"]
     S4 --> Loop{"next task<br/>T&lt;NN&gt;?"}
@@ -62,7 +62,7 @@ flowchart TD
     Reflect -->|user approves fixes| DriftCommit["docs: commit<br/>(drift corrections)"]
     DriftCommit --> Push["git push"]
     Push --> PRCreate["gh pr create"]
-    PRCreate --> Human(["user reviews & merges"])
+    PRCreate --> Human(["user reviews and merges"])
 
     classDef gate fill:#fff3cd,stroke:#d4a017,color:#333;
     classDef terminal fill:#dcfce7,stroke:#16a34a,color:#333;
