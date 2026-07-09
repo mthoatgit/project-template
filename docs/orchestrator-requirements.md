@@ -178,3 +178,24 @@ verified.
   default is in use AND `scripts/test.py` does not exist, the orchestrator
   exits with code 1 and a message pointing at `/scaffold`. Override with an
   explicit `--test-cmd` for projects that don't follow this convention.
+
+## Commit ownership
+
+- **REQ-41** — The orchestrator owns the single commit per task (REQ-21).
+  All code-writing prompts (implement, fix, write tests) forbid Claude
+  from running `git commit`, `git commit --amend`, `git revert`, and
+  friends. Reading git history (`git log` / `git diff` / `git status`)
+  remains allowed for diagnostics. The Critic prompt is exempt (returns
+  text only, doesn't write). Enforcement is prompt-level for now — if
+  Claude commits anyway the orchestrator's post-task commit finds
+  nothing staged and logs "Git commit failed" as a signal.
+
+## Manual state at HEAD
+
+- **REQ-42** — `resume_check` refuses to auto-reset when the current
+  HEAD is not an `[orchestrator]` commit. This protects manual commits
+  (revert, docs, fix-on-top) that the user made deliberately. On such a
+  mismatched HEAD the orchestrator exits with code 1 and prints the HEAD
+  subject so the user can reconcile the tree (`git log`, `git reset`)
+  before rerunning. The auto-reset path only fires when HEAD really is
+  the last orchestrator commit — the intended crash-mid-run case.

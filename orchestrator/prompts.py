@@ -1,8 +1,8 @@
 """Prompt builders for Claude (implement, fix, critic, write-tests), Critic
 output parsing, and small formatting helpers."""
 
-# The notice lists PROTECTED_FILES explicitly (rather than templating from
-# the constant) so the phrasing is stable and human-friendly.
+# Both notices list their targets explicitly (rather than templating from
+# constants) so the phrasing is stable and human-friendly.
 _PROTECTED_FILES_NOTICE = (
     "IMPORTANT — the following are the orchestrator's own tooling and are "
     "OFF-LIMITS. You MUST NOT create, modify, or delete anything under "
@@ -13,6 +13,22 @@ _PROTECTED_FILES_NOTICE = (
     "plain text as your response — do NOT edit them. Any edit will be "
     "automatically reverted."
 )
+
+# The orchestrator owns the single commit per task (REQ-21). Claude may
+# stage / rearrange / delete files freely, but MUST NOT create git commits
+# — otherwise the orchestrator's post-task commit finds nothing to stage
+# and the "one commit per task" invariant breaks (REQ-41).
+_NO_COMMIT_NOTICE = (
+    "IMPORTANT — DO NOT run `git commit` (or any command that creates a "
+    "commit — including `git commit --amend`, `git revert`, `git merge`, "
+    "`git cherry-pick`, ...). The orchestrator produces exactly one "
+    "commit per task after tests pass and the Critic approves. Your job "
+    "is to leave the working tree in the desired state; the orchestrator "
+    "handles staging and committing. Reading git history (`git log`, "
+    "`git diff`, `git status`) is fine."
+)
+
+_GUARDRAILS_NOTICE = _PROTECTED_FILES_NOTICE + "\n\n" + _NO_COMMIT_NOTICE
 
 
 def build_implement_prompt(
@@ -55,11 +71,11 @@ def build_implement_prompt(
         )
 
     sections.append(f"## Task ID: {task['id']}\n\n{task['content']}")
-    return _PROTECTED_FILES_NOTICE + "\n\n" + "\n\n".join(sections)
+    return _GUARDRAILS_NOTICE + "\n\n" + "\n\n".join(sections)
 
 
 def build_fix_prompt(task: dict, errors: str, iteration: int) -> str:
-    return f"""{_PROTECTED_FILES_NOTICE}
+    return f"""{_GUARDRAILS_NOTICE}
 
 The implementation of task '{task['id']}' failed the tests (attempt {iteration}).
 Analyze the test output below, identify the root cause, and fix the code.
@@ -121,7 +137,7 @@ Do not suggest fixes. Only identify what is wrong with the current approach.
 
 def build_write_tests_prompt(task: dict, test_doc_content: str) -> str:
     return (
-        f"{_PROTECTED_FILES_NOTICE}\n\n"
+        f"{_GUARDRAILS_NOTICE}\n\n"
         f"Read the task specification and test design document, "
         f"then write the tests for this task.\n\n"
         f"Rules:\n"

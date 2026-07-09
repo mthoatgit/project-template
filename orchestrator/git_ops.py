@@ -3,10 +3,23 @@
 check (REQ-23..25)."""
 import re
 import subprocess
+import sys
 
 from . import runner  # runner.run_tests — module-attribute access so
                       # @patch("orchestrator.runner.run_tests") works.
 from .config import GIT_COMMIT_PREFIX, MAX_ERROR_CHARS
+
+
+def _head_commit_subject(project_dir: str) -> str:
+    """Return the subject line of HEAD, or empty string on failure."""
+    try:
+        result = subprocess.run(
+            ["git", "log", "-1", "--pretty=%s"],
+            cwd=project_dir, capture_output=True, text=True, encoding="utf-8",
+        )
+    except Exception:
+        return ""
+    return result.stdout.strip() if result.returncode == 0 else ""
 
 
 def git_commit_task(task_id: str, project_dir: str) -> bool:
@@ -94,6 +107,21 @@ def resume_check(
         print(f"[Resume] Tests green — skipping {skipped} completed task(s), "
               f"{len(remaining)} remaining")
         return remaining, None
+
+    # Tests fail. Before auto-resetting, make sure HEAD really is an
+    # orchestrator commit — if the user manually committed on top (revert,
+    # fix, docs, ...), we must NOT touch it (REQ-42).
+    head_subject = _head_commit_subject(project_dir)
+    if not head_subject.startswith(GIT_COMMIT_PREFIX):
+        print(
+            f"[Resume] Tests failed, but HEAD is not an orchestrator commit:\n"
+            f"[Resume]   {head_subject or '<no HEAD>'}\n"
+            f"[Resume] A manual commit is on top of the orchestrator history —\n"
+            f"[Resume] refusing to auto-reset it. Reconcile the tree yourself\n"
+            f"[Resume] (git log / git reset) and rerun.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     # Tests fail — reset last orchestrator commit and retry with context
     last_id = get_last_orchestrator_task_id(project_dir)

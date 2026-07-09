@@ -149,12 +149,14 @@ def test_resume_check_green_tests_skip_completed(mock_ids, mock_tests):  # REQ-2
 #  REQ-24  resume_check: failing tests → reset last commit, return context
 # ─────────────────────────────────────────────────────────────
 
+@patch("orchestrator.git_ops._head_commit_subject",
+       return_value="[orchestrator] T02-beta — tests pass, design approved")
 @patch("orchestrator.git_ops.git_reset_hard")
 @patch("orchestrator.git_ops.get_last_orchestrator_task_id")
 @patch("orchestrator.runner.run_tests")
 @patch("orchestrator.git_ops.get_completed_task_ids")
 def test_resume_check_failing_tests_resets_and_returns_context(
-    mock_ids, mock_tests, mock_last_id, mock_reset,
+    mock_ids, mock_tests, mock_last_id, mock_reset, mock_head,
 ):  # REQ-24
     mock_ids.return_value = ["T01-alpha", "T02-beta"]
     mock_tests.return_value = (False, "3 failed in 0.5s")
@@ -168,3 +170,29 @@ def test_resume_check_failing_tests_resets_and_returns_context(
     assert context is not None
     assert "rolled back" in context.lower()
     assert "3 failed" in context
+
+
+# ─────────────────────────────────────────────────────────────
+#  REQ-42  resume_check refuses to auto-reset a manual commit at HEAD.
+# ─────────────────────────────────────────────────────────────
+
+@patch("orchestrator.git_ops._head_commit_subject",
+       return_value="chore: revert T02 for manual re-run")
+@patch("orchestrator.git_ops.git_reset_hard")
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.git_ops.get_completed_task_ids")
+def test_resume_check_refuses_to_reset_when_head_is_manual(
+    mock_ids, mock_tests, mock_reset, mock_head,
+):  # REQ-42
+    """If HEAD is a user commit (not an [orchestrator] commit), a failing
+    resume run must NOT auto-reset — it should exit with a clear error so
+    the user can reconcile the tree manually."""
+    import pytest
+    mock_ids.return_value = ["T01-alpha", "T02-beta"]
+    mock_tests.return_value = (False, "3 failed in 0.5s")
+
+    with pytest.raises(SystemExit) as exc:
+        resume_check(_RESUME_TASKS, "pytest", "/project")
+
+    assert exc.value.code == 1
+    mock_reset.assert_not_called()

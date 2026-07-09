@@ -150,3 +150,31 @@ def test_build_critic_prompt_does_not_include_protection_notice():  # REQ-39
     # noise. Assert it's absent to pin the design choice.
     prompt = build_critic_prompt(TASK)
     assert "OFF-LIMITS" not in prompt
+
+
+# ─────────────────────────────────────────────────────────────
+#  REQ-41  Code-writing prompts forbid `git commit`; Critic exempt.
+# ─────────────────────────────────────────────────────────────
+
+@pytest.mark.parametrize("builder,extra_args", [
+    ("build_implement_prompt",   ()),
+    ("build_fix_prompt",         ("test failure output", 1)),
+    ("build_write_tests_prompt", ("test design content",)),
+])
+def test_code_writing_prompts_forbid_git_commit(builder, extra_args):  # REQ-41
+    """Claude must not create commits during implementation — the orchestrator
+    owns the single 'one commit per task' step (REQ-21)."""
+    import orchestrator
+    fn = getattr(orchestrator, builder)
+    prompt = fn(TASK, *extra_args)
+    assert "git commit" in prompt
+    assert "DO NOT" in prompt or "MUST NOT" in prompt
+    # Positive callout: reading git history is still allowed so we don't
+    # accidentally lock Claude out of useful diagnostic commands.
+    assert "git log" in prompt or "git status" in prompt or "git diff" in prompt
+
+
+def test_build_critic_prompt_does_not_forbid_git_commit():  # REQ-41
+    # Critic only reads and outputs a verdict — no notice needed.
+    prompt = build_critic_prompt(TASK)
+    assert "git commit" not in prompt.lower()
