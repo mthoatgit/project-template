@@ -4,17 +4,18 @@ status: template
 
 # T<NN> — <Task Title>
 
-> **Template.** This file defines the canonical structure for every task
-> in this project. To create a new task:
+> **Template.** This file defines the canonical structure for every
+> task in this project. To create a new task:
 >
-> 1. Copy this file to `epics/E<N>/T<NN>-<slug>.md` (next free task number
+> 1. Copy this file to `E<N>/T<NN>-<slug>.md` (next free task number
 >    within the Epic, kebab-case slug)
 > 2. Fill in placeholders
 > 3. Remove this banner **and any optional sections that don't apply**
-> 4. Commit
+> 4. Add a row to `docs/tasks/index.md` with `Type: task`
+> 5. Commit
 >
-> Task IDs are stable within an Epic — never reused, never renumbered.
-> One task per file.
+> Task IDs are stable — never reused, never renumbered. One task
+> per file.
 
 **Epic:** E<N> — <Epic Name>
 

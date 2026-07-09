@@ -1,4 +1,4 @@
-"""Tests for orchestrator.status — docs/tasks/index.md rewriting (REQ-38)."""
+"""Tests for orchestrator.status — docs/index.md rewriting (REQ-38)."""
 from __future__ import annotations
 
 import pytest
@@ -16,10 +16,11 @@ def test_update_task_status_flips_pending_to_in_progress(tmp_path):  # REQ-38
     row = _row_for(f, "T01")
     assert "in progress" in row
     # pipe positions unchanged (status padded to 13 chars = 'action needed')
-    assert row.count("|") == 5
+    # Merged index has 5 columns → 6 pipes per row.
+    assert row.count("|") == 6
     assert "| in progress   |" in row
     # sibling row untouched
-    assert "| T02 | E1   | Docker compose stack   | pending       |" in f.read_text(encoding="utf-8")
+    assert "| T02 | E1   | task | Docker compose stack   | pending       |" in f.read_text(encoding="utf-8")
 
 
 def test_update_task_status_matches_short_id_only(tmp_path):  # REQ-38

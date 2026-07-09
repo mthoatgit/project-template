@@ -58,9 +58,9 @@ an observable acceptance line.>
 ## Tasks
 
 <Filled in during the Task Breakdown Phase. Links to files in
-`docs/tasks/epics/E<N>/`.>
+`docs/tasks/E<N>/`.>
 
-- [T<NN> — <Task title>](../../tasks/epics/E<N>/T<NN>-<slug>.md)
+- [F<NN> — <Feature title>](../../tasks/E<N>/F<NN>-<slug>.md)
 
 ## Epic-Level Acceptance Criteria
 

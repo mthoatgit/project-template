@@ -11,12 +11,13 @@ _RESUME_TASKS = [
 ]
 
 INDEX_SAMPLE = (
-    "# Task Status\n"
+    "# Work Items\n"
     "\n"
-    "| ID  | Epic | Title                  | Status        |\n"
-    "|-----|------|------------------------|---------------|\n"
-    "| T01 | E1   | Build and dependencies | pending       |\n"
-    "| T02 | E1   | Docker compose stack   | pending       |\n"
+    "| ID  | Epic | Type | Title                  | Status        |\n"
+    "|-----|------|------|------------------------|---------------|\n"
+    "| T01 | E1   | task | Build and dependencies | pending       |\n"
+    "| T02 | E1   | task | Docker compose stack   | pending       |\n"
+    "| B01 | E1   | bug  | Something broke        | pending       |\n"
 )
 
 

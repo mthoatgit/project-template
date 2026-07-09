@@ -9,8 +9,16 @@ import time
 # Module-attribute access (``runner.run_tests``, ``claude.run_claude``, ...)
 # so @patch("orchestrator.runner.run_tests") etc. propagate into these
 # callers — see docs/orchestrator-requirements.md.
-from . import claude, prompts, runner, status
+from . import bug_variant, claude, prompts, runner, status
 from .config import MAX_ERROR_CHARS, STUCK_STREAK_THRESHOLD
+
+
+def _prompts_for(item: dict):
+    """Return the prompt module for this item — bug_variant for bugs,
+    prompts for tasks. Both modules expose the same four builders
+    (build_write_tests_prompt, build_implement_prompt, build_fix_prompt,
+    build_critic_prompt) with the same signatures."""
+    return bug_variant if item.get("type") == "bug" else prompts
 
 
 def write_tests_phase(
@@ -19,26 +27,38 @@ def write_tests_phase(
     test_doc_content: str,
     project_dir: str,
 ) -> tuple[str, bool]:
-    """Call Claude to write tests, then verify they fail (REQ-30, REQ-31, REQ-32)."""
-    print(f"\n[Write Tests] '{task['id']}'")
-    prompt = prompts.build_write_tests_prompt(task, test_doc_content)
+    """Call Claude to write tests, then verify they fail (REQ-30, REQ-31, REQ-32).
+
+    Tasks: Claude creates a new test file; presence of the new file is
+    a precondition. Bugs: Claude appends a regression scenario to an
+    existing test file; no new file is required, and a passing verify
+    is a HARD FAIL (reproducer doesn't reproduce — see workflow-bugs).
+    """
+    is_bug = task.get("type") == "bug"
+    kind = "Regression Test" if is_bug else "Write Tests"
+    print(f"\n[{kind}] '{task['id']}'")
+    prompt = _prompts_for(task).build_write_tests_prompt(task, test_doc_content)
     rc, _ = claude.run_claude(prompt, project_dir)
     if rc != 0:
         print(f"  [!] claude exited with code {rc}")
 
-    test_files = runner.detect_task_test_files(project_dir)
-    if not test_files:
-        print("  [ERROR] No test files were created — aborting task")
-        return test_cmd, False
-    print(f"  Created: {', '.join(test_files)}")
+    if not is_bug:
+        test_files = runner.detect_task_test_files(project_dir)
+        if not test_files:
+            print("  [ERROR] No test files were created — aborting task")
+            return test_cmd, False
+        print(f"  Created: {', '.join(test_files)}")
 
-    # Framework-agnostic: the project's --test-cmd runs *all* tests. New
-    # tests are the only ones that should be failing at this point — if
-    # the pre-run tree was green, a red run here means our new tests are
-    # failing as expected.
+    # Framework-agnostic: the project's --test-cmd runs *all* tests. The
+    # new scenario is the only thing that should be failing now — a red
+    # run here means the reproducer / new tests are failing as expected.
     print(f"\n[Verify]  {test_cmd}")
     passed, verify_output = runner.run_tests(test_cmd, project_dir)
     if passed:
+        if is_bug:
+            print("  [ERROR] Regression test passes without a fix — reproducer doesn't reproduce.")
+            print("          Bug is misdescribed or targets the wrong entry point. Human triage required.")
+            return test_cmd, False
         print("  [WARNING] Tests pass before implementation — proceeding anyway")
     else:
         fail_count = runner.extract_failure_count(verify_output)
@@ -72,12 +92,14 @@ def ralph_loop(
     stuck_streak = 0
 
     for iteration in range(max_iterations + 1):
+        pm = _prompts_for(task)
         if iteration == 0:
-            print(f"\n[Implement] '{task['id']}'")
-            prompt = prompts.build_implement_prompt(task, critic_feedback, revert_context)
+            label = "Fix" if task.get("type") == "bug" else "Implement"
+            print(f"\n[{label}] '{task['id']}'")
+            prompt = pm.build_implement_prompt(task, critic_feedback, revert_context)
         else:
             print(f"\n[Ralph Loop] Fix attempt {iteration}/{max_iterations}")
-            prompt = prompts.build_fix_prompt(task, errors, iteration)
+            prompt = pm.build_fix_prompt(task, errors, iteration)
 
         rc, _ = claude.run_claude(prompt, project_dir)
         if rc != 0:
@@ -203,7 +225,7 @@ def critic_loop(
             return _finish(False, critic_iter, "tests failed")
 
         print(f"\n[Critic] Reviewing solution approach...")
-        _, critic_output = claude.run_claude(prompts.build_critic_prompt(task), project_dir)
+        _, critic_output = claude.run_claude(_prompts_for(task).build_critic_prompt(task), project_dir)
         approved, weaknesses = prompts.parse_critic_output(critic_output)
 
         if approved:

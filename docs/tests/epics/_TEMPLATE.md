@@ -17,8 +17,16 @@ status: template
 
 Covers <REQ-IDs>.
 
-| Scenario | Layer | Requirement | Task |
+**Entry-point anchoring:** for every user-observable outcome in this Epic,
+at least one row must start with `**Entry-point**:` — the scenario runs
+from the real user-contact surface (root widget rendered via `main()`,
+HTTP call with an external `Origin` header, CLI invoked via `main()`), not
+from a widget/function tested in isolation. Widget/unit rows are welcome
+in addition.
+
+| Scenario | Layer | Requirement | Feature |
 |---|---|---|---|
-| <Happy path — concise description of the observable behaviour> | <Unit / Slice / Integration / E2E> | <REQ-ID> | <T<NN>> |
-| <Validation / error case> | <Layer> | <REQ-ID, NFR-ID> | <T<NN>, T<NN>> |
-| <Edge case — concurrency / duplicate / missing entity> | <Layer> | <REQ-ID> | <T<NN>> |
+| **Entry-point**: <observable behaviour via the real entry — e.g. "root widget rendered via `main()` shows the task list", "GET /api/tasks with Origin http://localhost:8080 returns 200 with `Access-Control-Allow-Origin` header"> | <Integration / E2E> | <REQ-ID> | <F<NN>> |
+| <Happy path — concise description of the observable behaviour> | <Unit / Slice / Integration / E2E> | <REQ-ID> | <F<NN>> |
+| <Validation / error case> | <Layer> | <REQ-ID, NFR-ID> | <F<NN>, F<NN>> |
+| <Edge case — concurrency / duplicate / missing entity> | <Layer> | <REQ-ID> | <F<NN>> |

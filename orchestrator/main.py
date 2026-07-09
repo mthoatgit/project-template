@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 
 # Module-attribute access so @patch("orchestrator.<mod>.<name>") propagates.
-from . import git_ops, loops, output, runner, tasks
+from . import bug_variant, git_ops, item, loops, output, runner, tasks
 from .config import (
     DEFAULT_TEST_CMD, MAX_CRITIC_ITERATIONS, MAX_ITERATIONS,
 )
@@ -21,7 +21,11 @@ def main():
     )
     parser.add_argument(
         "--tasks", required=True,
-        help="Tasks source: path to a .md file, .json/.yaml file, or a directory of .md files",
+        help=(
+            "Work-item source: path to a .md file, .json/.yaml file, or a "
+            "directory. Directories are scanned for both T<NN>-*.md (tasks) "
+            "and B<NN>-*.md (bugs); Class B bugs are skipped with a log entry."
+        ),
     )
     parser.add_argument(
         "--test-cmd", default=DEFAULT_TEST_CMD,
@@ -50,12 +54,23 @@ def main():
     )
     args = parser.parse_args()
 
-    task_list = tasks.load_tasks(args.tasks)
+    task_list = item.load_items(args.tasks)
     if args.task_filter:
         task_list = [t for t in task_list if args.task_filter.lower() in t["id"].lower()]
 
+    # Filter Class B bugs — handled manually per workflow-bugs skill.
+    class_b_bugs = [t for t in task_list if bug_variant.is_class_b(t)]
+    if class_b_bugs:
+        print(f"[SKIP] {len(class_b_bugs)} Class B bug(s) not processed by orchestrator:")
+        for t in class_b_bugs:
+            print(f"       - {t['id']}  (Class B bugs are manual — see workflow-bugs skill)")
+        task_list = [t for t in task_list if t not in class_b_bugs]
+
+    # Stable sort: tasks before bugs within each Epic, then by ID.
+    task_list.sort(key=lambda t: (t.get("epic", ""), 0 if t.get("type") == "task" else 1, t["id"]))
+
     if not task_list:
-        print("[ERROR] No tasks found. Check --tasks path or --filter value.", file=sys.stderr)
+        print("[ERROR] No work items found. Check --tasks path or --filter value.", file=sys.stderr)
         sys.exit(1)
 
     project_dir = str(Path(args.project_dir).resolve())
