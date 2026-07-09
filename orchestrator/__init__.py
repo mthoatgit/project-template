@@ -32,7 +32,7 @@ from . import main as _main  # noqa: F401 — expose flat main() below
 # ── Public API — flat access preserved from the pre-split layout ──
 from .config import (
     MAX_ITERATIONS, STUCK_STREAK_THRESHOLD, MAX_CRITIC_ITERATIONS,
-    MAX_ERROR_CHARS, GIT_COMMIT_PREFIX, DEFAULT_TEST_CMD, PROTECTED_FILES,
+    MAX_ERROR_CHARS, GIT_COMMIT_PREFIX, DEFAULT_TEST_CMD,
 )
 from .tasks import load_tasks, find_test_doc
 from .runner import (
@@ -40,8 +40,7 @@ from .runner import (
     detect_task_test_files, _looks_like_test_file,
 )
 from .claude import (
-    run_claude, _revert_touched_protected_files,
-    parse_reset_time, handle_session_limit,
+    run_claude, parse_reset_time, handle_session_limit,
 )
 from .prompts import (
     build_implement_prompt, build_fix_prompt, build_critic_prompt,

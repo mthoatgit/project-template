@@ -1,10 +1,28 @@
 """Claude Code CLI wrapper — invocation (REQ-27), session-limit auto-resume
-(REQ-28), and the protected-file guardrail (REQ-39)."""
+(REQ-28), and the subprocess guardrail via a shipped settings JSON (REQ-39,
+REQ-41).
+
+The guardrail is enforced by Claude Code itself: every subprocess is
+launched with ``--settings orchestrator/subprocess_settings.json``,
+whose ``permissions.deny`` list hard-blocks
+
+- git-modifying Bash / PowerShell commands (commit, revert, merge,
+  cherry-pick, rebase, reset, push) so the orchestrator remains the
+  single author of the "one commit per task" (REQ-21) trail;
+- writes to anything under ``orchestrator/`` so the tool cannot rewrite
+  itself.
+
+Deny rules stay in force even with ``--dangerously-skip-permissions``,
+which only bypasses the interactive "may I?" dialog. There is no
+post-hoc rollback in this file — the block happens before the tool call
+runs, so there is nothing to roll back.
+"""
 import re
 import subprocess
 import sys
+from pathlib import Path
 
-from .config import PROTECTED_FILES
+_SETTINGS_PATH = Path(__file__).parent / "subprocess_settings.json"
 
 # ── Session-limit handling (REQ-28) ────────────────────────────
 # Edit parse_reset_time() if Claude changes the message format.
@@ -90,39 +108,6 @@ def handle_session_limit(message: str) -> None:
     print("[SESSION LIMIT] Woke up — resuming\n")
 
 
-# ── Protected-file guardrail (REQ-39) ──────────────────────────
-
-def _revert_touched_protected_files(project_dir: str) -> list[str]:
-    """Revert any modifications to PROTECTED_FILES in the working tree (REQ-39).
-
-    Compares against HEAD so any diff — from Claude, from an editor, from
-    any source — is undone. Returns the list of files that were reverted
-    (empty if none were touched, or if the project has no git repo).
-    Untracked files are ignored (``git checkout`` can't revert them, and
-    PROTECTED_FILES are always tracked in a project that ships them).
-
-    The pathspec ``orchestrator`` matches everything under the directory,
-    so a nested edit to e.g. ``orchestrator/config.py`` is caught.
-    """
-    try:
-        result = subprocess.run(
-            ["git", "diff", "--name-only", "HEAD", "--"] + list(PROTECTED_FILES),
-            cwd=project_dir, capture_output=True, text=True, encoding="utf-8",
-        )
-    except Exception:
-        return []  # git unavailable, cwd missing, or subprocess mocked in tests
-    if result.returncode != 0:
-        return []  # not a git repo — nothing to guard
-    touched = sorted(f for f in result.stdout.splitlines() if f)
-    if not touched:
-        return []
-    subprocess.run(
-        ["git", "checkout", "HEAD", "--"] + touched,
-        cwd=project_dir, capture_output=True, text=True,
-    )
-    return touched
-
-
 def run_claude(prompt: str, project_dir: str) -> tuple[int, str]:
     """Call the Claude Code CLI in non-interactive (print) mode.
 
@@ -130,11 +115,19 @@ def run_claude(prompt: str, project_dir: str) -> tuple[int, str]:
     file updates in real time during long Claude calls instead of staying
     silent for several minutes.
 
-    After every call, PROTECTED_FILES modifications are reverted (REQ-39).
+    The subprocess is launched with ``--settings`` pointing at the
+    package's ``subprocess_settings.json``. That file's deny list blocks
+    git-modifying commands and writes under ``orchestrator/`` before the
+    tool call fires (REQ-39, REQ-41).
     """
     while True:
         proc = subprocess.Popen(
-            ["claude", "--dangerously-skip-permissions", "-p", prompt],
+            [
+                "claude",
+                "--dangerously-skip-permissions",
+                "--settings", str(_SETTINGS_PATH),
+                "-p", prompt,
+            ],
             cwd=project_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -151,10 +144,4 @@ def run_claude(prompt: str, project_dir: str) -> tuple[int, str]:
         if proc.returncode != 0 and _SESSION_LIMIT_MARKER in output.lower():
             handle_session_limit(output)
             continue
-        reverted = _revert_touched_protected_files(project_dir)
-        if reverted:
-            print(
-                f"  [!] GUARDRAIL: reverted Claude edits to protected file(s): "
-                f"{', '.join(reverted)}"
-            )
         return proc.returncode, output

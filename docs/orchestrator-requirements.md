@@ -159,18 +159,21 @@ verified.
   removed it) the orchestrator logs a warning and continues — status updates
   are best-effort.
 
-## Protected-file guardrail
+## Subprocess guardrail
 
-- **REQ-39** — Claude must never modify anything under `orchestrator/` or
-  `test_orchestrator.py`. Two layers of defence:
-  1. All code-writing prompts (implement, fix, write tests) carry an
-     explicit off-limits notice listing PROTECTED_FILES.
-  2. After every `run_claude` call, any modifications to those files in the
-     working tree are reverted via `git checkout HEAD -- <file>` and a
-     WARNING is printed.
+- **REQ-39** — Every `run_claude` subprocess is launched with
+  `--settings orchestrator/subprocess_settings.json`. That file's
+  `permissions.deny` list hard-blocks writes to anything under
+  `orchestrator/` (via `Edit(orchestrator/**)`, `Write(orchestrator/**)`,
+  `MultiEdit(orchestrator/**)`). Enforcement happens inside Claude Code
+  itself, before the tool call fires — no post-hoc rollback lives in the
+  Python side. Deny rules apply even under
+  `--dangerously-skip-permissions` (that flag skips the interactive "may
+  I?" prompt, not the deny list).
 
-  The Critic prompt is exempt — the Critic returns text only and does not
-  write files.
+  The code-writing prompts still carry an informational notice listing
+  the off-limits paths so Claude understands the *why* when he sees a
+  permission error and can pick a legitimate alternative.
 
 ## Default test command
 
@@ -182,13 +185,21 @@ verified.
 ## Commit ownership
 
 - **REQ-41** — The orchestrator owns the single commit per task (REQ-21).
-  All code-writing prompts (implement, fix, write tests) forbid Claude
-  from running `git commit`, `git commit --amend`, `git revert`, and
-  friends. Reading git history (`git log` / `git diff` / `git status`)
-  remains allowed for diagnostics. The Critic prompt is exempt (returns
-  text only, doesn't write). Enforcement is prompt-level for now — if
-  Claude commits anyway the orchestrator's post-task commit finds
-  nothing staged and logs "Git commit failed" as a signal.
+  The same `subprocess_settings.json` used for REQ-39 deny-lists every
+  git command that mutates history (`git commit`, `git commit --amend`,
+  `git revert`, `git merge`, `git cherry-pick`, `git rebase`,
+  `git reset`, `git push`) via both `Bash(git commit*)`-style and
+  `PowerShell(git commit*)`-style entries. Enforcement is hard: Claude
+  Code refuses the tool call before it runs.
+
+  The orchestrator's own commit step (`git_commit_task` in `git_ops.py`)
+  uses Python's `subprocess.run(["git", "commit", ...])` directly, not
+  through Claude Code, so it is unaffected by the deny list.
+
+  The code-writing prompts still carry an informational "no git commit"
+  notice so Claude understands the boundary and doesn't try to work
+  around it. Reading git history (`git log` / `git diff` / `git status`)
+  is allowed and unblocked.
 
 ## Manual state at HEAD
 

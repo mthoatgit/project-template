@@ -34,8 +34,3 @@ GIT_COMMIT_PREFIX = "[orchestrator]"
 # stack in system-design.md) that dispatches to the right test tools. Keeps
 # the orchestrator itself framework-agnostic.
 DEFAULT_TEST_CMD = "python scripts/test.py"
-
-# Paths under project root that Claude must never modify — the orchestrator's
-# own tooling. Used as git pathspec: a bare name matches a directory (or a
-# top-level file). REQ-39 enforces this via prompt notice + post-call revert.
-PROTECTED_FILES = ("orchestrator", "test_orchestrator.py")

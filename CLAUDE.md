@@ -64,3 +64,8 @@ docs/architecture/system-design.md for the full structure.>
 <Non-obvious things that trip up a new contributor (human or AI).>
 
 - <e.g. Integration tests require Docker running>
+
+## Implementation
+
+Always use `orchestrator.py` during the implementation phase. Never implement tasks manually.
+Run: `python orchestrator.py --tasks docs/tasks/epics/<epic-folder>/ --test-cmd "<test-cmd>" --project-dir .`
