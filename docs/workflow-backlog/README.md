@@ -8,6 +8,8 @@ conventions), not about any single project's product features or bugs.
 prosa-frei gehalten, damit ein Frontend sie als reine Datenquelle parsen kann.
 Diese README erklärt Zweck und Konventionen.
 
+> **Current focus (Stand 2026-07-10, für nächste Session):** Wiedereinstieg bei Item [021 · Memory-Persistence — Migration ins Repo + Backup-Strategie](topics/021-memory-persistence-strategy.md). Die Diskussion wurde in dieser Session begonnen und bewusst vertagt; das Item enthält am Ende einen `Session-Kontext`-Block mit allen bereits geklärten Punkten und den nächsten konkreten Schritten. **Wenn du dieses Item startest, entferne diese Callout-Zeile** — sie ist Session-Handoff, nicht Dauer-Zustand.
+
 ## Struktur & Konventionen
 
 Etabliert am 2026-07-10 (Item 001). Änderungen an der Struktur laufen wieder über ein Backlog-Item.
