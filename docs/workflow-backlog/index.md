@@ -28,32 +28,32 @@ Etabliert am 2026-07-10 (Item 001). Änderungen an der Struktur laufen wieder ü
 
 ## Open
 
-| ID  | Prio | Titel                                                        | Status |
-|-----|------|--------------------------------------------------------------|--------|
-| [002](002-root-cause-fix-empty.md)                          | P1 | Root Cause + Fix bleiben nach Bugfix leer                     | open |
-| [003](003-regression-scenarios-not-appended.md)             | P1 | Regression-Szenarien werden nicht in Epic-Test-Docs angehängt | open |
-| [004](004-workflow-implementation-task-only.md)             | P1 | `workflow-implementation` Skill kennt keine Bugs              | open |
-| [005](005-manual-fix-bypasses-orchestrator.md)              | P1 | Manuelle `fix:`-Commits umgehen Orchestrator-Bug-Flow         | open |
-| [006](006-task-planning-step.md)                            | P2 | Task-Implementation ohne expliziten Planning-Step             | open |
-| [007](007-test-infra-vs-code-bugs.md)                       | P2 | Test-Infra-Bugs vs. Code-Bugs unterscheiden                   | open |
-| [008](008-max-consecutive-aborts-guard.md)                  | P2 | `MAX_CONSECUTIVE_ABORTS` Cascade Guard                        | open |
-| [009](009-dirty-tree-after-abort.md)                        | P2 | Dirty Working Tree nach Abort                                 | open |
-| [010](010-structured-smoke.md)                              | P2 | Structured-Smoke-Konzept                                      | open |
-| [011](011-logging-prose-mixed.md)                           | P2 | Logging prosa-vermischt, retrospektiv schwer auswertbar       | open |
-| [012](012-ship-epic-togglable.md)                           | P2 | `/ship-epic` PR-Ceremony togglable per Projekt                | open |
-| [013](013-docs-tasks-layout.md)                             | P2 | `docs/tasks/` Layout nicht final                              | open |
-| [014](014-dashboard-type-column.md)                         | P3 | Dashboard zeigt Type-Spalte nicht                             | open |
-| [015](015-multiedit-deny-warning.md)                        | P3 | `MultiEdit`-Deny cosmetic Warning                             | open |
-| [016](016-feat-fix-orchestrator-commits.md)                 | P3 | feat/fix-Unterscheidung in Orchestrator-Commits               | open |
+| ID  | Prio | Titel                                                         | Status | File                                          |
+|-----|------|---------------------------------------------------------------|--------|-----------------------------------------------|
+| 002 | P1   | Root Cause + Fix bleiben nach Bugfix leer                     | open   | [→](002-root-cause-fix-empty.md)              |
+| 003 | P1   | Regression-Szenarien werden nicht in Epic-Test-Docs angehängt | open   | [→](003-regression-scenarios-not-appended.md) |
+| 004 | P1   | `workflow-implementation` Skill kennt keine Bugs              | open   | [→](004-workflow-implementation-task-only.md) |
+| 005 | P1   | Manuelle `fix:`-Commits umgehen Orchestrator-Bug-Flow         | open   | [→](005-manual-fix-bypasses-orchestrator.md)  |
+| 006 | P2   | Task-Implementation ohne expliziten Planning-Step             | open   | [→](006-task-planning-step.md)                |
+| 007 | P2   | Test-Infra-Bugs vs. Code-Bugs unterscheiden                   | open   | [→](007-test-infra-vs-code-bugs.md)           |
+| 008 | P2   | `MAX_CONSECUTIVE_ABORTS` Cascade Guard                        | open   | [→](008-max-consecutive-aborts-guard.md)      |
+| 009 | P2   | Dirty Working Tree nach Abort                                 | open   | [→](009-dirty-tree-after-abort.md)            |
+| 010 | P2   | Structured-Smoke-Konzept                                      | open   | [→](010-structured-smoke.md)                  |
+| 011 | P2   | Logging prosa-vermischt, retrospektiv schwer auswertbar       | open   | [→](011-logging-prose-mixed.md)               |
+| 012 | P2   | `/ship-epic` PR-Ceremony togglable per Projekt                | open   | [→](012-ship-epic-togglable.md)               |
+| 013 | P2   | `docs/tasks/` Layout nicht final                              | open   | [→](013-docs-tasks-layout.md)                 |
+| 014 | P3   | Dashboard zeigt Type-Spalte nicht                             | open   | [→](014-dashboard-type-column.md)             |
+| 015 | P3   | `MultiEdit`-Deny cosmetic Warning                             | open   | [→](015-multiedit-deny-warning.md)            |
+| 016 | P3   | feat/fix-Unterscheidung in Orchestrator-Commits               | open   | [→](016-feat-fix-orchestrator-commits.md)     |
 
 ## Landed / Discarded
 
 Chronologisch nach Landung — jüngste zuerst. Einträge bleiben permanent (kein Archiv).
 
-| ID  | Prio | Titel                                                        | Status |
-|-----|------|--------------------------------------------------------------|--------|
-| [001](001-backlog-structure-pass.md)                        | P1 | Backlog-Struktur-Pass (Ordner + Index + Konventionen)         | done |
-| [020](020-workflow-bugs-skill.md)                           | —  | `workflow-bugs` Skill                                         | done |
-| [019](019-merged-work-item-index.md)                        | —  | Merged work-item index (`docs/tasks/`)                        | done |
-| [018](018-bug-flow-orchestrator-variant.md)                 | —  | Bug-flow Orchestrator variant                                 | done |
-| [017](017-entry-point-anchor-test-rule.md)                  | —  | Entry-point-anchor test rule (`workflow-tests`)               | done |
+| ID  | Prio | Titel                                                         | Status | File                                          |
+|-----|------|---------------------------------------------------------------|--------|-----------------------------------------------|
+| 001 | P1   | Backlog-Struktur-Pass (Ordner + Index + Konventionen)         | done   | [→](001-backlog-structure-pass.md)            |
+| 020 | —    | `workflow-bugs` Skill                                         | done   | [→](020-workflow-bugs-skill.md)               |
+| 019 | —    | Merged work-item index (`docs/tasks/`)                        | done   | [→](019-merged-work-item-index.md)            |
+| 018 | —    | Bug-flow Orchestrator variant                                 | done   | [→](018-bug-flow-orchestrator-variant.md)     |
+| 017 | —    | Entry-point-anchor test rule (`workflow-tests`)               | done   | [→](017-entry-point-anchor-test-rule.md)      |
