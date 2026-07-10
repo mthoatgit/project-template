@@ -4,7 +4,7 @@ status: template
 
 # P<N> · <Sprechender Kurztitel — Verb + Subjekt>
 
-> **Template file.** Kopiere zu `<NNN>-<slug>.md` (NNN = höchste existierende ID + 1, dreistellig; slug in kebab-case und trägt das Topic-Keyword für Grep). Entferne dieses Banner und das YAML-Frontmatter beim Kopieren. Neuen Zeileneintrag in `index.md` im selben Commit hinzufügen.
+> **Template file.** Kopiere zu `topics/<NNN>-<slug>.md` (NNN = höchste existierende ID + 1, dreistellig; slug in kebab-case und trägt das Topic-Keyword für Grep). Entferne dieses Banner und das YAML-Frontmatter beim Kopieren. Neuen Zeileneintrag in `index.md` im selben Commit hinzufügen.
 
 - **Symptom.** <Was heute konkret bricht — Beispiele, IDs, konkrete Fundstellen.>
 - **Impact.** <Warum es wichtig ist — welche Zukunftsarbeit leidet, oder was still verlorengeht.>
