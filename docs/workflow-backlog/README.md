@@ -8,6 +8,8 @@ conventions), not about any single project's product features or bugs.
 prosa-frei gehalten, damit ein Frontend sie als reine Datenquelle parsen kann.
 Diese README erklärt Zweck und Konventionen.
 
+> **Current focus (Stand 2026-07-11, für nächste Session):** Wiedereinstieg bei Item [022 · Workflow-overview.md driftet unbemerkt — Sync-Trigger unreliable](topics/022-workflow-overview-sync-trigger.md). Session vom 2026-07-11 hat den aktuellen halb-automatischen Sync-Mechanismus als unreliable identifiziert (4 unadressierte Drifts über 2 Tage), **Path 1 (lokaler post-commit Hook mit Subscription-Auth, keine Extra-Kosten)** als Lösung ausgewählt und ein fertiges Draft-Script produziert. Das Item enthält am Ende einen `Session-Kontext`-Block mit allen bereits geklärten Punkten, dem Script und den konkreten nächsten Schritten. **Wenn du dieses Item startest, entferne diese Callout-Zeile** — sie ist Session-Handoff, nicht Dauer-Zustand.
+
 ## Struktur & Konventionen
 
 Etabliert am 2026-07-10 (Item 001). Änderungen an der Struktur laufen wieder über ein Backlog-Item.
