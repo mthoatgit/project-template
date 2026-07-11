@@ -15,8 +15,8 @@
 | 014 | P3   | Dashboard zeigt Type-Spalte nicht                             | open   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/014-dashboard-type-column.md)                 |
 | 015 | P3   | `MultiEdit`-Deny cosmetic Warning                             | open   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/015-multiedit-deny-warning.md)                |
 | 016 | P3   | feat/fix-Unterscheidung in Orchestrator-Commits               | open   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/016-feat-fix-orchestrator-commits.md)         |
-| 021 | P1   | Memory-Persistence — Migration ins Repo + Backup-Strategie    | open   | 2026-07-10 21:36 | 2026-07-10 21:36 | [→](topics/021-memory-persistence-strategy.md)           |
 | 001 | P1   | Backlog-Struktur-Pass (Ordner + Index + Konventionen)         | done   | 2026-07-09 21:43 | 2026-07-10 08:49 | [→](topics/archive/001-backlog-structure-pass.md)        |
+| 021 | P1   | Memory-Persistence — Migration ins Repo + Backup-Strategie    | done   | 2026-07-10 21:36 | 2026-07-11 15:05 | [→](topics/archive/021-memory-persistence-strategy.md)   |
 | 017 | —    | Entry-point-anchor test rule (`workflow-tests`)               | done   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/archive/017-entry-point-anchor-test-rule.md)  |
 | 018 | —    | Bug-flow Orchestrator variant                                 | done   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/archive/018-bug-flow-orchestrator-variant.md) |
 | 019 | —    | Merged work-item index (`docs/tasks/`)                        | done   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/archive/019-merged-work-item-index.md)        |

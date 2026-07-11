@@ -43,3 +43,30 @@
 - Sensitive Content in Memories? Vor Push zu Remote screenen. Aktuell nichts kritisches drin, aber Governance-Regel etablieren
 - Nach Migration: aktive Cleanup-Runde durch die verbleibenden Memories, was noch redundant ist
 - Diese Datei sich selbst nicht vergessen: nach Umsetzung Status `done`, Move nach `topics/archive/`
+
+## Landed — 2026-07-11
+
+Beide Schichten umgesetzt in einer Session.
+
+**Schicht 1 — Content-Migration ins versionierte CLAUDE.md.**
+
+- `feedback_workflow_style` → neue H1 "Collaboration Style" in `~/.claude/CLAUDE.md`, vier Subsections (discuss-before-implement · minimalism-beats-defence-in-depth · name-real-trade-offs · brief stack context). Regel "respect workflow rituals" gedroppt — bereits durch bestehende "Strict Behavior Rules: NEVER skip phases" abgedeckt.
+- `feedback_semantic_naming` → weitere Subsection unter Collaboration Style (flag semantic naming concerns before renames).
+- `feedback_template_naming` → **Decision 2D** (spontan im Session-Verlauf gewählt statt geplanter 2A): One-liner ans Ende der bestehenden "Template Files"-Sektion angehängt statt project-CLAUDE.md, weil (a) die Konvention nicht projektspezifisch ist sondern für jedes scaffolded Projekt gilt, (b) global CLAUDE.md die Dual-Konvention ohnehin schon beschreibt — es fehlte nur der "don't propose unifying" Meta-Guard.
+- **Neue Governance-Rule** unter Collaboration Style: "Prefer CLAUDE.md over auto-memory for behavioral rules" — verhindert dass zukünftige Verhaltensregeln wieder in unversionierter Memory landen.
+- Memory-Files gelöscht: `feedback_workflow_style.md`, `feedback_semantic_naming.md`, `feedback_template_naming.md`. `MEMORY.md`-Index bereinigt. Dangling `[[…]]`-Backlinks in 4 anderen Memory-Files gepruned.
+
+**Schicht 2 — `~/.claude/` unter git.**
+
+- **Entdeckung während Umsetzung:** `~/.claude/` war bereits am 2026-05-21 als git-Repo initialisiert mit Remote `git@github.com:mthoatgit/dotfiles-claude.git` (private). `.gitignore` implementiert bereits das Best-Practice-Muster: **default-deny + explicit whitelist + belt-and-suspenders blacklist** (Credentials, projects/, sessions/, history.jsonl, plugins/, cache/ explizit denied selbst wenn Whitelist mal slippt). Whitelisted: `.gitignore`, `README.md`, `CLAUDE.md`, `settings.json`, `skills/**`, `commands/**`. Layer-2-Konzept aus Item 021 war also bei Fileing bereits partiell existent — Item wusste das nicht.
+- **Übrig-gebliebene Arbeit:** 7 Wochen Drift committen und pushen. Zwei Commits:
+  - `docs(claude): migrate collaboration-style rules from auto-memory` — Layer-1-Content.
+  - `chore: catch up 7 weeks of workflow-skill, command and settings drift` — akkumulierte Skill-, Command- und settings.json-Änderungen.
+- Beide gepusht auf `origin/main`. Restore-via-Clone funktioniert jetzt für alles unter der Whitelist.
+
+**Flag für später (nicht Blocker):** `settings.json` enthält absolute Windows-Pfade (`C:\Program Files\nodejs\...`, `C:\Users\mthor\...`) — bei Clone auf andere Maschine kaputt. Maschinen-spezifisches gehört in `settings.local.json` (bereits gitignored). Separates Backlog-Item wenn Multi-Machine relevant wird.
+
+**Was NICHT gemacht wurde** (bewusst außer Scope für 021):
+- `project_orchestrator_open_issues` weiter schrumpfen (landed-Liste könnte aus `git log` regeneriert werden). Nicht load-bearing genug für sofortigen Aufwand.
+- `project_orchestrator_dashboard_state` unangetastet — stirbt als Session-Snapshot in Stunden/Tagen von selbst.
+- `reference_workflow_backlog` unangetastet — bereits reiner Pointer, konsistent.
