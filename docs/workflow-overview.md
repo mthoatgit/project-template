@@ -20,7 +20,7 @@ flowchart TD
     Spike --> Architecture
     Architecture["Phase 2 — Architecture<br/>→ docs/architecture/system-design.md<br/>→ docs/adr/0001-tech-stack.md"]
     Architecture -->|approve| Tasks
-    Tasks["Phase 3 — Tasks<br/>→ docs/tasks/epics/E&lt;N&gt;/T&lt;NN&gt;-*.md<br/>→ docs/tasks/index.md"]
+    Tasks["Phase 3 — Tasks<br/>→ docs/tasks/E&lt;N&gt;/T&lt;NN&gt;-*.md<br/>→ docs/tasks/index.md"]
     Tasks -->|approve| Tests
     Tests["Phase 4 — Tests<br/>→ docs/tests/README.md<br/>→ docs/tests/strategy.md<br/>→ docs/tests/epics/E&lt;N&gt;-*.md"]
     Tests -->|approve| Implementation
@@ -47,7 +47,7 @@ it and go straight from Requirements to Architecture.
 flowchart TD
     S1["/start-epic &lt;N&gt;<br/>reads Epic file + tasks<br/>outputs confirmation block"] -->|user confirms go| S2["create branch<br/>epic/&lt;n&gt;-&lt;slug&gt; from main"]
     S2 --> S3["/scaffold &lt;N&gt;<br/>empty skeletons only, no logic<br/>commit: [scaffold] E&lt;N&gt;"]
-    S3 --> S4["orchestrator.py starts"]
+    S3 --> S4["python -m orchestrator starts"]
     S4 --> Loop{"next task<br/>T&lt;NN&gt;?"}
     Loop -->|yes| Ralph["Ralph Loop<br/>Claude implements + writes tests"]
     Ralph --> RunTests["run test-cmd"]
@@ -82,10 +82,11 @@ to `main` directly — the user always merges.
 | 1 — Requirements | `workflow-requirements` | `/new-requirement` (incremental changes) | `docs/specs/README.md`, `docs/specs/epics/E<N>-*.md` |
 | 1.5 — Spike (optional) | `workflow-spike` | `/spike <question>` | `docs/adr/<NNNN>-*.md`, branch `spike/<slug>` |
 | 2 — Architecture | `workflow-architecture` | — | `docs/architecture/system-design.md`, `docs/adr/0001-tech-stack.md` |
-| 3 — Tasks | `workflow-tasks` | — | `docs/tasks/epics/E<N>/T<NN>-*.md`, `docs/tasks/index.md` |
+| 3 — Tasks | `workflow-tasks` | — | `docs/tasks/E<N>/T<NN>-*.md`, `docs/tasks/index.md` |
 | 4 — Tests | `workflow-tests` | — | `docs/tests/README.md`, `docs/tests/strategy.md`, `docs/tests/epics/E<N>-*.md` |
-| 5-7 — Implementation | `workflow-implementation` | `/start-epic`, `/scaffold`, `orchestrator.py`, `/ship-epic` | code + tests, one PR per Epic |
+| 5-7 — Implementation | `workflow-implementation` | `/start-epic`, `/scaffold`, `python -m orchestrator`, `/ship-epic` | code + tests, one PR per Epic |
 | cross-cutting | `workflow-epics` | — | Epic naming/sizing conventions used by every phase above |
+| reactive (post-done) | `workflow-bugs` | — | `docs/tasks/E<N>/B<NN>-*.md`, entries in `docs/tasks/index.md` (Type: bug) |
 
 Skills live at `~/.claude/skills/workflow-*/SKILL.md` and are global —
 they apply to every project cloned from this template, not just this repo.
@@ -115,7 +116,7 @@ they apply to every project cloned from this template, not just this repo.
 
 **Never:**
 - Skip phases
-- Implement without an approved task
+- Implement without an approved task or bug
 - Change architecture without approval
 - Add unrelated features
 - Modify unrelated files
