@@ -8,8 +8,7 @@ status: template
 > Global rules live in `~/.claude/CLAUDE.md`; project-specific rules go here.
 > Remove this banner and the YAML frontmatter once filled.
 >
-> **Writing style for this file:** RFC 2119 normative language (MUST / MUST NOT
-> / SHOULD / SHOULD NOT / MAY) in structured markdown. Imperative bullets. No filler.
+> **Writing style for this file:** see `~/.claude/rules/claude-md-style.md`.
 
 ## What this project is
 
