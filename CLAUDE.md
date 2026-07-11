@@ -4,22 +4,20 @@ status: template
 
 # <Project Name>
 
-> **Template file.** Run `/init-project` to fill this in, or do it
-> manually. This file gives Claude project-specific context; the phased
-> workflow rules live in the global `~/.claude/CLAUDE.md`. Remove this
-> banner and the YAML frontmatter once filled.
+> **Template file.** Run `/init-project` to fill this in, or do it manually.
+> Global rules live in `~/.claude/CLAUDE.md`; project-specific rules go here.
+> Remove this banner and the YAML frontmatter once filled.
+>
+> **Writing style for this file:** RFC 2119 normative language (MUST / MUST NOT
+> / SHOULD / SHOULD NOT / MAY) in structured markdown. Imperative bullets. No filler.
 
 ## What this project is
 
-<One or two sentences: what it does, who it's for. Mirror docs/concept.md
-once that exists.>
+<One or two sentences: what it does, who it's for. Mirror `docs/concept.md`.>
 
 ## Tech Stack
 
-<Confirmed during the Architecture Phase (Phase 2). This table is a quick
-reference for Claude — the authoritative decision lives in
-docs/architecture/system-design.md (and ADRs). Keep them in sync. Leave
-as TBD until Phase 2 if not yet decided.>
+<Confirmed during the Architecture Phase (Phase 2). Authoritative source: `docs/architecture/system-design.md` + ADRs.>
 
 | Layer | Choice |
 |---|---|
@@ -30,8 +28,7 @@ as TBD until Phase 2 if not yet decided.>
 
 ## Commands
 
-<How to build, test, run, lint. These are the commands Claude should use.
-Fill in as the project takes shape.>
+Claude MUST use these commands for build, test, run, and lint:
 
 ```bash
 # Build
@@ -44,28 +41,47 @@ Fill in as the project takes shape.>
 <lint command>
 ```
 
+## Verification
+
+Claude MUST run the primary check before declaring a task done:
+
+- <primary check, e.g. `mvn verify`>
+- <optional secondary checks: type-check, lint, integration suite>
+
+Scenario coverage: `docs/tests/README.md`.
+
+## Dev Environment
+
+<Non-obvious setup Claude cannot infer from the files:>
+
+- <e.g. `docker-compose up -d` required for integration tests>
+- <e.g. required env vars: `DATABASE_URL`, `API_KEY`>
+- <e.g. `.envrc` managed by direnv>
+
 ## Code Layout
 
-<Top-level directories and their purpose. Point to
-docs/architecture/system-design.md for the full structure.>
+<Top-level directories and their purpose. Full structure: `docs/architecture/system-design.md`.>
 
 - `<dir>/` — <purpose>
 - `<dir>/` — <purpose>
 
 ## Conventions
 
-<Project-specific conventions beyond the global workflow rules.>
+<Project-specific rules. Use RFC 2119 style.>
 
-- <e.g. All API responses use a shared error envelope>
-- <e.g. Database access only through the repository layer>
+- <e.g. All API responses MUST use the shared error envelope>
+- <e.g. Database access MUST go through the repository layer>
 
 ## Gotchas
 
-<Non-obvious things that trip up a new contributor (human or AI).>
+<Non-obvious behaviors that trip up new contributors:>
 
 - <e.g. Integration tests require Docker running>
 
 ## Implementation
 
-Always use `orchestrator.py` during the implementation phase. Never implement tasks manually.
-Run: `python orchestrator.py --tasks docs/tasks/epics/<epic-folder>/ --test-cmd "<test-cmd>" --project-dir .`
+Claude MUST use the orchestrator during the implementation phase; Claude MUST NOT implement tasks manually.
+
+```bash
+python -m orchestrator --tasks docs/tasks/E<N>/ --test-cmd "<test-cmd>" --project-dir .
+```
