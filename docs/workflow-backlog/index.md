@@ -19,10 +19,10 @@
 | 023 | P1   | Stale `docs/tasks/epics/` + `backlog.md` Refs in Commands & Skills | open   | 2026-07-14 12:51 | 2026-07-14 12:51 | [→](topics/023-stale-task-layout-refs.md)                |
 | 024 | P2   | Diagramm-Skill für Code-Überblick (Packages, Flows, Entscheidungen) | open   | 2026-07-18 18:06 | 2026-07-18 18:06 | [→](topics/024-code-diagrams-for-overview.md)            |
 | 025 | P2   | Setup-Validation-Gate vor Orchestrator-Start (README + check-env + Skills) | open   | 2026-07-18 19:27 | 2026-07-18 19:27 | [→](topics/025-setup-validation-gate.md)                 |
-| 026 | P2   | `status.py` akzeptiert Bug-IDs im Code, aber kein Test schützt den B-Pfad | open   | 2026-07-18 21:27 | 2026-07-18 21:27 | [→](topics/026-status-updater-untested-for-bugs.md)      |
 | 001 | P1   | Backlog-Struktur-Pass (Ordner + Index + Konventionen)         | done   | 2026-07-09 21:43 | 2026-07-10 08:49 | [→](topics/archive/001-backlog-structure-pass.md)        |
 | 021 | P1   | Memory-Persistence — Migration ins Repo + Backup-Strategie    | done   | 2026-07-10 21:36 | 2026-07-11 15:05 | [→](topics/archive/021-memory-persistence-strategy.md)   |
 | 017 | —    | Entry-point-anchor test rule (`workflow-tests`)               | done   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/archive/017-entry-point-anchor-test-rule.md)  |
 | 018 | —    | Bug-flow Orchestrator variant                                 | done   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/archive/018-bug-flow-orchestrator-variant.md) |
 | 019 | —    | Merged work-item index (`docs/tasks/`)                        | done   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/archive/019-merged-work-item-index.md)        |
 | 020 | —    | `workflow-bugs` Skill                                         | done   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/archive/020-workflow-bugs-skill.md)           |
+| 026 | P2   | `status.py` akzeptiert Bug-IDs im Code, aber kein Test schützt den B-Pfad | done   | 2026-07-18 21:27 | 2026-07-18 21:27 | [→](topics/archive/026-status-updater-untested-for-bugs.md) |

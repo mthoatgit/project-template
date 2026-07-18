@@ -63,3 +63,25 @@ def test_update_task_status_rejects_invalid_status(tmp_path):  # REQ-38
     _make_index(tmp_path)
     with pytest.raises(ValueError):
         update_task_status(str(tmp_path), "T01-build", "wip")
+
+
+def test_update_task_status_flips_bug_status_with_slug(tmp_path):  # REQ-38
+    """B-prefixed IDs are handled symmetrically with T-prefixed IDs (slug variant)."""
+    f = _make_index(tmp_path)
+
+    assert update_task_status(str(tmp_path), "B01-something", "done") is True
+
+    row = _row_for(f, "B01")
+    assert "done" in row
+    assert row.count("|") == 6
+    assert "| done          |" in row
+    # sibling T rows untouched
+    assert "| T01 | E1   | task | Build and dependencies | pending       |" in f.read_text(encoding="utf-8")
+
+
+def test_update_task_status_matches_bare_bug_id(tmp_path):  # REQ-38
+    """Bare B-IDs (no slug suffix) resolve to their row."""
+    f = _make_index(tmp_path)
+
+    assert update_task_status(str(tmp_path), "B01", "action needed") is True
+    assert "| action needed |" in _row_for(f, "B01")
