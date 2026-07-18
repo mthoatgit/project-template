@@ -72,78 +72,123 @@ Das ist die seltene Ausnahme, wo Belt-and-Suspenders gerechtfertigt ist: Muster 
 
 Beide legitim. Entscheidung morgen früh.
 
-## Umsetzungsplan-Kandidat: Option E verfeinert (MVP-Skizze, noch nicht final)
+## Umsetzungsplan: Option H — sequenzielle Gate-Pipeline mit Design-Rückkehr
 
-Aus der Design-Diskussion Chat 2026-07-18 spätabends. Nutzer-Feedback: „das sieht schon recht gut aus aber wir müssen weiter daran arbeiten" — also: als Ausgangspunkt für die Morgen-Session, nicht als endgültiger Vertrag.
+Konvergent aus mehreren Iterationen der Design-Diskussion Chat 2026-07-18/19. Evolution der Optionen (kurz, damit nachvollziehbar):
+
+- **E (initial):** `ralph → docs_write → verify_docs → critic (full)` — Docs preemptiv geschrieben, kein sauberes Routing bei Docs-only-Failure.
+- **E verfeinert:** `full` und `docs_only` Review-Modi, um bei Docs-Iterationen nicht komplett re-reviewen zu müssen. Cache-freundlich, aber Docs werden immer noch preemptiv geschrieben.
+- **F:** dimensionierter Critic mit `failure_dimensions: [...]`-Array, parallel dispatch. Zu komplex, Routing wird schwammig, Multi-Dim-Handling nicht so relevant wie gedacht.
+- **G:** Sequenzielle Gates statt dimensionierter Review. `ralph → struktur_check → docs_write → docs_gate`. Docs_write erst nach Struktur-Approval — löst Preemptive-Waste-Problem.
+- **H (final):** G + Rückkehr-Kante vom Final-Gate zur Impl-Phase, weil Docs-Schreiben Design-Fehler enthüllen kann. Semantische Präzisierung: "approved" gibt's nur am Ende.
 
 ### Loop-Flow
 
 ```
-1. write_tests_phase                       (bestehend)
-2. ralph_loop bis Tests grün               (bestehend)
-3. docs_write_phase                        (NEU — Actor updated Docs basierend auf Diff)
-4. review(mode="full")                     (NEU — einzelner Critic-Call, alle drei Dimensionen)
-5. Router in Python (aus Structured Output):
-     approve                       → commit
-     failure_dim = "code"/"tests"  → ralph_loop mit Feedback → zurück zu Step 3
-                                     (weil Code neu, Docs müssen re-visited werden)
-     failure_dim = "docs"          → docs_write_phase mit Feedback → Step 6
-6. review(mode="docs_only")                (Focused-Prompt, Code + Tests bereits approved)
-7. Router:
-     approve                       → commit
-     failure_dim = "docs"          → docs_write_phase, zurück zu Step 6
-                                     (bis max_docs_critic_cycles erreicht)
+Phase 1: ralph_loop (Impl + Test)
+         └─ bestehend, iteriert bis Tests grün
+
+Phase 2: struktur_check (Reviewer)
+         ├─ pass  → Phase 3
+         └─ fail  → Phase 1 mit Feedback
+
+Phase 3: docs_write_phase (Actor)
+         └─ Actor updated Docs basierend auf Diff.
+            Actor darf abbrechen mit `design_issue_from_docs_attempt`
+            wenn Verhalten nicht sauber beschreibbar ist → Phase 1.
+
+Phase 4: final_approval (Reviewer, 3-Way Verdict)
+         ├─ approve                    → commit
+         ├─ reject route_to="docs"     → Phase 3 mit Feedback
+         └─ reject route_to="design"   → Phase 1 mit Feedback
 ```
 
-Ein Commit am Ende (atomarer State, unveränderte Resume-Logik).
-
-### Prompt-Modes
-
-`review(mode)` ist eine Funktion mit identischem Präfix (Task-Content + Diff + Mandatory-Files) und unterschiedlichem Suffix:
-
-- **`mode="full"`** — „Reviewe Code, Tests, Docs im Zusammenhang. Falls Ablehnung: nenne die Dimension die am kritischsten fehlt."
-- **`mode="docs_only"`** — „Code und Tests sind bereits approved. Prüfe nur ob die Docs den Code jetzt korrekt beschreiben."
-
-Strukturell EIN Critic-Component, zwei Prompt-Suffixe. Nicht zwei separate Critic-Loops mit eigenen `max_cycles`.
+Ein Commit am Ende. "Approved" bedeutet exklusiv Phase-4-Approve — Phase 2 gibt nur einen Struktur-Pass ("darf weiter"), keinen Final-Segen.
 
 ### Structured Output für sauberes Routing
 
-Der Router lebt in Python, nicht im Prompt. Damit das funktioniert, gibt der Critic keine Prosa zurück, sondern nutzt Tool-Use / Function-Calling:
+Reviewer nutzt Tool-Use / Function-Calling. Zwei Verdict-Schemas:
 
+**Phase 2 (struktur_check):** binärer Ausgang
 ```python
-tools = [{
-    "name": "submit_verdict",
-    "input_schema": {
-        "properties": {
-            "approve":           {"type": "boolean"},
-            "failure_dimension": {"enum": ["code", "tests", "docs", null]},
-            "reason":            {"type": "string"}
-        }
-    }
-}]
+{"pass": true} | {"pass": false, "reason": "..."}
 ```
 
-Anthropic-API-erzwungene Struktur — kein Parse-Error möglich. Python routet deterministisch anhand `failure_dimension`.
+**Phase 4 (final_approval):** 3-Way mit Kriterium-Enum
+```python
+{
+  "approve": bool,
+  "route_to": "docs" | "design" | null,  # null nur bei approve=true
+  "criterion": "factual_error" | "missing_coverage" | "inconsistent_docs"
+              | "leaky_abstraction" | "behavior_inconsistency"
+              | "design_contradicts_other_docs" | "scope_beyond_mandatory",
+  "reason": "..."
+}
+```
 
-### Kosten (grob)
+Der `criterion`-Enum zwingt den Reviewer sich explizit auf ein Kriterium zu committen — kein "irgendwo dazwischen"-Verdict möglich.
 
-| Szenario | Full-only Baseline | Verfeinert (mit `docs_only`) |
-|---|---|---|
-| Happy Path (first-try approved) | ~10–15k Tokens | Same |
-| **Docs-Iteration** | ~20–30k (2× full) | **~13–17k** (full + docs_only, Cache-warm) |
-| Code-Iteration | ~20–30k (2× full) | ~20–30k (Code-Kontext hat sich geändert, Cache invalid, Full nötig) |
+### Klassifikations-Kriterien im Reviewer-Prompt
 
-Docs-Iterationen sind der häufige Fall der teuer wäre; hier greift die Ersparnis. Code-Iterationen bleiben teuer weil der Kontext dort inhaltlich neu ist — angemessen.
+Der Prompt für final_approval enthält die Zuordnung Kriterium → route_to:
 
-### Multi-dimensionale Fehler
+```
+route_to = "docs" wenn:
+- factual_error         → Docs enthalten sachliche Fehler (Typo, falscher Befehl, falsche Version)
+- missing_coverage      → Docs lassen ein Feature aus, das im Code existiert
+- inconsistent_docs     → Docs widersprechen sich untereinander (README sagt X, CLAUDE.md sagt Y)
 
-MVP: iterativ. Critic gibt genau **eine** `failure_dimension` (die kritischste). Fix, nächste Runde findet die zweite. Später ausbaubar zu Liste, wenn nötig.
+route_to = "design" wenn:
+- leaky_abstraction              → Behavior nicht beschreibbar ohne Implementation-Details
+- behavior_inconsistency         → Docs müssten widersprüchliches Verhalten dokumentieren
+- design_contradicts_other_docs  → Code verletzt Verträge aus anderen Doku-Stellen
+- scope_beyond_mandatory         → Änderung würde Files jenseits der Mandatory-Liste erfordern
 
-### Was noch offen ist / worüber wir weiterreden müssen
+Faustregel: Im Zweifel route_to = "design". Ein falsch-positiver Design-Flag kostet eine Ralph-Iteration
+extra; ein übersehener Design-Fehler shippt broken code.
+```
 
-- **Verankerungsort:** Skill-Ebene in `workflow-implementation` (deklarativ, weich) vs. Code-Ebene in `orchestrator/loops.py` als explizite Phase-Funktion. Wahrscheinlich beides — Skill dokumentiert, Code enforced.
-- **Mandatory-Files-Liste:** wo definiert? Vorschlag: Projekt-`CLAUDE.md` unter neuer Sektion, Default falls fehlend `[README.md, CLAUDE.md]`. Muss noch mit Struktur-Muster-Diskussion (oben) zusammengedacht werden — wenn wir Colocation (Muster 3) einführen, ändert sich die Liste per Package.
-- **Prompt-Caching in `orchestrator/claude.py`:** heute unbekannt ob explizit genutzt (mit `cache_control`-Markern) oder nur automatisch. Als 5-Min-Sichtprüfung morgen früh.
-- **Interaktion mit Ralph-Loop-Feedback:** wenn der Docs-Critic ablehnt, kriegt Docs-Write die Reason als Kontext — analog wie Ralph-Loop heute Critic-Feedback ins nächste Implement-Prompt einspielt. Existierendes Muster wiederverwenden.
-- **Interaktion mit Struktur-Mustern (siehe Diskussion oben):** wenn wir gleichzeitig Muster 1 (Generation) einführen, entfällt `docs/api.md` als Mandatory-File komplett. Reihenfolge der Umsetzung durchdenken.
-- **Kein finaler Vertrag**: Option E verfeinert ist der aktuelle beste Kompromiss aus Klarheit, Kosten und Robustheit. Ein weiterer Refinement-Zyklus in der nächsten Session ist explizit eingeplant.
+Design-First-Bias ist Absicht — asymmetrische Failure-Kosten (Design-Fehler shipping ist teurer als eine unnötige Ralph-Runde).
+
+### Vier Guardrails gegen Reviewer-Fehlklassifikation
+
+Klassifikation via LLM ist nicht 100% zuverlässig. Vier ineinandergreifende Mechanismen:
+
+1. **Klare Kriterien im Prompt** (oben) — strukturierte Signale statt Prosa-Judgment.
+2. **`criterion`-Enum-Zwang** — Reviewer muss sich explizit committen, keine unklaren Verdicts möglich.
+3. **Cycle-Escalation**: `MAX_DOCS_CYCLES` (z. B. 2). Wenn Docs-Iteration den Zähler erreicht ohne Approve, force `route_to = "design"` — Evidenz dass Docs allein nicht das Problem sind.
+4. **Actor-Fluchtstiege in Phase 3** — Actor darf docs_write abbrechen mit `design_issue_from_docs_attempt`, um Ralph mit einem Design-Hinweis anzustoßen. Fängt den Fall dass Actor beim Doku-Schreiben eine Inkohärenz entdeckt, bevor Phase 4 überhaupt drankommt.
+
+Zusammen: **False-Positive-Design** ist billig (eine Ralph-Runde extra); **False-Negative-Design** (als Docs missklassifiziert) wird durch Cycle-Escalation systemisch gefangen.
+
+### Kosten
+
+| Szenario | Option H |
+|---|---|
+| **Happy Path** (Struktur-Check + Final-Approve first-try) | ~10-15k Tokens |
+| **Interner Refactor** (Struktur pass, docs_write no-op, Final-Approve trivial) | ~8-13k Tokens |
+| Docs-Iteration (Typo/Coverage) | ~15-20k |
+| Design-Iteration (Struktur-Check fail oder Phase-4 route_to design) | ~20-30k |
+| Design-durch-Docs (Cycle-Escalation oder Actor-Fluchtstiege) | ~25-35k (aber Design-Fehler gefangen — sonst wäre broken code committet) |
+
+Wesentlich besser als F bei internen Refactors (kein preemptiver Docs-Check), vergleichbar bei Docs-Iterationen, teurer bei Design-durch-Docs — der Aufpreis der wirklich value liefert.
+
+### Extensibilität — Modes-Muster für zukünftige Concerns
+
+Das sequenzielle-Gates-Muster ist offen für weitere Gates. Beispielsweise Security als eigene Sequenz-Phase:
+
+```
+ralph → struktur_check → security_gate → docs_write → final_approval
+```
+
+Jedes neue Gate ist single-purpose, hat binäres oder 3-Way-Verdict, hat einen klaren Rückwärts-Sprung. Neue Gates fügen = Sequenz erweitern, kein Router-Casing-Zoo. Ohne dieses strukturelle Muster hätte Item 028 nur eine spezifische Lösung; mit ihm ist es ein Framework für alle künftigen orthogonalen Concerns (Security, Performance, Accessibility, …).
+
+### Was noch offen ist / für die Umsetzung durchzudenken
+
+- **Verankerungsort:** `workflow-implementation`-Skill (deklarativ) UND `orchestrator/loops.py` (enforcement) — wahrscheinlich beides parallel. Skill dokumentiert, Code führt aus.
+- **Mandatory-Files-Liste:** Vorschlag Projekt-`CLAUDE.md` unter neuer Sektion, Default falls fehlend `[README.md, CLAUDE.md]`. Interaktion mit Struktur-Muster-Diskussion oben: bei Colocation ändert sich die Liste per Package.
+- **Prompt-Caching in `orchestrator/claude.py`:** unbekannt ob explizit genutzt (`cache_control`-Marker) oder nur automatisch. Als 5-Min-Sichtprüfung am Session-Start.
+- **`MAX_DOCS_CYCLES`-Wert:** 2 wahrscheinlich, aber empirisch zu justieren.
+- **Feedback-Weiterleitung:** wenn Phase 4 `route_to="design"` sagt, wie kommt die `reason` als sinnvoller Prompt-Context in Ralph? Existierendes Ralph-Feedback-Muster wiederverwenden.
+- **Interaktion mit Struktur-Mustern:** wenn Muster 1 (Generation) für API-Referenz eingeführt wird, entfällt `docs/api.md` als Mandatory. Reihenfolge Muster-Einführung ↔ Loop-Umbau durchdenken.
+- **Ein Committed-Flag pro Phase im Log:** damit man beim Debug erkennt an welchem Gate ein Task gescheitert wäre / weitergeleitet wurde. Nice-to-have.
