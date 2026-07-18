@@ -71,3 +71,79 @@ Das ist die seltene Ausnahme, wo Belt-and-Suspenders gerechtfertigt ist: Muster 
 - **(b) Direkt in die Entscheidung:** aus dem obigen Bild wählen welche Muster adoptiert werden. Weniger Empirie, schnelleres Vorankommen. Passt wenn du für dein Setup schon ein Gefühl hast, was zu dir passt.
 
 Beide legitim. Entscheidung morgen früh.
+
+## Umsetzungsplan-Kandidat: Option E verfeinert (MVP-Skizze, noch nicht final)
+
+Aus der Design-Diskussion Chat 2026-07-18 spätabends. Nutzer-Feedback: „das sieht schon recht gut aus aber wir müssen weiter daran arbeiten" — also: als Ausgangspunkt für die Morgen-Session, nicht als endgültiger Vertrag.
+
+### Loop-Flow
+
+```
+1. write_tests_phase                       (bestehend)
+2. ralph_loop bis Tests grün               (bestehend)
+3. docs_write_phase                        (NEU — Actor updated Docs basierend auf Diff)
+4. review(mode="full")                     (NEU — einzelner Critic-Call, alle drei Dimensionen)
+5. Router in Python (aus Structured Output):
+     approve                       → commit
+     failure_dim = "code"/"tests"  → ralph_loop mit Feedback → zurück zu Step 3
+                                     (weil Code neu, Docs müssen re-visited werden)
+     failure_dim = "docs"          → docs_write_phase mit Feedback → Step 6
+6. review(mode="docs_only")                (Focused-Prompt, Code + Tests bereits approved)
+7. Router:
+     approve                       → commit
+     failure_dim = "docs"          → docs_write_phase, zurück zu Step 6
+                                     (bis max_docs_critic_cycles erreicht)
+```
+
+Ein Commit am Ende (atomarer State, unveränderte Resume-Logik).
+
+### Prompt-Modes
+
+`review(mode)` ist eine Funktion mit identischem Präfix (Task-Content + Diff + Mandatory-Files) und unterschiedlichem Suffix:
+
+- **`mode="full"`** — „Reviewe Code, Tests, Docs im Zusammenhang. Falls Ablehnung: nenne die Dimension die am kritischsten fehlt."
+- **`mode="docs_only"`** — „Code und Tests sind bereits approved. Prüfe nur ob die Docs den Code jetzt korrekt beschreiben."
+
+Strukturell EIN Critic-Component, zwei Prompt-Suffixe. Nicht zwei separate Critic-Loops mit eigenen `max_cycles`.
+
+### Structured Output für sauberes Routing
+
+Der Router lebt in Python, nicht im Prompt. Damit das funktioniert, gibt der Critic keine Prosa zurück, sondern nutzt Tool-Use / Function-Calling:
+
+```python
+tools = [{
+    "name": "submit_verdict",
+    "input_schema": {
+        "properties": {
+            "approve":           {"type": "boolean"},
+            "failure_dimension": {"enum": ["code", "tests", "docs", null]},
+            "reason":            {"type": "string"}
+        }
+    }
+}]
+```
+
+Anthropic-API-erzwungene Struktur — kein Parse-Error möglich. Python routet deterministisch anhand `failure_dimension`.
+
+### Kosten (grob)
+
+| Szenario | Full-only Baseline | Verfeinert (mit `docs_only`) |
+|---|---|---|
+| Happy Path (first-try approved) | ~10–15k Tokens | Same |
+| **Docs-Iteration** | ~20–30k (2× full) | **~13–17k** (full + docs_only, Cache-warm) |
+| Code-Iteration | ~20–30k (2× full) | ~20–30k (Code-Kontext hat sich geändert, Cache invalid, Full nötig) |
+
+Docs-Iterationen sind der häufige Fall der teuer wäre; hier greift die Ersparnis. Code-Iterationen bleiben teuer weil der Kontext dort inhaltlich neu ist — angemessen.
+
+### Multi-dimensionale Fehler
+
+MVP: iterativ. Critic gibt genau **eine** `failure_dimension` (die kritischste). Fix, nächste Runde findet die zweite. Später ausbaubar zu Liste, wenn nötig.
+
+### Was noch offen ist / worüber wir weiterreden müssen
+
+- **Verankerungsort:** Skill-Ebene in `workflow-implementation` (deklarativ, weich) vs. Code-Ebene in `orchestrator/loops.py` als explizite Phase-Funktion. Wahrscheinlich beides — Skill dokumentiert, Code enforced.
+- **Mandatory-Files-Liste:** wo definiert? Vorschlag: Projekt-`CLAUDE.md` unter neuer Sektion, Default falls fehlend `[README.md, CLAUDE.md]`. Muss noch mit Struktur-Muster-Diskussion (oben) zusammengedacht werden — wenn wir Colocation (Muster 3) einführen, ändert sich die Liste per Package.
+- **Prompt-Caching in `orchestrator/claude.py`:** heute unbekannt ob explizit genutzt (mit `cache_control`-Markern) oder nur automatisch. Als 5-Min-Sichtprüfung morgen früh.
+- **Interaktion mit Ralph-Loop-Feedback:** wenn der Docs-Critic ablehnt, kriegt Docs-Write die Reason als Kontext — analog wie Ralph-Loop heute Critic-Feedback ins nächste Implement-Prompt einspielt. Existierendes Muster wiederverwenden.
+- **Interaktion mit Struktur-Mustern (siehe Diskussion oben):** wenn wir gleichzeitig Muster 1 (Generation) einführen, entfällt `docs/api.md` als Mandatory-File komplett. Reihenfolge der Umsetzung durchdenken.
+- **Kein finaler Vertrag**: Option E verfeinert ist der aktuelle beste Kompromiss aus Klarheit, Kosten und Robustheit. Ein weiterer Refinement-Zyklus in der nächsten Session ist explizit eingeplant.
