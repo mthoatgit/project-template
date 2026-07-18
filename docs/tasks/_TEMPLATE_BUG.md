@@ -32,6 +32,14 @@ status: template
 3. **Expected:** <observable behavior that should happen>
 4. **Actual:** <what happens instead>
 
+## Affected Surface
+
+<Filled at filing time (not during handling). Every place that must change together for the fix to leave the tree consistent. The Actor uses this as the atomic scope of the fix commit — a surface missing here will be left stale after the fix lands. Omit a category when it doesn't apply; add a row for anything else that describes the same behavior (schema, config, prompt).>
+
+- **Code:** <path/to/file.py — function or region>
+- **Tests:** <path/to/test_file.py — asserted constant, expected string, or scenario>
+- **Docs:** <README.md section, CLAUDE.md block, other files that describe the affected behavior>
+
 ## Root Cause
 
 <Filled in when the bug is fixed. Two things: why did the bug exist, AND why did the tests / smoke miss it? The second question is what turns a bug into a workflow learning.>

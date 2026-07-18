@@ -14,3 +14,13 @@
      - „Rules"-Block am Ende um dieselbe Regel ergänzen
   3. **Keine Änderung am Orchestrator-Prompt nötig.** Der Actor liest das ganze Bug-File als `content` — die neue Sektion wird von selbst sichtbar. Wenn sich in der Praxis zeigt, dass Prompt-Boost nötig ist, ist das ein Follow-up.
 - **Source.** Chat-Session 2026-07-18, B03-Orchestrator-Run in `orchestrator-dashboard` und anschließende Konsistenz-Retrospektive. Verwandt: 002 (Root Cause + Fix bleiben nach Bugfix leer — dieselbe Kategorie „Bug-File-Sektionen, die Disziplin brauchen"), 020 (workflow-bugs Skill, done — hat B-Support eingeführt, die Scope-Disziplin aber offen gelassen).
+
+## Landed — 2026-07-18
+
+Beide Änderungen wie vorgeschlagen umgesetzt, keine Abweichung vom Proposed shape:
+
+- **`docs/tasks/_TEMPLATE_BUG.md`** (project-template): neue Sektion `## Affected Surface` zwischen `## Reproduction` und `## Root Cause` mit drei Kategorien (Code / Tests / Docs) und Placeholder-Text, der die Filing-Zeit-Semantik erklärt („Actor uses this as atomic scope; missing row → stale after fix").
+- **`~/.claude/skills/workflow-bugs/SKILL.md`** (dotfiles-claude): drei chirurgische Ergänzungen — (a) neuer Bullet in „Bug file structure" für die Sektion, (b) Class-A-Handling-Protokoll Step 6 umformuliert auf „Fix every surface listed", (c) neue Rule im Rules-Block am Ende, symmetrisch zur bestehenden „regression test in the same commit"-Rule.
+- **Kein Orchestrator-Prompt-Change nötig** — der Actor lädt das ganze Bug-File als Prompt-Content, die neue Sektion wird von selbst sichtbar. Wenn sich in der Praxis zeigt, dass ein Prompt-Boost nötig ist (etwa: der Actor ignoriert die Sektion trotz Sichtbarkeit), ist das ein separates Follow-up.
+
+Erster Testfall für die neue Sektion wird der nächste Class-A-Bug in irgendeinem Projekt sein — ex-post-facto Nachziehen für B03 lohnt sich nicht (der Fix ist schon durch, die Konsistenz-Commits ebenfalls).
