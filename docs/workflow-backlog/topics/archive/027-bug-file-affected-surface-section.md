@@ -24,3 +24,15 @@ Beide Änderungen wie vorgeschlagen umgesetzt, keine Abweichung vom Proposed sha
 - **Kein Orchestrator-Prompt-Change nötig** — der Actor lädt das ganze Bug-File als Prompt-Content, die neue Sektion wird von selbst sichtbar. Wenn sich in der Praxis zeigt, dass ein Prompt-Boost nötig ist (etwa: der Actor ignoriert die Sektion trotz Sichtbarkeit), ist das ein separates Follow-up.
 
 Erster Testfall für die neue Sektion wird der nächste Class-A-Bug in irgendeinem Projekt sein — ex-post-facto Nachziehen für B03 lohnt sich nicht (der Fix ist schon durch, die Konsistenz-Commits ebenfalls).
+
+## Reverted — 2026-07-18
+
+Am selben Abend zurückgerollt nach weiterer Diskussion mit dem Nutzer. Kern-Einsicht: die Sektion verlangt vom Filer Wissen, das er beim Filing typisch **nicht hat**. Der Filer sieht zunächst nur das Symptom; Root Cause und betroffene Code-/Doku-Flächen ergeben sich erst aus Investigation und während der Implementation. Bei B03 hat es funktioniert, weil ich vor dem Filing schon stundenlang debuggt hatte — Ausnahmefall, nicht Normalfall.
+
+Der Fehlermodus, den 027 adressieren wollte (Actor scoped eng, Doku bleibt stale), gilt weiter — aber die richtige Antwort liegt nicht in einer Filing-Zeit-Enumeration, sondern in einem **Docs-Check-Checkpoint während des Fix-Loops**: der Actor greppt aktiv nach Signaturen des geänderten Verhaltens im Repo und aktualisiert jede Fundstelle. Das braucht kein Filer-Wissen upfront und findet auch die Doku-Stellen, an die der Filer nicht gedacht hat.
+
+**Nachfolge-Item:** 028 (Definition-of-Done-Checkpoints im Loop). Die Rückrollung ist in derselben Session erfolgt, betroffene Files:
+- `docs/tasks/_TEMPLATE_BUG.md` — Affected-Surface-Sektion entfernt (project-template)
+- `~/.claude/skills/workflow-bugs/SKILL.md` — die drei Ergänzungen (Bullet, Step-6-Umformulierung, neue Rule) zurückgenommen (dotfiles-claude)
+
+Konvention „Bug files are append-only after `done`" gilt hier weiter — dieses Item ist nicht rewritten, sondern um eine dokumentierende Sektion ergänzt. Der ursprüngliche Landed-Text bleibt als Zeitzeuge für die überholte Design-Entscheidung stehen.
