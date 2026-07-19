@@ -18,14 +18,9 @@
 
 ## LOW — Kosmetisch, aber im Auge behalten
 
-5. **Column-Width-Drift in `docs/tasks/index.md` nach `update_task_status`.** Status-Cell wird auf `STATUS_WIDTH=13` gepadded, aber Header/Separator werden nicht mitverbreitet. Table rendert als Markdown ok, roh unschön:
-   ```
-   |-----|------|------|----------|---------|
-   | T01 | E1   | task | greet    | done          |
-   ```
-   Fix: entweder Header beim Erzeugen breit genug erstellen (min 13), oder `update_task_status` re-formatiert die ganze Tabelle auf Max-Width.
+5. ~~**Column-Width-Drift in `docs/tasks/index.md` nach `update_task_status`.**~~ **Done 2026-07-19.** `status.py` self-heilt jetzt: neue Helper `_widen_status_column_header` läuft nach dem Row-Rewrite und widens Header + Separator auf `STATUS_WIDTH+2` (kanonische Zellbreite 15). Widen-only, kürzt nie ab. Zwei neue Tests decken (a) narrow-header → auto-widen und (b) bereits-breite-Header → unverändert ab.
 
-6. **Final-Approval-Reviewer flaggt Status-Flip als „cosmetic nit".** Zitat aus T01-Run: „`docs/tasks/index.md` status was bumped to 'in progress' (not a mandatory doc, so out of scope; minor/cosmetic, worth a nit but not blocking)." Reviewer ist etwas übereifrig — kein Bug im Sinne von falschem Verdict, aber Signal dass er Bookkeeping-Änderungen anschaut. Falls Mandatory-Liste eines Tages per-Task konfigurierbar wird, `docs/tasks/index.md` explizit als „ignore this in review" markieren.
+6. ~~**Final-Approval-Reviewer flaggt Status-Flip als „cosmetic nit".**~~ **Done 2026-07-19.** Neue „Out of scope"-Sektion im `build_final_approval_prompt` (task + bug-variant) instruiert den Reviewer explizit: `docs/tasks/index.md` und orchestrator run artifacts (`logs/*.log`, `*.progress.log`, `orchestrator-run.log`) silent ignorieren — nicht in Reason erwähnen, nicht klassifizieren. Test guard-t die Klausel gegen Regression.
 
 ## TESTING GAPS — real nicht ausgeübt, nur mock-getestet
 

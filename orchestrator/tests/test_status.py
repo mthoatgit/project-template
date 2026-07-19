@@ -85,3 +85,41 @@ def test_update_task_status_matches_bare_bug_id(tmp_path):  # REQ-38
 
     assert update_task_status(str(tmp_path), "B01", "action needed") is True
     assert "| action needed |" in _row_for(f, "B01")
+
+
+def test_update_task_status_widens_narrow_status_header(tmp_path):  # item-030 #5
+    """A hand-written index.md with a Status header narrower than the
+    canonical width gets auto-widened on the first status write, so the
+    padded row doesn't visually break the table."""
+    narrow_index = (
+        "# Work Items\n"
+        "\n"
+        "| ID  | Epic | Type | Title    | Status  |\n"
+        "|-----|------|------|----------|---------|\n"
+        "| T01 | E1   | task | greet    | pending |\n"
+    )
+    f = _make_index(tmp_path, body=narrow_index)
+
+    assert update_task_status(str(tmp_path), "T01", "in progress") is True
+
+    text = f.read_text(encoding="utf-8")
+    # Header cell widened to 15 chars (1 leading + 13 + 1 trailing)
+    assert "| Status        |" in text
+    # Separator cell widened to matching 15 dashes
+    assert "|---------------|" in text
+    # Data row's status also padded to 15-char cell content
+    assert "| in progress   |" in text
+
+
+def test_update_task_status_leaves_already_wide_header_alone(tmp_path):  # item-030 #5
+    """Widen-only: an already-canonical header must not be resized."""
+    f = _make_index(tmp_path)  # INDEX_SAMPLE already uses the canonical width
+    before = f.read_text(encoding="utf-8")
+
+    update_task_status(str(tmp_path), "T01-build", "done")
+
+    text = f.read_text(encoding="utf-8")
+    # Header line is unchanged.
+    header_line_before = next(l for l in before.splitlines() if "| Status" in l)
+    header_line_after  = next(l for l in text.splitlines()   if "| Status" in l)
+    assert header_line_before == header_line_after

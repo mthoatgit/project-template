@@ -279,6 +279,20 @@ First, inspect the change:
 ## Mandatory documentation files (must be consistent with the fix):
 {file_list}
 
+## Out of scope — do NOT mention or classify
+
+The orchestrator itself updates certain bookkeeping files during the
+run. Ignore them silently — they are not part of your review surface:
+
+- `docs/tasks/index.md` (status flips through pending / in progress /
+  done / action needed)
+- `logs/*.log`, `*.progress.log`, `orchestrator-run.log`
+  (orchestrator run artifacts)
+
+If your `git diff` / `git status` shows changes there, do not include
+them in your reason and do not classify them under any of the seven
+criteria below.
+
 ## Seven failure criteria
 
 Classify any problem into exactly ONE criterion. Each maps to a fixed

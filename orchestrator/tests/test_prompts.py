@@ -299,6 +299,16 @@ def test_build_final_approval_prompt_states_design_first_bias():  # item-028
     assert "doubt" in prompt.lower() or "bias" in prompt.lower()
 
 
+def test_build_final_approval_prompt_lists_bookkeeping_ignores():  # item-030 #6
+    """Reviewer must be told to silently ignore orchestrator bookkeeping
+    files (index.md, logs) so they don't show up as 'cosmetic nits' in
+    the verdict prose."""
+    prompt = build_final_approval_prompt(TASK, ["README.md"])
+    assert "docs/tasks/index.md" in prompt
+    assert "logs/" in prompt or "*.log" in prompt
+    assert "Out of scope" in prompt or "not mention" in prompt.lower()
+
+
 def test_parse_final_approval_output_approve():  # item-028
     out = 'Everything checks out.\n{"approve": true, "route_to": null, "criterion": null, "reason": "clean"}'
     verdict, criterion, reason = parse_final_approval_output(out)
