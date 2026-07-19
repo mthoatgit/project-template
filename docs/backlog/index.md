@@ -32,3 +32,4 @@
 | 026 | improvement | P2   | `status.py` akzeptiert Bug-IDs im Code, aber kein Test schützt den B-Pfad | done | 2026-07-18 21:27 | 2026-07-18 21:27 | [→](archive/026-status-updater-untested-for-bugs.md)     |
 | 027 | improvement | P2   | Bug-File hat keine „Affected Surface"-Sektion — Actor scoped zu eng | done | 2026-07-18 21:41 | 2026-07-18 21:41 | [→](archive/027-bug-file-affected-surface-section.md)    |
 | 015 | improvement | P3   | `MultiEdit`-Deny cosmetic Warning (aufgedeckt als kaputter Guardrail) | done | 2026-07-09 21:31 | 2026-07-19 13:45 | [→](archive/015-multiedit-deny-warning.md)               |
+| 033 | question    | P3   | Läuft der `/backlog` Flow sauber durch?                       | dropped | 2026-07-19 15:30 | 2026-07-19 15:30 | [→](archive/033-test-backlog-flow.md)                    |
