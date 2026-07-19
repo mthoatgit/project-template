@@ -6,7 +6,7 @@
 
 ## HIGH — beeinträchtigen Loop-Nutzung oder verstecken Bugs
 
-1. **`logs/` und Root-Log-Files landen in jedem Task-Commit.** In `0b2e1fa` (T01) sind 6 Files committed, davon 3 Log-Files (~150 Zeilen Noise); T02 ähnlich (394 insertions, davon >300 Log-Zeilen). Fix: `.gitignore` im Template muss `logs/` + `*.log` als Default enthalten. Scaffold-Skill / `init-project` sollten das setzen. Impact skaliert linear mit jeder Task-Commit — bei einem Epic mit 10 Tasks sind das potenziell tausende Log-Zeilen im PR-Diff.
+1. ~~**`logs/` und Root-Log-Files landen in jedem Task-Commit.**~~ **Retracted 2026-07-19.** Ursache war ein Test-Setup-Fehler: mein hello-028 Scratchpad-Projekt hatte eine handgeschriebene minimale `.gitignore` (`__pycache__/`, `*.pyc`, `.pytest_cache/`), die den project-template-Default (`*.log` und andere Standards, siehe `.gitignore` in project-template Root) nicht enthielt. In einem echten Downstream-Projekt (das project-template klont/inheritet) werden `logs/orchestrator-*.log`, `*.progress.log` und `orchestrator-run.log` alle vom `*.log`-Pattern gefangen und landen nicht in Commits. Kein template-Fix nötig. **Adjacente offene Frage**: sollte scaffold beim ersten Epic-Start verifizieren dass `.gitignore` die Minimums enthält? Als eigenes Item filen wenn wir das wollen — hier nur festhalten.
 
 2. **`Write(orchestrator/**)` und `MultiEdit(orchestrator/**)` Deny-Rules sind non-functional.** Claude CLI meldet bei jedem Aufruf:
    > `Write(orchestrator/**)` is not matched by file permission checks — only Edit(path) rules are. Use Edit(orchestrator/**) instead (Edit rules cover all file-editing tools).
@@ -42,4 +42,4 @@
 
 10. **JSON-in-Text hat 4/4 Gate-Calls sauber geparst.** Sample size 1, aber positives Signal für Variante A aus 028. Bei größerer Nutzung wird's Failures geben — dann relevant wie robust unser Fallback zu „design"-Default wirklich ist.
 
-- **Source.** E2E-Run 2026-07-19 vormittags gegen `hello-028` im scratchpad. Logs unter `hello-028/logs/orchestrator-2026-07-19-08-30.{log,progress.log}`, Commits `0b2e1fa` (T01) + `e771ebf` (T02). Nutzer-Aussage nach Beobachtungs-Report: „erstelle mal ein backlog item mit allen punkten damit wir es nicht verlieren und dann lass uns oben anfangen" — Reihenfolge #1 (gitignore) → #2 (deny rules) → #3 (docs-write silence) → #7 (docs-rerun retry).
+- **Source.** E2E-Run 2026-07-19 vormittags gegen `hello-028` im scratchpad. Logs unter `hello-028/logs/orchestrator-2026-07-19-08-30.{log,progress.log}`, Commits `0b2e1fa` (T01) + `e771ebf` (T02). Nutzer-Aussage nach Beobachtungs-Report: „erstelle mal ein backlog item mit allen punkten damit wir es nicht verlieren und dann lass uns oben anfangen" — nach Retraction von #1 wird die Fix-Reihenfolge zu: #2 (deny rules) → #3 (docs-write silence) → #7 (docs-rerun retry) → dann Kleinkram.
