@@ -465,3 +465,142 @@ def test_happy_path_bug_flow_uses_bug_variant_prompts(mock_claude, mock_tests): 
     # The struktur prompt (call index 1) must use bug-variant framing.
     struktur_prompt = mock_claude.call_args_list[1][0][0]
     assert "bug" in struktur_prompt.lower() or "fix" in struktur_prompt.lower()
+
+
+# ═══════════════════════════════════════════════════════════════
+#  Integration-level prompt-structure verification (item 030 #7 / #8)
+#
+#  These tests go one level deeper than the pure routing tests above:
+#  they pin the STRUCTURE and CONTENT of the prompts sent on rerun
+#  paths, not just that a call happened. Written after two live E2E
+#  runs failed to trigger the docs-rerun path (actor was thorough
+#  enough to fix everything in cycle 1); the loop-level guarantees
+#  need to be locked in synthetically as long as the real path stays
+#  rare in practice.
+# ═══════════════════════════════════════════════════════════════
+
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
+def test_docs_rerun_prompt_carries_full_review_context(mock_claude, mock_tests):  # item-030 #7
+    """When Phase 4 rejects with route_to=docs, the retry docs_write prompt
+    must carry not just the reviewer's reason but the FULL actor context
+    (task content, mandatory files list, escape-hatch instructions) so the
+    actor has everything needed to fix without re-fetching."""
+    from orchestrator import MANDATORY_DOC_FILES
+    mock_claude.side_effect = [
+        (0, "impl"), _STRUKTUR_PASS,
+        _DOCS_OK, _FINAL_DOCS,          # docs cycle 1: rejected (route_to=docs)
+        _DOCS_OK, _FINAL_APPROVE,       # docs cycle 2: approved
+    ]
+    mock_tests.return_value = (True, "green")
+
+    result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
+
+    assert result is True
+    retry_docs_prompt = mock_claude.call_args_list[4][0][0]
+
+    # Reviewer feedback signals present.
+    assert "factual_error" in retry_docs_prompt          # criterion echoed
+    assert "wrong version" in retry_docs_prompt          # reason echoed
+
+    # Actor context still fully present (retry is a rehydrated actor call,
+    # not a bare feedback ping).
+    assert TASK["content"] in retry_docs_prompt          # task body
+    for f in MANDATORY_DOC_FILES:                        # mandatory files list
+        assert f in retry_docs_prompt
+    assert "design_issue" in retry_docs_prompt           # escape hatch still available
+    assert "git diff HEAD" in retry_docs_prompt          # inspection instruction
+
+    # Feedback precedes the standard actor prompt so the actor reads WHY
+    # they are re-running before the how-to.
+    assert retry_docs_prompt.find("wrong version") < retry_docs_prompt.find(TASK["content"])
+
+
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
+def test_max_docs_cycles_escalation_gives_ralph_labeled_feedback(mock_claude, mock_tests):  # item-030 #8
+    """Guardrail 3 escalation must reach Ralph with a LABELED reason
+    ('docs cycle escalation (...)'), not a raw criterion — so the next
+    implementation attempt understands the docs path was exhausted."""
+    from orchestrator import MAX_DOCS_CYCLES
+    docs_pairs = []
+    for _ in range(MAX_DOCS_CYCLES):
+        docs_pairs.append(_DOCS_OK)
+        docs_pairs.append(_FINAL_DOCS)          # keeps rejecting to docs
+    mock_claude.side_effect = [
+        (0, "impl v1"), _STRUKTUR_PASS,
+        *docs_pairs,                            # exhaust
+        (0, "impl v2"),                         # Ralph re-runs after escalation
+        _STRUKTUR_PASS, _DOCS_OK, _FINAL_APPROVE,
+    ]
+    mock_tests.return_value = (True, "green")
+
+    result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
+
+    assert result is True
+    reimpl_idx = 2 + 2 * MAX_DOCS_CYCLES
+    reimpl_prompt = mock_claude.call_args_list[reimpl_idx][0][0]
+
+    # The escalation marker must be explicit — otherwise Ralph can't
+    # distinguish "final_approval said design" from "docs kept failing
+    # so we escalated". The latter is a stronger signal.
+    assert "docs cycle escalation" in reimpl_prompt.lower()
+    # The final_approval reason from the last docs cycle should carry
+    # through so Ralph has actionable context, not just a category.
+    assert "wrong version" in reimpl_prompt
+
+
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
+def test_docs_escape_gives_ralph_labeled_feedback(mock_claude, mock_tests):  # item-030 #7 (escape path)
+    """Guardrail 4: docs_write actor escape sends Ralph a LABELED reason
+    ('design_issue_from_docs_attempt: ...') so Ralph knows the docs actor
+    tapped out mid-write, not that Phase 4 rejected."""
+    mock_claude.side_effect = [
+        (0, "impl v1"), _STRUKTUR_PASS,
+        _DOCS_ESCAPE,                           # cycle 1 escape → back to Ralph
+        (0, "impl v2"),
+        _STRUKTUR_PASS, _DOCS_OK, _FINAL_APPROVE,
+    ]
+    mock_tests.return_value = (True, "green")
+
+    result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
+
+    assert result is True
+    # Call sequence: 0 impl, 1 struktur, 2 docs_escape, 3 impl-v2, ...
+    reimpl_prompt = mock_claude.call_args_list[3][0][0]
+    assert "design_issue_from_docs_attempt" in reimpl_prompt
+    assert "leaky abstraction" in reimpl_prompt          # escape reason preserved
+
+
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
+def test_interleaved_struktur_and_docs_failures_route_correctly(mock_claude, mock_tests):  # item-030 #7
+    """Mixed-failure state transition:
+    design cycle 0: Ralph → struktur FAIL → back to Ralph
+    design cycle 1: Ralph → struktur PASS → docs cycle 1 rejects → docs cycle 2 approves
+    Exercises the full grid of state transitions in a single task run."""
+    mock_claude.side_effect = [
+        # Design cycle 0: struktur rejects
+        (0, "impl v1"),
+        _STRUKTUR_FAIL,
+        # Design cycle 1: everything passes but final_approval bounces docs
+        (0, "impl v2"),
+        _STRUKTUR_PASS,
+        _DOCS_OK, _FINAL_DOCS,          # docs cycle 1 route_to=docs
+        _DOCS_OK, _FINAL_APPROVE,       # docs cycle 2 approves
+    ]
+    mock_tests.return_value = (True, "green")
+
+    result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
+
+    assert result is True
+    # Ralph ran exactly twice (struktur reject + fresh cycle), NOT thrice.
+    assert mock_tests.call_count == 2
+    # Cycle-1 (recovered) Ralph implement prompt carries the struktur feedback.
+    reimpl_prompt = mock_claude.call_args_list[2][0][0]
+    assert "structure:" in reimpl_prompt.lower() or "wrong abstraction" in reimpl_prompt
+    # Docs-cycle-2 prompt still has final_approval feedback (not stale struktur).
+    docs_retry_prompt = mock_claude.call_args_list[6][0][0]
+    assert "wrong version" in docs_retry_prompt or "factual_error" in docs_retry_prompt
+    assert "wrong abstraction" not in docs_retry_prompt  # struktur feedback is gone
