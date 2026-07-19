@@ -34,3 +34,17 @@ GIT_COMMIT_PREFIX = "[orchestrator]"
 # stack in system-design.md) that dispatches to the right test tools. Keeps
 # the orchestrator itself framework-agnostic.
 DEFAULT_TEST_CMD = "python scripts/test.py"
+
+# ── Option-H DoD gates (backlog item 028) ─────────────────────
+
+# Maximum docs_write ↔ final_approval iterations before the loop force-
+# routes to a design fix. 2 means: after one Phase-3/Phase-4 round-trip
+# that didn't approve, the next docs-only reject is treated as evidence
+# that docs alone are not the problem — Guardrail 3 in item 028.
+MAX_DOCS_CYCLES = 2
+
+# Files that Phase-3 (docs_write) is required to bring into sync with the
+# code change and Phase-4 (final_approval) checks for coverage. Paths are
+# relative to the project root. Starter list; can be lifted into a per-
+# project override later (see open questions in backlog item 028).
+MANDATORY_DOC_FILES = ["README.md", "CLAUDE.md"]

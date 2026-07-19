@@ -33,6 +33,7 @@ from . import main as _main  # noqa: F401 — expose flat main() below
 from .config import (
     MAX_ITERATIONS, STUCK_STREAK_THRESHOLD, MAX_CRITIC_ITERATIONS,
     MAX_ERROR_CHARS, GIT_COMMIT_PREFIX, DEFAULT_TEST_CMD,
+    MAX_DOCS_CYCLES, MANDATORY_DOC_FILES,
 )
 from .tasks import load_tasks, find_test_doc
 from .runner import (
@@ -45,6 +46,11 @@ from .claude import (
 from .prompts import (
     build_implement_prompt, build_fix_prompt, build_critic_prompt,
     build_write_tests_prompt, parse_critic_output, format_elapsed,
+    # Option-H DoD gates (backlog item 028)
+    build_struktur_check_prompt, parse_struktur_check_output,
+    build_docs_write_prompt, parse_docs_write_output,
+    build_final_approval_prompt, parse_final_approval_output,
+    FINAL_APPROVAL_CRITERIA,
 )
 from .status import update_task_status, STATUS_REL_PATH, STATUS_WIDTH
 from .git_ops import (
