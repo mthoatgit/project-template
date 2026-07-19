@@ -1,0 +1,10 @@
+---
+type: improvement
+---
+
+# P2 · `/ship-epic` PR ceremony should be togglable per project
+
+- **Symptom.** Current `workflow-implementation` skill hard-wires "one PR per Epic, user merges" as the terminal ceremony. In solo AI-driven contexts, all value-adding gates have already fired before PR opens (`/start-epic` approval, Ralph Loop green tests, Critic APPROVED per task, `/ship-epic` self-review + reflect, upcoming structured smoke). The PR-then-merge step is then paperwork without a second reviewer perspective.
+- **Impact.** Adds friction to every Epic close for a value that only materialises in team or high-risk contexts. Removing it unconditionally would kill the safety net where it *does* matter (team review, risky architecture / dep / security changes). Right answer isn't remove; it's make optional.
+- **Proposed shape.** One config knob — working name `automerge_epic_pr` or `ship_epic_mode: auto|pr`. Default: current PR-open-and-wait behavior (preserves the ceremony for setups that need it). Toggled on: after `/ship-epic` self-review + smoke pass, fast-forward to `main` and push directly, no PR. Open questions: (a) where does the config live — project `CLAUDE.md` under a "Workflow Config" section, a dedicated config file, or env var; (b) does auto-merge get a per-Epic risk override (e.g. touched files match architecture / config / deps patterns → drop back to PR mode automatically); (c) does auto-merge still emit a summary artifact for retrospective visibility.
+- **Source.** 2026-07-09 late-night discussion — user: "an sich ist die ceremony ja super ich hätte nur gern eine konfig die ich auf true oder false stellen je nachdem."

@@ -1,0 +1,10 @@
+---
+type: improvement
+---
+
+# P1 · Manual `fix:` commits bypass the orchestrator bug flow
+
+- **Symptom.** During the 2026-07-09 session, after the folder restructure exposed a five-column-vs-four-column parser mismatch in the dashboard, Claude fixed it as a manual `fix:` commit (`672b879`) instead of filing B03 and routing through the extended orchestrator. The manual path was chosen for speed. The same shortcut will surface every time a defect appears mid-session — quick manual fix always feels faster than filing a bug and starting a subprocess.
+- **Impact.** The whole point of the bug-flow discipline (regression test first, Class A/B routing, Ralph + Critic loop, `[orchestrator]` commit format) is *repeatable, documented protection*. Every manual `fix:` bypass teaches Claude "this is the easier path" — over time the orchestrator becomes ceremonial rather than default, and the disciplined pattern erodes. The value we invested in building the bug flow only pays off if the bug flow is what actually runs.
+- **Proposed shape.** Convention rule to add (candidate homes: `workflow-implementation` skill, a new `workflow-integrity` note, or the top-level `CLAUDE.md`): **Claude MUST file every observed defect as `B<NN>-*.md` before touching production code, even when the fix is small.** Manual `fix:` commits are reserved for cases where the orchestrator itself is broken (bootstrapping problem). Trade-off: adds ceremony to small fixes; the reason it's worth the cost is that discipline drift silently kills the workflow's value proposition. To reduce the ceremony cost, a fast-path helper — a slash command like `/file-bug <one-liner>` that scaffolds a `B<NN>.md` from in-session context with a template symptom + reproduction — could make filing feel less like paperwork.
+- **Source.** 2026-07-09 session — user flagged the parser fix post-hoc as the wrong choice ("das stört mich sehr — nicht am orchestrator vorbeilaufen"). Concrete instance: commit `672b879` should have been B03 → orchestrator instead.
