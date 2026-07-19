@@ -22,6 +22,7 @@
 | 029 | P3   | Tool-Use / Function-Calling für Orchestrator-Reviewer statt JSON-in-Text | open   | 2026-07-19 12:00 | 2026-07-19 12:00 | [→](topics/029-tool-use-for-orchestrator-reviewers.md)   |
 | 030 | P2   | Option-H E2E-Run Follow-ups (gitignore, deny rules, docs-phase silence, terminologie, testing gaps) | open   | 2026-07-19 13:30 | 2026-07-19 13:30 | [→](topics/030-option-h-e2e-followups.md)              |
 | 031 | P3   | Docs-Write-Phase: inhaltliche Summary statt Konstante         | open   | 2026-07-19 14:00 | 2026-07-19 14:00 | [→](topics/031-docs-write-summary-extraction.md)         |
+| 032 | P2   | `orchestrator-requirements.md` beschreibt Post-028 Verhalten inkonsistent | open   | 2026-07-19 14:30 | 2026-07-19 14:30 | [→](topics/032-orchestrator-requirements-drift.md)       |
 | 001 | P1   | Backlog-Struktur-Pass (Ordner + Index + Konventionen)         | done   | 2026-07-09 21:43 | 2026-07-10 08:49 | [→](topics/archive/001-backlog-structure-pass.md)        |
 | 021 | P1   | Memory-Persistence — Migration ins Repo + Backup-Strategie    | done   | 2026-07-10 21:36 | 2026-07-11 15:05 | [→](topics/archive/021-memory-persistence-strategy.md)   |
 | 017 | —    | Entry-point-anchor test rule (`workflow-tests`)               | done   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/archive/017-entry-point-anchor-test-rule.md)  |

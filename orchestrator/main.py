@@ -16,7 +16,7 @@ from .runner import extract_failure_count
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Orchestrator — implement tasks via Claude, verify with tests and Critic, "
+        description="Orchestrator — implement tasks via Claude, verify with tests and DoD gates, "
                     "commit to Git, resume on restart"
     )
     parser.add_argument(
@@ -46,7 +46,9 @@ def main():
     )
     parser.add_argument(
         "--max-critic-iterations", type=int, default=MAX_CRITIC_ITERATIONS,
-        help=f"Max Critic review cycles per task (default: {MAX_CRITIC_ITERATIONS})",
+        help=f"Max design review cycles per task (default: {MAX_CRITIC_ITERATIONS}). "
+             f"Historical name: 'critic'; each cycle now runs the full DoD gate "
+             f"sequence (Struktur-Check + Docs-Write + Final-Approval).",
     )
     parser.add_argument(
         "--filter", default=None, dest="task_filter",
@@ -140,7 +142,7 @@ def _run(args, task_list, project_dir: str, log_path) -> None:
     print(f"  Project dir        : {project_dir}")
     print(f"  Test command       : {args.test_cmd}")
     print(f"  Max loop retries   : {args.max_iterations}")
-    print(f"  Max critic cycles  : {args.max_critic_iterations}")
+    print(f"  Max design cycles  : {args.max_critic_iterations}")
 
     results: list[dict] = []
     total_tasks = len(tasks_to_run)
@@ -166,7 +168,7 @@ def _run(args, task_list, project_dir: str, log_path) -> None:
             "id":            task["id"],
             "passed":        ok,
             "elapsed":       stats.get("elapsed", 0.0),
-            "critic_cycles": stats.get("critic_cycles", 0),
+            "design_cycles": stats.get("design_cycles", 0),
             "reason":        stats.get("reason", "unknown"),
         })
 
@@ -196,14 +198,14 @@ def _run(args, task_list, project_dir: str, log_path) -> None:
     print(f"\n{'='*64}")
     print("  ORCHESTRATOR SUMMARY")
     print(f"{'='*64}")
-    print(f"  {'Task':<{col}}  {'Status':<8}  {'Time':>7}  {'Critic'}")
+    print(f"  {'Task':<{col}}  {'Status':<8}  {'Time':>7}  {'Design'}")
     print(f"  {sep}")
     total_secs = 0.0
     for r in results:
         state_str = "PASSED" if r["passed"] else "FAILED"
         elapsed   = format_elapsed(r["elapsed"])
-        cycles    = (f"{r['critic_cycles']} cycle{'s' if r['critic_cycles'] != 1 else ''}"
-                     if r["critic_cycles"] else f"— ({r['reason']})")
+        cycles    = (f"{r['design_cycles']} cycle{'s' if r['design_cycles'] != 1 else ''}"
+                     if r["design_cycles"] else f"— ({r['reason']})")
         print(f"  {r['id']:<{col}}  {state_str:<8}  {elapsed:>7}  {cycles}")
         total_secs += r["elapsed"]
     print(f"  {sep}")

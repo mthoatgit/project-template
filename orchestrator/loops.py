@@ -1,7 +1,9 @@
-"""The two nested loops that drive each task through TDD:
+"""The nested loops that drive each task through TDD + DoD gates:
 
 - ``ralph_loop``: inner correctness loop (implement → test → fix)
-- ``critic_loop``: outer solution-quality loop (correctness + adversarial review)
+- ``critic_loop``: outer solution-quality loop — Option-H DoD gates
+  (correctness → struktur_check → docs_write → final_approval).
+  Legacy name kept; historically it wrapped a single Critic-Actor review.
 - ``write_tests_phase``: pre-implementation test-writing step
 """
 import time
@@ -18,9 +20,11 @@ from .config import (
 
 def _prompts_for(item: dict):
     """Return the prompt module for this item — bug_variant for bugs,
-    prompts for tasks. Both modules expose the same four builders
-    (build_write_tests_prompt, build_implement_prompt, build_fix_prompt,
-    build_critic_prompt) with the same signatures."""
+    prompts for tasks. Both modules expose the same seven builders with
+    the same signatures: build_write_tests_prompt, build_implement_prompt,
+    build_fix_prompt, build_critic_prompt (legacy, unused since Option-H),
+    build_struktur_check_prompt, build_docs_write_prompt,
+    build_final_approval_prompt."""
     return bug_variant if item.get("type") == "bug" else prompts
 
 
@@ -195,18 +199,18 @@ def critic_loop(
 
     status.update_task_status(project_dir, task["id"], "in progress")
 
-    def _finish(passed: bool, critic_cycles: int, reason: str) -> bool:
+    def _finish(passed: bool, design_cycles: int, reason: str) -> bool:
         secs    = time.time() - task_start
         elapsed = prompts.format_elapsed(secs)
         if stats_out is not None:
-            stats_out.update({"elapsed": secs, "critic_cycles": critic_cycles, "reason": reason})
+            stats_out.update({"elapsed": secs, "design_cycles": design_cycles, "reason": reason})
         status.update_task_status(
             project_dir, task["id"], "done" if passed else "action needed",
         )
         symbol = "[✓]" if passed else "[✗]"
         state_str = "PASSED" if passed else "FAILED"
-        cycles = (f"critic: {critic_cycles} cycle{'s' if critic_cycles != 1 else ''}"
-                  if critic_cycles else "—")
+        cycles = (f"design: {design_cycles} cycle{'s' if design_cycles != 1 else ''}"
+                  if design_cycles else "—")
         print(f"\n  {symbol} {task['id']} — {state_str}  ({elapsed})  [{cycles}]")
         return passed
 
@@ -220,19 +224,19 @@ def critic_loop(
     critic_feedback: str | None = None
     prev_weaknesses: str | None = None
 
-    for critic_iter in range(max_critic_iterations + 1):
-        if critic_iter > 0:
-            print(f"\n[Design Cycle] {critic_iter}/{max_critic_iterations}")
+    for design_iter in range(max_critic_iterations + 1):
+        if design_iter > 0:
+            print(f"\n[Design Cycle] {design_iter}/{max_critic_iterations}")
 
         # ── Phase 1: Ralph (impl + test) ────────────────────────
         passed = ralph_loop(
             task, task_test_cmd, project_dir, max_ralph_iterations,
             critic_feedback,
-            revert_context if critic_iter == 0 else None,
+            revert_context if design_iter == 0 else None,
         )
         if not passed:
             print("  [STOP] Could not get tests to pass — aborting")
-            return _finish(False, critic_iter, "tests failed")
+            return _finish(False, design_iter, "tests failed")
 
         # ── Phase 2: Struktur-Check (binary gate) ───────────────
         print("\n[Struktur-Check] Reviewing solution structure...")
@@ -244,12 +248,12 @@ def critic_loop(
         if not struktur_passed:
             print(f"  [REJECT] Struktur: {struktur_reason}")
             new_feedback = f"structure: {struktur_reason}"
-            if critic_iter == max_critic_iterations:
+            if design_iter == max_critic_iterations:
                 print(f"  [STOP] Max design cycles ({max_critic_iterations}) reached")
-                return _finish(False, critic_iter + 1, "critic: max cycles")
+                return _finish(False, design_iter + 1, "design: max cycles")
             if new_feedback == prev_weaknesses:
                 print("  [STOP] Reviewer repeating identical feedback — conceptually stuck")
-                return _finish(False, critic_iter + 1, "critic: stuck")
+                return _finish(False, design_iter + 1, "design: stuck")
             prev_weaknesses = new_feedback
             critic_feedback = new_feedback
             continue
@@ -293,7 +297,7 @@ def critic_loop(
 
             if verdict == "approve":
                 print(f"  [OK] {final_reason or 'approved'}")
-                return _finish(True, critic_iter + 1, "passed")
+                return _finish(True, design_iter + 1, "passed")
 
             print(f"  [REJECT] route_to={verdict}"
                   f"{f', criterion={criterion}' if criterion else ''}: {final_reason}")
@@ -314,12 +318,12 @@ def critic_loop(
             break
 
         # Docs loop ended without approve → route back through Ralph.
-        if critic_iter == max_critic_iterations:
+        if design_iter == max_critic_iterations:
             print(f"  [STOP] Max design cycles ({max_critic_iterations}) reached")
-            return _finish(False, critic_iter + 1, "critic: max cycles")
+            return _finish(False, design_iter + 1, "design: max cycles")
         if design_feedback == prev_weaknesses:
             print("  [STOP] Reviewer repeating identical feedback — conceptually stuck")
-            return _finish(False, critic_iter + 1, "critic: stuck")
+            return _finish(False, design_iter + 1, "design: stuck")
         prev_weaknesses = design_feedback
         critic_feedback = design_feedback
 

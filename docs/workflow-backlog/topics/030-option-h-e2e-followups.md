@@ -14,7 +14,7 @@
 
 ## MEDIUM — Terminologie- und UX-Drift
 
-4. **`[critic: N cycle(s)]`-Label in Task-Summary + Stats ist Legacy-Terminologie.** Es gibt keinen einzelnen „Critic" mehr, sondern drei Gates. Fix: `[design: N cycle(s)]` in `loops.py::_finish`. Betrifft auch `stats_out["critic_cycles"]`-Key — Umbenennung propagiert durch dashboard/summary. Kleine Kaskade.
+4. ~~**`[critic: N cycle(s)]`-Label in Task-Summary + Stats ist Legacy-Terminologie.**~~ **Done 2026-07-19.** Kaskade abgearbeitet: `_finish`-Param `critic_cycles` → `design_cycles`, stats-Key gleich, Label `[design: N cycle]`, Reason-Strings `"design: max cycles"` / `"design: stuck"`, `[Design Cycle]`-Print-Präfix, Loop-Variable `design_iter`, Summary-Column „Design" in `main.py`. **Nicht umbenannt** (bewusst API-stabil gehalten): `critic_loop` Funktionsname, `--max-critic-iterations` CLI-Flag, `MAX_CRITIC_ITERATIONS` Konstante, `max_critic_iterations` Parameter, lokale `critic_feedback` Variable (das ist der Feedback-Carrier zurück zu Ralph, nicht user-facing). CLI-Help-Text erklärt den historischen Namen kurz. Adjacenter Fund als [[032-orchestrator-requirements-drift]] gefiled — die REQ-15..REQ-20 Beschreibungen im REQ-Doc sind noch Pre-028-Wording.
 
 ## LOW — Kosmetisch, aber im Auge behalten
 
