@@ -278,6 +278,11 @@ def critic_loop(
                 design_feedback = f"design_issue_from_docs_attempt: {docs_reason}"
                 break
 
+            # Constant one-liner so the progress log shows the phase
+            # completed even though the actor produces no verdict on the
+            # happy path. Content-aware summary is deferred (item 031).
+            print("  [OK] docs updated")
+
             # Phase 4
             print("\n[Final-Approval] Reviewing full change (code+tests+docs)...")
             _, final_output = claude.run_claude(

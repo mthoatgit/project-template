@@ -10,7 +10,7 @@
 
 2. ~~**`Write(orchestrator/**)` und `MultiEdit(orchestrator/**)` Deny-Rules sind non-functional.**~~ **Done 2026-07-19.** Beide No-op-Zeilen aus `orchestrator/subprocess_settings.json` entfernt; `Edit(orchestrator/**)` bleibt als einzige Regel und deckt Write+MultiEdit ab (Claude-Codes Permission-Modell). Test `test_subprocess_settings_deny_orchestrator_file_writes` aktualisiert um explizit die Abwesenheit der beiden No-op-Regeln zu asserten — Regression wird durch den Test verhindert. REQ-39 in `docs/orchestrator-requirements.md` mit korrekter Begründung umgeschrieben. Verwandtes Item [[015-multiedit-deny-warning]] als Resolved-Sektion aktualisiert und ins Archive verschoben.
 
-3. **Docs-Write-Phase ist stumm im Progress-Log.** Zeile 32/58 des progress.log: `[Docs-Write] Cycle 1/2` — kein `[OK]`, kein `[DONE]`, keine Zusammenfassung. Man sieht nur später über die Prosa des Final-Approval Reviewers was der Actor tatsächlich gemacht hat. Fix: analog zu Struktur-Check einen `[OK] <one-liner>` nach `run_claude` in der Docs-Phase printen — auch wenn keine JSON zurückkommt (extrahiere erste sinnvolle Zeile aus der Actor-Ausgabe, oder „docs updated"/„no changes needed" heuristisch).
+3. ~~**Docs-Write-Phase ist stumm im Progress-Log.**~~ **Done 2026-07-19.** In `loops.py` nach `run_claude` auf dem Happy-Path (docs_status != "design_issue") jetzt konstante Zeile `[OK] docs updated`. Der Escape-Pfad hatte bereits `[ESCAPE] Docs actor: ...`. Content-aware Summary (letzte Actor-Zeile extrahieren) als eigenes Item [[031-docs-write-summary-extraction]] deferred, weil UI-only und noch iterierbar.
 
 ## MEDIUM — Terminologie- und UX-Drift
 
