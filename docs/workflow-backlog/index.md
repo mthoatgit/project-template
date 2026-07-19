@@ -21,6 +21,7 @@
 | 025 | P2   | Setup-Validation-Gate vor Orchestrator-Start (README + check-env + Skills) | open   | 2026-07-18 19:27 | 2026-07-18 19:27 | [→](topics/025-setup-validation-gate.md)                 |
 | 028 | P2   | DoD-Checkpoints + Struktur-Muster + Umsetzungsplan „Option H" (sequenzielle Gates) | open   | 2026-07-18 22:32 | 2026-07-19 00:09 | [→](topics/028-definition-of-done-for-work-items.md)     |
 | 029 | P3   | Tool-Use / Function-Calling für Orchestrator-Reviewer statt JSON-in-Text | open   | 2026-07-19 12:00 | 2026-07-19 12:00 | [→](topics/029-tool-use-for-orchestrator-reviewers.md)   |
+| 030 | P2   | Option-H E2E-Run Follow-ups (gitignore, deny rules, docs-phase silence, terminologie, testing gaps) | open   | 2026-07-19 13:30 | 2026-07-19 13:30 | [→](topics/030-option-h-e2e-followups.md)              |
 | 001 | P1   | Backlog-Struktur-Pass (Ordner + Index + Konventionen)         | done   | 2026-07-09 21:43 | 2026-07-10 08:49 | [→](topics/archive/001-backlog-structure-pass.md)        |
 | 021 | P1   | Memory-Persistence — Migration ins Repo + Backup-Strategie    | done   | 2026-07-10 21:36 | 2026-07-11 15:05 | [→](topics/archive/021-memory-persistence-strategy.md)   |
 | 017 | —    | Entry-point-anchor test rule (`workflow-tests`)               | done   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/archive/017-entry-point-anchor-test-rule.md)  |
