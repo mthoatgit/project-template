@@ -1,9 +1,13 @@
-"""Bug-flow variants of the four prompt builders in ``prompts.py``.
+"""Bug-flow variants of the prompt builders in ``prompts.py``.
 
 Same function signatures as ``prompts.build_*``, different framing:
 tasks say "implement this new feature", bugs say "make the pinned
 regression test go green with a minimal fix". Loops.py picks the module
 based on ``item['type']``.
+
+Covers the classic four (write_tests, implement, fix, critic) plus the
+Option-H DoD gates (struktur_check, docs_write, final_approval) from
+backlog item 028 — same signatures, bug-appropriate framing.
 
 Also exposes ``is_class_b(item)`` — a one-liner check the dispatcher
 uses to skip Class B bugs (human-only per ``workflow-bugs`` skill).
@@ -152,4 +156,170 @@ If there are problems:
   ...
 
 Do not suggest fixes. Identify what is wrong with the current approach.
+"""
+
+
+# ═══════════════════════════════════════════════════════════════
+#  Option-H DoD gates (bug flavor — backlog item 028)
+# ═══════════════════════════════════════════════════════════════
+
+def build_struktur_check_prompt(item: dict) -> str:
+    """Struktur-Check reviewer for a bug fix (Phase 2).
+
+    Binary gate that runs after the regression test goes green. Focuses
+    on root-cause discipline and scope — the two failure modes most
+    common in bug fixes.
+    """
+    return f"""You are a senior software engineer conducting a fast STRUCTURAL
+review of a bug fix. The regression test already passes — your job is to
+decide whether the FIX STRUCTURE is sound before we invest in updating
+documentation.
+
+First, inspect the change:
+- Run `git diff HEAD` to see what changed.
+- The regression test is PINNED — don't judge it, only the production
+  code changes.
+
+## Bug that was fixed:
+{item['content']}
+
+## Evaluate:
+- Does the fix address the ROOT CAUSE, or is it a symptomatic patch?
+- Is the scope MINIMAL — only code needed to make the regression test
+  pass?
+- Are there drive-by refactors or unrelated edits?
+- Would similar-shaped bugs slip through if the underlying issue is
+  still there elsewhere in the code?
+
+## Do NOT evaluate:
+- The regression test itself (pinned)
+- Documentation drift — that gets fixed in the next phase
+- Formatting, indentation, naming
+
+## Response format
+
+You may reason briefly in prose. END your response with a JSON block
+matching this schema exactly:
+
+```json
+{{"pass": true, "reason": "one-line summary"}}
+```
+OR
+```json
+{{"pass": false, "reason": "one-line summary of the structural problem"}}
+```
+"""
+
+
+def build_docs_write_prompt(item: dict, mandatory_files: list[str]) -> str:
+    """Docs-Write actor for a bug fix (Phase 3).
+
+    Updates mandatory docs to reflect the FIX — what behavior is now
+    correct — not the bug's symptom. Escape hatch identical to task
+    flow (design_issue → back to Ralph).
+    """
+    file_list = ", ".join(f"`{f}`" for f in mandatory_files)
+    return f"""{_p._GUARDRAILS_NOTICE}
+
+## Docs-Write Phase (bug fix)
+
+The regression test for bug '{item['id']}' passed structural review.
+Your job: bring the mandatory documentation files into sync with the
+NEW (correct) behavior — not the buggy symptom.
+
+Steps:
+1. Run `git diff HEAD` and `git status` to see what changed.
+2. For each mandatory file, grep for descriptions of the OLD (buggy)
+   behavior that the fix contradicts. Update to describe the fixed
+   behavior.
+3. Do NOT add new sections for unrelated content. Only update what
+   would now be factually wrong.
+
+Mandatory files: {file_list}
+
+## Escape Hatch
+
+If while attempting to describe the fixed behavior you discover the
+fix has a design problem — e.g. the docs would have to describe an
+inconsistent state, or the root cause isn't actually addressed — STOP
+and output ONLY this JSON block as your final response:
+
+```json
+{{"status": "design_issue", "reason": "<one-sentence why>"}}
+```
+
+This routes back to Ralph (Phase 1) for a redo.
+
+## Bug report (for context)
+
+{item['content']}
+
+Otherwise: update docs silently. No explicit success signal is required.
+"""
+
+
+def build_final_approval_prompt(item: dict, mandatory_files: list[str]) -> str:
+    """Final-approval reviewer for a bug fix (Phase 4).
+
+    Same 7-criterion 3-way verdict as the task flow. The criteria are
+    behavior-agnostic; only the framing shifts to bug context.
+    """
+    file_list = ", ".join(f"`{f}`" for f in mandatory_files)
+    return f"""You are a senior software engineer conducting the FINAL approval
+review of a bug fix. Both the code fix (with pinned regression test)
+AND mandatory docs have already been updated in the working tree.
+
+First, inspect the change:
+- Run `git diff HEAD` to see all pending changes.
+- Run `git status` to see file-level scope.
+
+## Bug that was fixed:
+{item['content']}
+
+## Mandatory documentation files (must be consistent with the fix):
+{file_list}
+
+## Seven failure criteria
+
+Classify any problem into exactly ONE criterion. Each maps to a fixed
+routing decision:
+
+route_to = "docs" (docs update needed, code is fine):
+- factual_error      : Docs contain factual mistakes (wrong command,
+                       wrong version, wrong describe of behavior).
+- missing_coverage   : Fixed behavior exists in code but not described.
+- inconsistent_docs  : Docs contradict each other after the fix.
+
+route_to = "design" (fix itself needs rework):
+- leaky_abstraction              : Fix cannot be described without
+                                   implementation details.
+- behavior_inconsistency         : Docs would have to describe
+                                   contradictory behavior post-fix.
+- design_contradicts_other_docs  : Fix violates contracts documented
+                                   elsewhere.
+- scope_beyond_mandatory         : Fix required touching files outside
+                                   the mandatory list — likely scope
+                                   creep or wrong root-cause layer.
+
+## Design-first bias
+
+WHEN IN DOUBT, choose route_to = "design". A false-positive design flag
+costs one extra Ralph iteration; a missed design bug ships broken code.
+
+## Response format
+
+You may reason in prose above the JSON. END your response with a JSON
+block matching this schema exactly:
+
+```json
+{{"approve": true, "route_to": null, "criterion": null, "reason": "..."}}
+```
+OR
+```json
+{{"approve": false, "route_to": "docs", "criterion": "factual_error", "reason": "..."}}
+```
+OR
+```json
+{{"approve": false, "route_to": "design", "criterion": "leaky_abstraction", "reason": "..."}}
+```
 """

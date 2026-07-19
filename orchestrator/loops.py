@@ -10,7 +10,10 @@ import time
 # so @patch("orchestrator.runner.run_tests") etc. propagate into these
 # callers — see docs/orchestrator-requirements.md.
 from . import bug_variant, claude, prompts, runner, status
-from .config import MAX_ERROR_CHARS, STUCK_STREAK_THRESHOLD
+from .config import (
+    MAX_ERROR_CHARS, STUCK_STREAK_THRESHOLD,
+    MAX_DOCS_CYCLES, MANDATORY_DOC_FILES,
+)
 
 
 def _prompts_for(item: dict):
@@ -164,18 +167,26 @@ def critic_loop(
     total_tasks: int = 1,
     stats_out: dict | None = None,
 ) -> bool:
-    """Outer loop: correctness via ``ralph_loop``, then design quality via
-    the Critic.
+    """Outer solution-quality loop — Option-H sequential DoD gates
+    (backlog item 028).
 
-    Runs ``ralph_loop`` to get tests green, then asks the Critic to
-    evaluate the solution approach. If rejected, re-runs ``ralph_loop``
-    with the Critic's feedback as context (but without the rejected code).
-    Repeats until the Critic approves or an exit criterion fires.
+    Per design cycle:
+        Phase 1  ralph_loop        (impl + test, iterated until green)
+        Phase 2  struktur_check    (binary reviewer gate)
+        Phase 3  docs_write        (actor updates mandatory docs)
+        Phase 4  final_approval    (3-way reviewer; approve / docs / design)
+
+    Backward routing:
+        struktur fail            → next design cycle (Phase 1) with feedback
+        docs escape              → next design cycle (Phase 1) with feedback
+        final_approval "docs"    → repeat Phase 3 (up to MAX_DOCS_CYCLES);
+                                   on cycle exhaust, force route to design
+        final_approval "design"  → next design cycle (Phase 1) with feedback
 
     ``revert_context`` is forwarded to the first ``ralph_loop`` call only,
     so Claude knows a previous commit was rolled back and why (REQ-24).
 
-    Returns True if tests pass AND Critic approves, False otherwise.
+    Returns True iff Phase 4 approves within the cycle budget.
     """
     task_start = time.time()
     print(f"\n{'='*64}")
@@ -211,42 +222,100 @@ def critic_loop(
 
     for critic_iter in range(max_critic_iterations + 1):
         if critic_iter > 0:
-            print(f"\n[Critic Loop] Re-implementation cycle "
-                  f"{critic_iter}/{max_critic_iterations}")
+            print(f"\n[Design Cycle] {critic_iter}/{max_critic_iterations}")
 
+        # ── Phase 1: Ralph (impl + test) ────────────────────────
         passed = ralph_loop(
             task, task_test_cmd, project_dir, max_ralph_iterations,
             critic_feedback,
             revert_context if critic_iter == 0 else None,
         )
-
         if not passed:
             print("  [STOP] Could not get tests to pass — aborting")
             return _finish(False, critic_iter, "tests failed")
 
-        print(f"\n[Critic] Reviewing solution approach...")
-        _, critic_output = claude.run_claude(_prompts_for(task).build_critic_prompt(task), project_dir)
-        approved, weaknesses = prompts.parse_critic_output(critic_output)
+        # ── Phase 2: Struktur-Check (binary gate) ───────────────
+        print("\n[Struktur-Check] Reviewing solution structure...")
+        _, struktur_output = claude.run_claude(
+            _prompts_for(task).build_struktur_check_prompt(task), project_dir,
+        )
+        struktur_passed, struktur_reason = prompts.parse_struktur_check_output(struktur_output)
 
-        if approved:
-            first_line = critic_output.strip().splitlines()[0] if critic_output.strip() else ""
-            print(f"  [OK] {first_line}")
-            return _finish(True, critic_iter + 1, "passed")
+        if not struktur_passed:
+            print(f"  [REJECT] Struktur: {struktur_reason}")
+            new_feedback = f"structure: {struktur_reason}"
+            if critic_iter == max_critic_iterations:
+                print(f"  [STOP] Max design cycles ({max_critic_iterations}) reached")
+                return _finish(False, critic_iter + 1, "critic: max cycles")
+            if new_feedback == prev_weaknesses:
+                print("  [STOP] Reviewer repeating identical feedback — conceptually stuck")
+                return _finish(False, critic_iter + 1, "critic: stuck")
+            prev_weaknesses = new_feedback
+            critic_feedback = new_feedback
+            continue
 
-        print(f"  [REJECT] Design concerns:")
-        for line in weaknesses.splitlines()[:6]:
-            if line.strip():
-                print(f"    {line}")
+        print(f"  [OK] {struktur_reason or 'structure sound'}")
 
+        # ── Phases 3+4: Docs-Write → Final-Approval (inner cycle) ──
+        docs_feedback: str | None = None
+        design_feedback: str | None = None
+
+        for docs_cycle in range(1, MAX_DOCS_CYCLES + 1):
+            print(f"\n[Docs-Write] Cycle {docs_cycle}/{MAX_DOCS_CYCLES}")
+            docs_prompt = _prompts_for(task).build_docs_write_prompt(
+                task, MANDATORY_DOC_FILES,
+            )
+            if docs_feedback:
+                docs_prompt = (
+                    f"## Previous docs review feedback\n{docs_feedback}\n\n"
+                    f"{docs_prompt}"
+                )
+            _, docs_output = claude.run_claude(docs_prompt, project_dir)
+            docs_status, docs_reason = prompts.parse_docs_write_output(docs_output)
+
+            if docs_status == "design_issue":
+                print(f"  [ESCAPE] Docs actor: {docs_reason}")
+                design_feedback = f"design_issue_from_docs_attempt: {docs_reason}"
+                break
+
+            # Phase 4
+            print("\n[Final-Approval] Reviewing full change (code+tests+docs)...")
+            _, final_output = claude.run_claude(
+                _prompts_for(task).build_final_approval_prompt(task, MANDATORY_DOC_FILES),
+                project_dir,
+            )
+            verdict, criterion, final_reason = prompts.parse_final_approval_output(final_output)
+
+            if verdict == "approve":
+                print(f"  [OK] {final_reason or 'approved'}")
+                return _finish(True, critic_iter + 1, "passed")
+
+            print(f"  [REJECT] route_to={verdict}"
+                  f"{f', criterion={criterion}' if criterion else ''}: {final_reason}")
+
+            if verdict == "docs":
+                # Guardrail 3 (item 028): repeated docs failure ⇒ design issue.
+                if docs_cycle >= MAX_DOCS_CYCLES:
+                    print(f"  [ESCALATE] MAX_DOCS_CYCLES={MAX_DOCS_CYCLES} — forcing design route")
+                    design_feedback = (
+                        f"docs cycle escalation ({criterion or 'unspecified'}): {final_reason}"
+                    )
+                    break
+                docs_feedback = f"{criterion or 'unspecified'}: {final_reason}"
+                continue
+
+            # verdict == "design"
+            design_feedback = f"{criterion or 'unspecified'}: {final_reason}"
+            break
+
+        # Docs loop ended without approve → route back through Ralph.
         if critic_iter == max_critic_iterations:
-            print(f"  [STOP] Max critic iterations ({max_critic_iterations}) reached")
+            print(f"  [STOP] Max design cycles ({max_critic_iterations}) reached")
             return _finish(False, critic_iter + 1, "critic: max cycles")
-
-        if weaknesses == prev_weaknesses:
-            print("  [STOP] Critic repeating identical feedback — conceptually stuck")
+        if design_feedback == prev_weaknesses:
+            print("  [STOP] Reviewer repeating identical feedback — conceptually stuck")
             return _finish(False, critic_iter + 1, "critic: stuck")
-
-        prev_weaknesses = weaknesses
-        critic_feedback = weaknesses
+        prev_weaknesses = design_feedback
+        critic_feedback = design_feedback
 
     return _finish(False, max_critic_iterations + 1, "unknown")

@@ -128,47 +128,71 @@ def test_exit_max_iterations(mock_claude, mock_tests):  # REQ-14
 
 
 # ─────────────────────────────────────────────────────────────
-#  REQ-15  critic runs after tests pass
+#  Reusable Option-H gate responses (backlog item 028)
+# ─────────────────────────────────────────────────────────────
+#  Per happy-path design cycle: 4 Claude calls
+#    (1) implement, (2) struktur_check, (3) docs_write, (4) final_approval
+#  docs_write returns bare text = "ok" path (no JSON escape).
+
+_STRUKTUR_PASS = (0, '{"pass": true, "reason": "structure sound"}')
+_STRUKTUR_FAIL = (0, '{"pass": false, "reason": "wrong abstraction"}')
+_DOCS_OK       = (0, "Updated README and CLAUDE.md.")
+_DOCS_ESCAPE   = (0, '{"status": "design_issue", "reason": "leaky abstraction"}')
+_FINAL_APPROVE = (0, '{"approve": true, "route_to": null, "criterion": null, "reason": "clean"}')
+_FINAL_DOCS    = (0, '{"approve": false, "route_to": "docs", "criterion": "factual_error", "reason": "wrong version"}')
+_FINAL_DESIGN  = (0, '{"approve": false, "route_to": "design", "criterion": "leaky_abstraction", "reason": "docs need impl details"}')
+
+
+# ─────────────────────────────────────────────────────────────
+#  REQ-15 (adapted for item 028): all four gates run after tests pass
 # ─────────────────────────────────────────────────────────────
 
 @patch("orchestrator.runner.run_tests")
 @patch("orchestrator.claude.run_claude")
-def test_critic_runs_after_tests_pass(mock_claude, mock_tests):  # REQ-15
-    # First call: implementation; second call: critic review
+def test_all_four_gates_run_after_tests_pass(mock_claude, mock_tests):  # REQ-15 / item-028
     mock_claude.side_effect = [
-        (0, "implemented"),           # ralph_loop: implement
-        (0, "APPROVED — clean"),      # critic review
+        (0, "implemented"),  # Phase 1: implement
+        _STRUKTUR_PASS,      # Phase 2: struktur_check
+        _DOCS_OK,            # Phase 3: docs_write
+        _FINAL_APPROVE,      # Phase 4: final_approval
     ]
     mock_tests.return_value = (True, "1 passed")
 
     result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
 
     assert result is True
-    assert mock_claude.call_count == 2  # implement + critic
+    assert mock_claude.call_count == 4
 
 
 # ─────────────────────────────────────────────────────────────
-#  REQ-18  re-implementation feeds Critic feedback back to Claude
+#  REQ-18 (adapted for item 028): final_approval route_to="design"
+#                                 feeds feedback back into Ralph
 # ─────────────────────────────────────────────────────────────
 
 @patch("orchestrator.runner.run_tests")
 @patch("orchestrator.claude.run_claude")
-def test_critic_rejection_triggers_reimplementation_with_feedback(mock_claude, mock_tests):  # REQ-18
-    weakness = "- Uses procedural style instead of appropriate OOP pattern"
+def test_final_approval_design_reject_triggers_reimplementation_with_feedback(mock_claude, mock_tests):  # REQ-18 / item-028
     mock_claude.side_effect = [
-        (0, "first implementation"),           # cycle 1: implement
-        (0, f"REJECTED\n{weakness}"),          # cycle 1: critic rejects
-        (0, "second implementation"),          # cycle 2: re-implement
-        (0, "APPROVED — now uses OOP"),        # cycle 2: critic approves
+        # Cycle 1: implement → struktur pass → docs ok → final rejects (design)
+        (0, "first implementation"),
+        _STRUKTUR_PASS,
+        _DOCS_OK,
+        _FINAL_DESIGN,
+        # Cycle 2: re-implement with feedback → all gates pass
+        (0, "second implementation"),
+        _STRUKTUR_PASS,
+        _DOCS_OK,
+        _FINAL_APPROVE,
     ]
     mock_tests.return_value = (True, "all passed")
 
     result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
 
     assert result is True
-    # The third claude call (re-implementation) must include critic feedback
-    third_call_prompt = mock_claude.call_args_list[2][0][0]
-    assert weakness in third_call_prompt
+    # The re-implementation call (5th claude call = index 4) must include
+    # the design-side feedback from the previous final_approval reject.
+    reimpl_prompt = mock_claude.call_args_list[4][0][0]
+    assert "leaky_abstraction" in reimpl_prompt or "docs need impl details" in reimpl_prompt
 
 
 # ─────────────────────────────────────────────────────────────
@@ -177,13 +201,13 @@ def test_critic_rejection_triggers_reimplementation_with_feedback(mock_claude, m
 
 @patch("orchestrator.runner.run_tests")
 @patch("orchestrator.claude.run_claude")
-def test_critic_loop_aborts_on_repeated_feedback(mock_claude, mock_tests):  # REQ-19
-    weakness = "- Wrong abstraction level throughout"
+def test_critic_loop_aborts_on_repeated_feedback(mock_claude, mock_tests):  # REQ-19 / item-028
+    """Struktur-check rejecting with the same reason twice ⇒ stuck ⇒ abort."""
     mock_claude.side_effect = [
-        (0, "implementation v1"),       # cycle 1: implement
-        (0, f"REJECTED\n{weakness}"),   # cycle 1: critic rejects
-        (0, "implementation v2"),       # cycle 2: re-implement
-        (0, f"REJECTED\n{weakness}"),   # cycle 2: same feedback → stuck
+        (0, "implementation v1"),
+        _STRUKTUR_FAIL,                 # cycle 1: struktur rejects
+        (0, "implementation v2"),
+        _STRUKTUR_FAIL,                 # cycle 2: same reason → stuck
     ]
     mock_tests.return_value = (True, "all passed")
 
@@ -194,25 +218,29 @@ def test_critic_loop_aborts_on_repeated_feedback(mock_claude, mock_tests):  # RE
 
 
 # ─────────────────────────────────────────────────────────────
-#  REQ-20  critic loop max iterations
+#  REQ-20 (adapted for item 028): outer design-cycle ceiling
 # ─────────────────────────────────────────────────────────────
 
 @patch("orchestrator.runner.run_tests")
 @patch("orchestrator.claude.run_claude")
-def test_critic_loop_max_iterations(mock_claude, mock_tests):  # REQ-20
+def test_critic_loop_max_iterations(mock_claude, mock_tests):  # REQ-20 / item-028
+    """Each design cycle: impl + struktur-fail (different reasons to avoid stuck).
+    Cycles = max_critic + 1; struktur fails immediately so only 2 calls per cycle."""
     max_critic = 2
-    mock_claude.side_effect = [
-        (0, f"implementation {i // 2}") if i % 2 == 0
-        else (0, f"REJECTED\n- concern {i}")   # different feedback each time
-        for i in range((max_critic + 1) * 2)
-    ]
+    responses = []
+    for i in range(max_critic + 1):
+        responses.append((0, f"impl {i}"))
+        # Different reason per cycle keeps stuck-detection from firing early.
+        responses.append((0, f'{{"pass": false, "reason": "concern {i}"}}'))
+    mock_claude.side_effect = responses
     mock_tests.return_value = (True, "all passed")
 
-    result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5,
-                         max_critic_iterations=max_critic)
+    result = critic_loop(
+        TASK, "pytest", "/project",
+        max_ralph_iterations=5, max_critic_iterations=max_critic,
+    )
 
     assert result is False
-    # implement + critic per cycle, cycles = max_critic + 1
     assert mock_claude.call_count == (max_critic + 1) * 2
 
 
@@ -266,11 +294,13 @@ def test_write_tests_phase_fails_when_no_files_created(mock_claude, mock_detect)
 @patch("orchestrator.status.update_task_status")
 @patch("orchestrator.claude.run_claude")
 @patch("orchestrator.runner.run_tests")
-def test_critic_loop_flips_status_to_done_on_success(  # REQ-38
+def test_critic_loop_flips_status_to_done_on_success(  # REQ-38 / item-028
     mock_tests, mock_claude, mock_update, tmp_path,
 ):
     mock_tests.return_value = (True, "pytest: 3 passed")
-    mock_claude.return_value = (0, "APPROVED — looks great")
+    mock_claude.side_effect = [
+        (0, "implemented"), _STRUKTUR_PASS, _DOCS_OK, _FINAL_APPROVE,
+    ]
 
     ok = critic_loop(TASK, "pytest", str(tmp_path), max_ralph_iterations=1, max_critic_iterations=1)
 
@@ -296,3 +326,142 @@ def test_critic_loop_flips_status_to_action_needed_on_failure(  # REQ-38
     calls = [c.args for c in mock_update.call_args_list]
     assert (str(tmp_path), TASK["id"], "in progress") in calls
     assert (str(tmp_path), TASK["id"], "action needed") in calls
+
+
+# ═══════════════════════════════════════════════════════════════
+#  Option-H DoD gates — phase-specific behaviors (backlog item 028)
+# ═══════════════════════════════════════════════════════════════
+
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
+def test_struktur_reject_routes_to_ralph_with_feedback(mock_claude, mock_tests):  # item-028
+    """Struktur fail on cycle 1 → Ralph rerun on cycle 2 with the reason
+    embedded in the implement prompt. Cycle 2 passes all gates."""
+    mock_claude.side_effect = [
+        (0, "impl v1"),
+        _STRUKTUR_FAIL,                 # cycle 1: struktur rejects
+        (0, "impl v2"),
+        _STRUKTUR_PASS, _DOCS_OK, _FINAL_APPROVE,
+    ]
+    mock_tests.return_value = (True, "green")
+
+    result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
+
+    assert result is True
+    # Cycle-2 implement (index 2) must carry the struktur rejection reason.
+    reimpl_prompt = mock_claude.call_args_list[2][0][0]
+    assert "wrong abstraction" in reimpl_prompt or "structure" in reimpl_prompt
+
+
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
+def test_docs_write_escape_routes_to_ralph_with_design_feedback(mock_claude, mock_tests):  # item-028
+    """Docs actor invoking the design_issue escape aborts docs+final and
+    kicks Ralph back on the next design cycle with the escape reason."""
+    mock_claude.side_effect = [
+        (0, "impl v1"),
+        _STRUKTUR_PASS,
+        _DOCS_ESCAPE,                   # cycle 1: docs actor escapes
+        (0, "impl v2"),
+        _STRUKTUR_PASS, _DOCS_OK, _FINAL_APPROVE,
+    ]
+    mock_tests.return_value = (True, "green")
+
+    result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
+
+    assert result is True
+    reimpl_prompt = mock_claude.call_args_list[3][0][0]
+    assert "design_issue_from_docs_attempt" in reimpl_prompt \
+        or "leaky abstraction" in reimpl_prompt
+
+
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
+def test_final_approval_docs_route_reruns_docs_write_within_same_cycle(mock_claude, mock_tests):  # item-028
+    """route_to='docs' repeats Phase 3 in the SAME design cycle — no
+    Ralph rerun, no new implementation call."""
+    mock_claude.side_effect = [
+        (0, "impl"),
+        _STRUKTUR_PASS,
+        _DOCS_OK,       _FINAL_DOCS,    # docs cycle 1: rejected → retry docs
+        _DOCS_OK,       _FINAL_APPROVE, # docs cycle 2: approved
+    ]
+    mock_tests.return_value = (True, "green")
+
+    result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
+
+    assert result is True
+    # Only ONE implement call means Ralph did not rerun — routing stayed
+    # inside the docs sub-loop.
+    assert mock_tests.call_count == 1
+    # 2 impl-worthy calls would double the test invocations; single-run
+    # confirmation is the meaningful signal here.
+
+
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
+def test_docs_route_passes_reject_feedback_into_next_docs_write(mock_claude, mock_tests):  # item-028
+    """The docs_write retry must include the previous final_approval
+    reason as feedback (so the actor knows what to fix)."""
+    mock_claude.side_effect = [
+        (0, "impl"),
+        _STRUKTUR_PASS,
+        _DOCS_OK, _FINAL_DOCS,          # docs cycle 1: rejected
+        _DOCS_OK, _FINAL_APPROVE,       # docs cycle 2: approved
+    ]
+    mock_tests.return_value = (True, "green")
+
+    critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
+
+    # The second docs_write prompt (call index 4) must carry final_approval feedback.
+    retry_docs_prompt = mock_claude.call_args_list[4][0][0]
+    assert "wrong version" in retry_docs_prompt or "factual_error" in retry_docs_prompt
+
+
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
+def test_max_docs_cycles_escalates_to_design_route(mock_claude, mock_tests):  # item-028 (Guardrail 3)
+    """After MAX_DOCS_CYCLES docs-only rejects, the loop force-routes to
+    a design fix — evidence that docs alone are not the problem."""
+    from orchestrator import MAX_DOCS_CYCLES
+    docs_pairs = []
+    for _ in range(MAX_DOCS_CYCLES):
+        docs_pairs.append(_DOCS_OK)
+        docs_pairs.append(_FINAL_DOCS)          # keeps rejecting to docs
+    mock_claude.side_effect = [
+        (0, "impl cycle 1"),
+        _STRUKTUR_PASS,
+        *docs_pairs,                            # exhaust docs cycles
+        (0, "impl cycle 2"),                    # escalated → Ralph rerun
+        _STRUKTUR_PASS, _DOCS_OK, _FINAL_APPROVE,
+    ]
+    mock_tests.return_value = (True, "green")
+
+    result = critic_loop(TASK, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
+
+    assert result is True
+    # Ralph ran twice → 2 test-command invocations
+    assert mock_tests.call_count == 2
+    # Cycle-2 implement prompt must carry the escalation feedback
+    reimpl_idx = 2 + 2 * MAX_DOCS_CYCLES        # after impl + struktur + docs_pairs
+    reimpl_prompt = mock_claude.call_args_list[reimpl_idx][0][0]
+    assert "escalation" in reimpl_prompt.lower() or "factual_error" in reimpl_prompt
+
+
+@patch("orchestrator.runner.run_tests")
+@patch("orchestrator.claude.run_claude")
+def test_happy_path_bug_flow_uses_bug_variant_prompts(mock_claude, mock_tests):  # item-028
+    """Bug items must run through the same 4-gate sequence via bug_variant
+    prompt builders (identical outer flow, different framing)."""
+    bug = {"id": "B01-broken", "content": "Reproducer for defect X", "type": "bug", "path": "b.md"}
+    mock_claude.side_effect = [
+        (0, "fixed"), _STRUKTUR_PASS, _DOCS_OK, _FINAL_APPROVE,
+    ]
+    mock_tests.return_value = (True, "green")
+
+    result = critic_loop(bug, "pytest", "/project", max_ralph_iterations=5, max_critic_iterations=3)
+
+    assert result is True
+    # The struktur prompt (call index 1) must use bug-variant framing.
+    struktur_prompt = mock_claude.call_args_list[1][0][0]
+    assert "bug" in struktur_prompt.lower() or "fix" in struktur_prompt.lower()
