@@ -15,9 +15,7 @@
       "PowerShell(git rebase*)",
       "PowerShell(git reset*)",
       "PowerShell(git push*)",
-      "Edit(orchestrator/**)",
-      "Write(orchestrator/**)",
-      "MultiEdit(orchestrator/**)"
+      "Edit(orchestrator/**)"
     ]
   }
 }

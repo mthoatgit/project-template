@@ -164,8 +164,12 @@ verified.
 - **REQ-39** — Every `run_claude` subprocess is launched with
   `--settings orchestrator/subprocess_settings.json`. That file's
   `permissions.deny` list hard-blocks writes to anything under
-  `orchestrator/` (via `Edit(orchestrator/**)`, `Write(orchestrator/**)`,
-  `MultiEdit(orchestrator/**)`). Enforcement happens inside Claude Code
+  `orchestrator/` via a single `Edit(orchestrator/**)` rule. Claude
+  Code's permission model treats `Edit` as the umbrella that covers all
+  file-editing tools (Write, MultiEdit, …); adding separate
+  `Write(orchestrator/**)` / `MultiEdit(orchestrator/**)` entries would
+  be silently ignored and produce a "not matched by file permission
+  checks" warning on every call. Enforcement happens inside Claude Code
   itself, before the tool call fires — no post-hoc rollback lives in the
   Python side. Deny rules apply even under
   `--dangerously-skip-permissions` (that flag skips the interactive "may

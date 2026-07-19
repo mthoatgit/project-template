@@ -108,7 +108,20 @@ def test_subprocess_settings_deny_git_write_commands():  # REQ-41
 
 def test_subprocess_settings_deny_orchestrator_file_writes():  # REQ-39
     """Every write path that Claude typically uses for source files is
-    blocked from touching anything under orchestrator/."""
+    blocked from touching anything under orchestrator/.
+
+    A single ``Edit(orchestrator/**)`` rule is sufficient — Claude Code's
+    permission model treats Edit as the umbrella tool that covers Write,
+    MultiEdit, and any other file-editing tool. Adding separate
+    ``Write(...)`` / ``MultiEdit(...)`` entries produces "not matched by
+    file permission checks" warnings on every subprocess call (see
+    backlog item 015). Assert only ``Edit(...)`` and assert that the
+    other two are absent so the warning cannot regress.
+    """
     deny = _settings()["permissions"]["deny"]
-    for tool in ("Edit", "Write", "MultiEdit"):
-        assert f"{tool}(orchestrator/**)" in deny, f"deny missing: {tool}(orchestrator/**)"
+    assert "Edit(orchestrator/**)" in deny, "deny missing: Edit(orchestrator/**)"
+    for shadow in ("Write(orchestrator/**)", "MultiEdit(orchestrator/**)"):
+        assert shadow not in deny, (
+            f"{shadow} is a no-op — Edit(...) already covers it, and the "
+            f"presence of {shadow} produces a CLI warning every call"
+        )

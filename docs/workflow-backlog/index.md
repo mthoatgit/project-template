@@ -13,7 +13,6 @@
 | 012 | P2   | `/ship-epic` PR-Ceremony togglable per Projekt                | open   | 2026-07-09 21:55 | 2026-07-09 21:55 | [→](topics/012-ship-epic-togglable.md)                   |
 | 013 | P2   | `docs/tasks/` Layout nicht final                              | open   | 2026-07-09 21:34 | 2026-07-09 21:34 | [→](topics/013-docs-tasks-layout.md)                     |
 | 014 | P3   | Dashboard zeigt Type-Spalte nicht                             | open   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/014-dashboard-type-column.md)                 |
-| 015 | P3   | `MultiEdit`-Deny cosmetic Warning                             | open   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/015-multiedit-deny-warning.md)                |
 | 016 | P3   | feat/fix-Unterscheidung in Orchestrator-Commits               | open   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/016-feat-fix-orchestrator-commits.md)         |
 | 022 | P1   | Workflow-overview.md driftet unbemerkt — Sync-Trigger unreliable | open   | 2026-07-11 22:12 | 2026-07-11 22:12 | [→](topics/022-workflow-overview-sync-trigger.md)        |
 | 023 | P1   | Stale `docs/tasks/epics/` + `backlog.md` Refs in Commands & Skills | open   | 2026-07-14 12:51 | 2026-07-14 12:51 | [→](topics/023-stale-task-layout-refs.md)                |
@@ -30,3 +29,4 @@
 | 020 | —    | `workflow-bugs` Skill                                         | done   | 2026-07-09 21:31 | 2026-07-09 21:31 | [→](topics/archive/020-workflow-bugs-skill.md)           |
 | 026 | P2   | `status.py` akzeptiert Bug-IDs im Code, aber kein Test schützt den B-Pfad | done   | 2026-07-18 21:27 | 2026-07-18 21:27 | [→](topics/archive/026-status-updater-untested-for-bugs.md) |
 | 027 | P2   | Bug-File hat keine „Affected Surface"-Sektion — Actor scoped zu eng | done   | 2026-07-18 21:41 | 2026-07-18 21:41 | [→](topics/archive/027-bug-file-affected-surface-section.md) |
+| 015 | P3   | `MultiEdit`-Deny cosmetic Warning (aufgedeckt als kaputter Guardrail) | done   | 2026-07-09 21:31 | 2026-07-19 13:45 | [→](topics/archive/015-multiedit-deny-warning.md)        |
