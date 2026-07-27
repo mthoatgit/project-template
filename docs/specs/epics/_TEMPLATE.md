@@ -74,15 +74,15 @@ an observable acceptance line.>
 
 ## Tasks
 
-<Filled in during the Task Breakdown Phase. Links to files in
-`docs/tasks/E<N>/`.>
+<Filled in at Stage 4 (Task-Breakdown) of the featurework lifecycle.
+Links to files in `docs/tasks/E<N>/`.>
 
 - [T<NN> — <Task title>](../../tasks/E<N>/T<NN>-<slug>.md)
 
 ## Epic-Level Acceptance Criteria
 
-<Filled in during the Task Breakdown Phase. User-observable behaviour
-that proves this Epic is done.>
+<Filled in at Stage 4 (Task-Breakdown) of the featurework lifecycle.
+User-observable behaviour that proves this Epic is done.>
 
 - <Criterion 1>
 - <Criterion 2>

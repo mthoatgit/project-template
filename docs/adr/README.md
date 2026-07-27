@@ -25,5 +25,6 @@ The canonical structure lives in [`_TEMPLATE.md`](_TEMPLATE.md).
   `superseded by NNNN`.
 - A new ADR that supersedes an old one references the old one in its
   Status line; the old ADR's Status is updated to reflect supersession.
-- ADRs are written during Phase 2 (Architecture) and whenever a
-  significant architectural decision is made later.
+- ADRs are written at Stage 3 (Architecture) of a backlog item's
+  featurework lifecycle — item 001's Stage 3 produces the founding
+  ADR-0001 (tech stack); later items' Stage 3 produce further ADRs.

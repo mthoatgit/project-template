@@ -16,7 +16,7 @@ status: template
 
 ## Tech Stack
 
-<Confirmed during the Architecture Phase (Phase 2). Authoritative source: `docs/architecture/system-design.md` + ADRs.>
+<Confirmed at Stage 3 (Architecture) of item 001's featurework lifecycle. Authoritative source: `docs/architecture/system-design.md` + ADRs.>
 
 | Layer | Choice |
 |---|---|

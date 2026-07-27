@@ -18,9 +18,10 @@ it let them do, why does it matter.>
 Scheduling", "Document Signing". One line.>
 
 <!-- Tech stack is NOT decided here. It is an architecture decision —
-made in Phase 2 and recorded in docs/architecture/system-design.md +
-docs/adr/0001-tech-stack.md. Mandated/forbidden tech (a constraint, not
-a choice) belongs in docs/concept.md → Constraints. -->
+made at Stage 3 (Architecture) of item 001's featurework lifecycle and
+recorded in docs/architecture/system-design.md + docs/adr/0001-tech-stack.md.
+Mandated/forbidden tech (a constraint, not a choice) belongs in
+docs/concept.md → Constraints. -->
 
 ## Out of Scope (for now)
 

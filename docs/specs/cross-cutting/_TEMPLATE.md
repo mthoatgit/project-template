@@ -35,8 +35,8 @@ compliance.>
 
 ## Affected Epics
 
-<Epics that must satisfy this concern. Traceability hint for Phase 4
-test coverage.>
+<Epics that must satisfy this concern. Traceability hint for Stage 5
+(Tests) coverage.>
 
 - E<N> — <Epic name>
 - E<N> — <Epic name>
