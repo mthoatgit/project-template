@@ -15,7 +15,7 @@ status: template
 > Every scenario must map back to a requirement ID and the task(s) it
 > depends on.
 
-**Source:** [[NNN-slug]]     <!-- Backlog item whose promotion produced the initial test-scenario set. Later append-only additions from other items are marked with an inline HTML comment `<!-- Source: [[MMM-slug]] -->` before their block. -->
+**Source:** [[NNN-slug]]     <!-- Backlog item that produced this file's initial write. Every scenario row also carries its own Source column below. -->
 
 Covers <REQ-IDs>.
 
@@ -26,9 +26,11 @@ HTTP call with an external `Origin` header, CLI invoked via `main()`), not
 from a widget/function tested in isolation. Widget/unit rows are welcome
 in addition.
 
-| Scenario | Layer | Requirement | Feature |
-|---|---|---|---|
-| **Entry-point**: <observable behaviour via the real entry — e.g. "root widget rendered via `main()` shows the task list", "GET /api/tasks with Origin http://localhost:8080 returns 200 with `Access-Control-Allow-Origin` header"> | <Integration / E2E> | <REQ-ID> | <F<NN>> |
-| <Happy path — concise description of the observable behaviour> | <Unit / Slice / Integration / E2E> | <REQ-ID> | <F<NN>> |
-| <Validation / error case> | <Layer> | <REQ-ID, NFR-ID> | <F<NN>, F<NN>> |
-| <Edge case — concurrency / duplicate / missing entity> | <Layer> | <REQ-ID> | <F<NN>> |
+**Per-scenario Source:** every row has a `Source` column carrying the backlog item that produced that specific scenario in `[[NNN-slug]]` syntax. Required. This is how the file stays traceable as scenarios from many items accumulate over time.
+
+| Scenario | Layer | Requirement | Task | Source |
+|---|---|---|---|---|
+| **Entry-point**: <observable behaviour via the real entry — e.g. "root widget rendered via `main()` shows the task list", "GET /api/tasks with Origin http://localhost:8080 returns 200 with `Access-Control-Allow-Origin` header"> | <Integration / E2E> | <REQ-ID> | <T<NN>> | [[NNN-slug]] |
+| <Happy path — concise description of the observable behaviour> | <Unit / Slice / Integration / E2E> | <REQ-ID> | <T<NN>> | [[NNN-slug]] |
+| <Validation / error case> | <Layer> | <REQ-ID, NFR-ID> | <T<NN>, T<NN>> | [[NNN-slug]] |
+| <Edge case — concurrency / duplicate / missing entity> | <Layer> | <REQ-ID> | <T<NN>> | [[NNN-slug]] |

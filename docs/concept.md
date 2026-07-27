@@ -14,6 +14,12 @@ status: template
 **Status:** draft
 **Last-reviewed:** YYYY-MM-DD
 
+## Change log
+
+<Reverse-chronological list of writes and amendments. One bullet per event: date, one-line reason, source backlog item. Every Concept-Amendment phase step MUST append an entry here.>
+
+- YYYY-MM-DD — initial write [[001-slug]]
+
 ## In one paragraph
 
 <What this project is, for whom, and why it exists. A reader landing
