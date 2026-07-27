@@ -31,13 +31,17 @@ once assigned. Tasks and tests reference IDs, never file paths.
 Each REQ carries three required indented fields:
 - **`Acceptance:`** — observable behavior that proves it; product framing OK, tech stack NOT.
 - **`Source:`** — the backlog item it was promoted from, `[[NNN-slug]]` syntax.
-- **`Architecture-impact:`** — either the ADR IDs this REQ produced (e.g. `ADR-0007`), or `none (no ADR)` when the REQ has no architectural consequence. The record that Phase 3 (ADR) was consciously either applied or skipped.>
+- **`Architecture-impact:`** — one of: `pending (see Stage 3)` (Stage 2 defers the decision; Stage 3 back-fills the concrete value), `none (no ADR)` (Stage 2 confident no architecture change needed), or `ADR-<NNNN>` (concrete ADR ID, typically back-filled by Stage 3 in the ADR commit). The record that Stage 3 was consciously either applied or skipped.>
 
-- **<REQ-ID>** — <one-line requirement>
+- **<REQ-ID>** — <one-line requirement, Stage 2 confident no ADR>
   **Acceptance:** <observable, testable behavior — no tech stack>
   **Source:** [[NNN-slug]]
   **Architecture-impact:** none (no ADR)
-- **<REQ-ID>** — <one-line requirement>
+- **<REQ-ID>** — <one-line requirement with plausible arch bearing>
+  **Acceptance:** <observable behavior>
+  **Source:** [[NNN-slug]]
+  **Architecture-impact:** pending (see Stage 3)  <!-- Stage 3 back-fills to ADR-<NNNN> or downgrades to none -->
+- **<REQ-ID>** — <one-line requirement, shape after Stage 3 back-fill>
   **Acceptance:** <observable behavior>
   **Source:** [[NNN-slug]]
   **Architecture-impact:** ADR-<NNNN> (<one-line reminder of what the ADR decided>)
