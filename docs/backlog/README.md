@@ -23,10 +23,13 @@ Etabliert am 2026-07-10 (Item 001), universal refactored am 2026-07-19 mit Type-
   - `/backlog <type> <oneliner>` — neues Item, Type direkt gegeben
   - `/backlog <oneliner>` — neues Item, Type wird interaktiv gefragt
   - `/backlog <NNN-slug>` — existierendes Item öffnen / erweitern / promoten
-- **Lifecycle-Exits.**
-  - `done` — Item ist gelandet (Code committed **oder** Konvention in Skill / CLAUDE.md verankert). File nach `archive/`, Status flippt im Index, `updated` bumpen.
-  - `dropped` — Item wurde überlegt und verworfen (misdiagnosed, YAGNI, überholt). Einzeiler-warum in den Notes anhängen, File nach `archive/`.
-  - `superseded` — Item durch anderes ersetzt. `## Resolution` bekommt `Superseded <YYYY-MM-DD> by [[NNN-slug]]. Reason: <one line>.` (gleiche Slot-Konvention wie `done`). Optional zusätzlicher `### <today>` Notes-Eintrag mit Kontext. File nach `archive/`.
+- **Lifecycle & Stages.** Jeder Item-Type ist an einen Lifecycle gebunden, der die Stages definiert die er durchläuft. `workflow-lifecycle-featurework` für idea/gap/improvement (5 Stages), `workflow-lifecycle-bug` für bug (4 Stages), `workflow-lifecycle-question` für question (2 Stages). Item's `**Lifecycle:**` Header-Zeile zeigt drauf. Stage-Sections wachsen im Item-Body je nachdem in welcher Stage gerade gearbeitet wird.
+- **Terminal-Exits.**
+  - `done` — Alle applicable Stages abgeschlossen. File nach `archive/`, Status flippt im Index, `updated` bumpen.
+  - `dropped` — Item wurde überlegt und verworfen (misdiagnosed, YAGNI, überholt). Einzeiler-warum in der aktuellen Stage's Discussion, File nach `archive/`.
+  - `superseded` — Item durch anderes ersetzt. `## Related` bekommt `Superseded <YYYY-MM-DD> by [[NNN-slug]]. Reason: <one line>.` File nach `archive/`.
+  - `wont-fix` — bug-only. Bug entschieden nicht zu fixen. Reason im Bug-File. File nach `archive/`.
+  - `cant-repro` — bug-only. Stage 1 (Reproduction) endete ohne Reproducer. File nach `archive/`.
 
 ## Prioritisation
 
@@ -36,4 +39,4 @@ Etabliert am 2026-07-10 (Item 001), universal refactored am 2026-07-19 mit Type-
 
 ## Sortierung in `index.md`
 
-Nach Status gruppiert (open → done → dropped → superseded), innerhalb Gruppe nach ID aufsteigend.
+Nach Status gruppiert (open → done → dropped → superseded → wont-fix → cant-repro), innerhalb Gruppe nach ID aufsteigend.

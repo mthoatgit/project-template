@@ -4,7 +4,9 @@ status: template
 
 # <Short title — one line>
 
-> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: gap`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`) and remove this banner. See the `workflow-backlog` skill for the WHY behind the sections below.
+> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: gap`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`) and remove this banner. See the `workflow-backlog` skill for structure and `workflow-lifecycle-featurework` for how this item's stages work.
+
+**Lifecycle:** featurework — see `workflow-lifecycle-featurework`
 
 ## Missing
 
@@ -19,25 +21,16 @@ status: template
 <Impact of leaving it open. What silently degrades or blocks.>
 
 <!--
-Optional section — add when gap-analysis produces a rolling summary worth keeping visible above the Notes trail. Rewritten in-place as understanding shifts. Remove the header entirely if it stays empty.
-
-## Current view
-- Front-runner shape of the fix, open threads, what's blocking.
+Stage sections are added as the item enters each stage of the featurework lifecycle
+(Stage 1 Concept → Stage 2 Requirements → Stage 3 Architecture → Stage 4 Task-Breakdown → Stage 5 Tests).
+Each stage has ### Discussion (dated notes) + ### Outcome (artefact link or null decision) + **Approved:** date.
+See workflow-lifecycle-featurework for each stage's specifics.
 -->
 
-## Notes (chronological)
-
-### YYYY-MM-DD
-
-<First note. What triggered the capture, any immediate context.>
-
 <!--
-Sections below are OPTIONAL. Add them when the item grows into needing
-them. Remove the header entirely if the section stays empty.
+Optional. Add when this item cross-references other items.
+Remove the header entirely if it stays empty.
 
 ## Related
-- [[NNN-other-item]]
-
-## Resolution
-Filled when done. Link to the closing artifact.
+- [[NNN-other-item]] — <one-line reason>
 -->

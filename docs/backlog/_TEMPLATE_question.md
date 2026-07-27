@@ -4,7 +4,9 @@ status: template
 
 # <Short title — one line>
 
-> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: question`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`) and remove this banner. See the `workflow-backlog` skill for the WHY behind the sections below.
+> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: question`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`) and remove this banner. See the `workflow-backlog` skill for structure and `workflow-lifecycle-question` for how this item's stages work.
+
+**Lifecycle:** question — see `workflow-lifecycle-question`
 
 ## Question
 
@@ -15,25 +17,19 @@ status: template
 <What triggered it. What's blocked until it's answered.>
 
 <!--
-Optional section — add when investigation produces partial answers or a rolling summary worth keeping visible above the Notes trail. Rewritten in-place as understanding shifts. Remove the header entirely if it stays empty.
-
-## Current view
-- Best guess so far, open threads, what would settle it.
+Stage sections are added as the item enters each stage of the question lifecycle
+(Stage 1 Investigation → Stage 2 Answer).
+Each stage has ### Discussion (dated notes) + ### Outcome (findings, spike, or answer) + **Approved:** date.
+See workflow-lifecycle-question for each stage's specifics — including when to run /spike vs inline research.
 -->
 
-## Notes (chronological)
-
-### YYYY-MM-DD
-
-<First note. Any thoughts, hypotheses, or partial answers so far.>
-
 <!--
-Sections below are OPTIONAL. Add them when the item grows into needing
-them. Remove the header entirely if the section stays empty.
+Optional. Add when this item cross-references other items — commonly:
+- Follow-up work when the answer requires a new feature/fix/investigation
+- The spike ADR that produced the answer
+
+Remove the header entirely if it stays empty.
 
 ## Related
-- [[NNN-other-item]]
-
-## Resolution
-The answer, or a link to the spike / discussion / ADR that produced it.
+- [[NNN-other-item]] — <one-line reason>
 -->

@@ -22,17 +22,17 @@ status: template
 
 ## Requirements
 
-<REQ-IDs this task implements or contributes to. Required.
+<REQ-IDs this task implements or contributes to. Required — at least one REQ.
 
 REQ IDs are stable and never renumbered — if a REQ later gets
 superseded, its ID stays; this task's reference remains an honest
 record of what it originally implemented, and a new task is created
 for the superseding REQ.
 
-For direct-task shortcuts that bypassed a REQ (small trivial changes
-promoted straight from a backlog item per the shortcut in
-`workflow-requirements` "When to skip the spec entry"), write
-`Direct task from [[NNN-slug]] (no REQ)` instead.>
+Every task belongs to at least one REQ. There is no direct-task
+shortcut without a REQ — small changes still enter the featurework
+lifecycle at Stage 2 (REQ + Epic-Birth) before Stage 4 (Task-Breakdown)
+produces this file.>
 
 - **<REQ-ID>** — <optional one-line reminder of what the REQ covers>
 - **<REQ-ID>** — <optional one-line reminder>

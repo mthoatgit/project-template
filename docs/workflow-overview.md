@@ -1,47 +1,109 @@
 # Workflow Overview
 
-A visual map of the phased, spec-driven workflow this template implements.
-The phase rules themselves live in `~/.claude/skills/workflow-*/SKILL.md`
+A visual map of the backlog-item-driven, stage-based workflow this template implements.
+The stage rules themselves live in `~/.claude/skills/workflow-*/SKILL.md`
 (global, apply to every project cloned from this template) — this file is
 a quick-recall reference, not a source of truth. If it drifts from the
 skills, the skills win.
 
-## Main Flow
+## Central principle
+
+**Everything starts as a backlog item.** The item's `type` determines its
+**lifecycle**, and the lifecycle defines the **stages** the item runs through.
+Each stage is deliberately entered with its own approval gate and its own
+commit — never grouped, never auto-skipped. Every artefact produced carries
+a Source pointer back to the item; the item's Stage sections accumulate
+pointers to every artefact it produced.
+
+## The three lifecycles
 
 ```mermaid
 flowchart TD
-    Idea(["New idea"]) --> Concept
-    Concept["Phase 0 — Concept<br/>ripen 001 in /backlog<br/>→ snapshot to docs/concept.md"]
-    Concept -->|approve| Requirements
-    Requirements["Phase 1 — Requirements<br/>→ docs/specs/README.md<br/>→ docs/specs/epics/E&lt;N&gt;-*.md"]
-    Requirements -->|approve| RiskCheck{"Technical risk?"}
-    RiskCheck -->|yes| Spike["Phase 1.5 — Spike<br/>/spike<br/>branch spike/&lt;slug&gt; — never merged<br/>→ docs/adr/&lt;NNNN&gt;-*.md"]
-    RiskCheck -->|no| Architecture
-    Spike --> Architecture
-    Architecture["Phase 2 — Architecture<br/>→ docs/architecture/system-design.md<br/>→ docs/adr/0001-tech-stack.md"]
-    Architecture -->|approve| Tasks
-    Tasks["Phase 3 — Tasks<br/>→ docs/tasks/E&lt;N&gt;/T&lt;NN&gt;-*.md<br/>→ docs/tasks/index.md"]
-    Tasks -->|approve| Tests
-    Tests["Phase 4 — Tests<br/>→ docs/tests/README.md<br/>→ docs/tests/strategy.md<br/>→ docs/tests/epics/E&lt;N&gt;-*.md"]
-    Tests -->|approve| Implementation
-    Implementation["Phase 5-7 — Implementation<br/>see sub-flow below"]
-    Implementation --> Merged(["PR merged"])
-    Merged -.->|next Epic| Requirements
+    Capture(["Capture in /backlog<br/>type + day-zero framing"])
+    Capture --> TypeCheck{"Type?"}
+    TypeCheck -->|idea/gap/improvement| FW["Featurework<br/>5 stages"]
+    TypeCheck -->|bug| Bug["Bug<br/>4 stages"]
+    TypeCheck -->|question| Q["Question<br/>2 stages"]
+    FW --> ArchivedFW(["Item archived"])
+    Bug --> ArchivedBug(["Item archived"])
+    Q --> ArchivedQ(["Item archived"])
 
     classDef gate fill:#fff3cd,stroke:#d4a017,color:#333;
     classDef doc fill:#eef2ff,stroke:#6366f1,color:#333;
     classDef terminal fill:#dcfce7,stroke:#16a34a,color:#333;
-    class RiskCheck gate;
-    class Concept,Requirements,Spike,Architecture,Tasks,Tests,Implementation doc;
-    class Idea,Merged terminal;
+    class TypeCheck gate;
+    class FW,Bug,Q doc;
+    class Capture,ArchivedFW,ArchivedBug,ArchivedQ terminal;
 ```
 
-Every arrow labeled `approve` is a hard stop: the phase ends with an
-explicit approval request, and nothing in the next phase starts before
-the user confirms. The Spike is the only optional phase — most Epics skip
-it and go straight from Requirements to Architecture.
+## Featurework lifecycle (idea / gap / improvement)
 
-## Implementation Sub-Flow (per Epic)
+Skill: `workflow-lifecycle-featurework`. Five stages, ordered, each deliberately entered.
+
+```mermaid
+flowchart TD
+    S1["Stage 1 — Concept<br/>Discussion + Outcome<br/>artefact: docs/concept.md write/amend<br/>OR null decision"]
+    S1 -->|approve| S2["Stage 2 — Requirements<br/>Discussion + Outcome<br/>artefact: REQ(s) in docs/specs/epics/E&lt;N&gt;-*.md<br/>possibly Epic-birth"]
+    S2 -->|approve| S3["Stage 3 — Architecture<br/>Discussion + Outcome<br/>artefact: ADR + system-design.md<br/>OR null decision"]
+    S3 -->|approve| S4["Stage 4 — Task-Breakdown<br/>Discussion + Outcome<br/>artefact: T-files in docs/tasks/E&lt;N&gt;/"]
+    S4 -->|approve| S5["Stage 5 — Tests<br/>Discussion + Outcome<br/>artefact: scenarios in docs/tests/epics/E&lt;N&gt;-*.md<br/>item archived on this commit"]
+    S5 --> Impl(["Implementation Phase<br/>per Epic — see sub-flow"])
+
+    classDef gate fill:#fff3cd,stroke:#d4a017,color:#333;
+    classDef doc fill:#eef2ff,stroke:#6366f1,color:#333;
+    classDef terminal fill:#dcfce7,stroke:#16a34a,color:#333;
+    class S1,S2,S3,S4,S5 doc;
+    class Impl terminal;
+```
+
+Every arrow is a hard stop: the stage ends with an explicit approval request,
+and nothing in the next stage starts before the user confirms. Stages 1 and 3
+can legitimately produce a **null decision** (no artefact) if the item's
+ripening didn't require it — the null is recorded in the item's Outcome
+sub-section, never silently skipped.
+
+Item 001 (project seed) runs this lifecycle. Its Stage 1 always produces the
+initial `docs/concept.md` (concept file doesn't exist yet, so cannot be null).
+
+## Bug lifecycle
+
+Skill: `workflow-lifecycle-bug`. Four stages, reactive-only (humans file bugs,
+orchestrator never does).
+
+```mermaid
+flowchart TD
+    B1["Stage 1 — Reproduction<br/>Discussion + Outcome<br/>reproducer recipe in bug file<br/>OR cant-repro terminal"]
+    B1 -->|approve| B2["Stage 2 — Root cause<br/>Discussion + Outcome<br/>Root Cause section filled"]
+    B2 -->|approve| B3["Stage 3 — Regression test<br/>Discussion + Outcome<br/>Class A: test scenario in docs/tests/ (RED)<br/>Class B: smoke-catalog entry"]
+    B3 -->|approve| B4["Stage 4 — Fix<br/>Discussion + Outcome<br/>Class A: orchestrator-driven<br/>Class B: human-implemented<br/>bug archived on this commit"]
+
+    classDef gate fill:#fff3cd,stroke:#d4a017,color:#333;
+    classDef doc fill:#eef2ff,stroke:#6366f1,color:#333;
+    class B1,B2,B3,B4 doc;
+```
+
+Test-first regression discipline: Stage 3 (regression test, RED) always
+comes before Stage 4 (fix, flips to GREEN). Class B bugs skip the
+orchestrator in Stage 4 and are manually implemented.
+
+## Question lifecycle
+
+Skill: `workflow-lifecycle-question`. Two stages, short flow.
+
+```mermaid
+flowchart TD
+    Q1["Stage 1 — Investigation<br/>Discussion + Outcome<br/>inline research in item<br/>OR /spike branch"]
+    Q1 -->|approve| Q2["Stage 2 — Answer<br/>Discussion + Outcome<br/>inline resolution<br/>OR ADR from spike<br/>OR follow-up item filed<br/>question archived on this commit"]
+
+    classDef gate fill:#fff3cd,stroke:#d4a017,color:#333;
+    classDef doc fill:#eef2ff,stroke:#6366f1,color:#333;
+    class Q1,Q2 doc;
+```
+
+If Stage 1 chose the spike route, its outcome is the spike branch + closing
+ADR (per `workflow-spike`). Stage 2 references that ADR as the answer.
+
+## Implementation Sub-Flow (per Epic — for featurework items after Stage 5)
 
 ```mermaid
 flowchart TD
@@ -74,55 +136,68 @@ Claude never runs `git checkout -b`, never commits during the loops
 (the orchestrator owns the per-task commit), and never merges or pushes
 to `main` directly — the user always merges.
 
-## Phase Reference
+Bugs (Class A) enter the same orchestrator loop at Stage 4 of the bug
+lifecycle, but pick up as `fix:` commits instead of `feat:` and are
+constrained by the pinned regression test from Stage 3.
 
-| Phase | Skill | Command(s) | Primary output |
-|---|---|---|---|
-| 0 — Concept | `workflow-backlog` (ripening) + `workflow-concept` (artifact) | `/backlog 001` → snapshot promotion | `docs/concept.md` |
-| 1 — Requirements | `workflow-requirements` | always via `/backlog` promotion (1..N REQs per item) — at Phase 1 kick-off just in rapid succession | `docs/specs/README.md`, `docs/specs/epics/E<N>-*.md` |
-| 1.5 — Spike (optional) | `workflow-spike` | `/spike <question>` | `docs/adr/<NNNN>-*.md`, branch `spike/<slug>` |
-| 2 — Architecture | `workflow-architecture` | — | `docs/architecture/system-design.md`, `docs/adr/0001-tech-stack.md` |
-| 3 — Tasks | `workflow-tasks` | — | `docs/tasks/E<N>/T<NN>-*.md`, `docs/tasks/index.md` |
-| 4 — Tests | `workflow-tests` | — | `docs/tests/README.md`, `docs/tests/strategy.md`, `docs/tests/epics/E<N>-*.md` |
-| 5-7 — Implementation | `workflow-implementation` | `/start-epic`, `/scaffold`, `python -m orchestrator`, `/ship-epic` | code + tests, one PR per Epic |
-| cross-cutting | `workflow-epics` | — | Epic naming/sizing conventions used by every phase above |
-| reactive (post-done) | `workflow-bugs` | — | `docs/tasks/E<N>/B<NN>-*.md`, entries in `docs/tasks/index.md` (Type: bug) |
+## Skill map
+
+| Skill | Role |
+|---|---|
+| `workflow-backlog` | Universal capture and cross-cutting item conventions (types, universal frontmatter, item structure, design-conversation principles, cross-item references) |
+| `workflow-lifecycle-featurework` | 5-stage lifecycle for idea / gap / improvement |
+| `workflow-lifecycle-bug` | 4-stage lifecycle for bug |
+| `workflow-lifecycle-question` | 2-stage lifecycle for question |
+| `workflow-concept` | Artefact spec for `docs/concept.md` (used at Stage 1 of featurework) |
+| `workflow-requirements` | Artefact spec for REQ entries + Epic files (used at Stage 2 of featurework) |
+| `workflow-architecture` | Artefact spec for ADR + `docs/architecture/system-design.md` (used at Stage 3 of featurework, sometimes at Stage 1 of question via spike) |
+| `workflow-tasks` | Artefact spec for task files (used at Stage 4 of featurework and Stage 4 of bug) |
+| `workflow-tests` | Artefact spec for test-scenario files (used at Stage 5 of featurework and Stage 3 of bug) |
+| `workflow-spike` | Artefact spec for spike branches + closing ADRs (used at Stage 1 of question when investigation route is spike) |
+| `workflow-epics` | Epic naming/sizing conventions used across all featurework lifecycles |
+| `workflow-implementation` | Orchestrator + Git workflow for turning task/bug files into merged code |
+| `workflow-new-project` | Scaffold flow for creating a fresh downstream project from project-template |
 
 Skills live at `~/.claude/skills/workflow-*/SKILL.md` and are global —
-they apply to every project cloned from this template, not just this repo.
+they apply to every project cloned from this template.
 
 ## Easy-to-Forget Concepts
 
+- **Type is immutable.** Once an item is filed with a type, that type
+  determines the lifecycle for its life. If a type turns out wrong
+  (bug misdiagnosed as improvement, question that's really a feature),
+  drop the item and refile with the correct type. Cross-link both.
 - **Three levels of acceptance criteria, not one:**
-  `REQ-AC` (Phase 1, behavioral) → `Epic-AC` (Phase 3, user-observable) →
-  `Task-AC` (Phase 3, technical). Later levels refine earlier ones; they
-  must never contradict them.
+  `REQ-AC` (Stage 2 of featurework, behavioral) → `Epic-AC` (Stage 4,
+  user-observable) → `Task-AC` (Stage 4, technical). Later levels refine
+  earlier ones; they must never contradict them.
 - **Requirements are append-only.** A substantial change to an approved
   requirement is a *supersession* (`STATUS: superseded by <new-ID>`), not
   an edit in place. IDs are never reused or renumbered.
-- **Epic sizing:** 3–8 tasks, demoable in 30 seconds after merge. Smaller
-  is noise, larger is unreviewable. A pure refactor with no user-visible
-  delta is not an Epic.
-- **Template-file marker:** files awaiting real content carry
-  `status: template` frontmatter + an inline banner. Remove both when
-  filling them for real — a file without these markers is real content,
-  never edit it as if it were still a placeholder.
+- **Every artefact carries a Source.** REQ has `Source: [[NNN-slug]]`,
+  ADR has `Source-item:` + `Source-REQs:`, Task has `Source:` header +
+  `## Requirements` section, Test scenario has `Source` column per row,
+  concept has `## Change log` bullets. No orphan artefacts.
 - **Foundational contradictions mid-Epic** (architecture can't work,
   a requirement turns out impossible) stop everything immediately and
-  propagate upstream with user go-ahead — this is different from the
-  routine drift the Reflect step handles at `/ship-epic` time.
+  propagate upstream with user go-ahead.
+- **Template-file marker:** files awaiting real content carry
+  `status: template` frontmatter + an inline banner. Remove both when
+  filling them for real.
 
 ## Golden Rules
 
 **Never:**
-- Skip phases
+- Skip stages (each stage is deliberately entered, even for null outcomes)
+- Group multiple stages into one commit (each stage is its own approval gate)
+- File a task without a REQ (no direct-task-bypass)
+- Modify unrelated files during a stage's work
 - Implement without an approved task or bug
-- Change architecture without approval
-- Add unrelated features
-- Modify unrelated files
 
 **Always:**
-- Stay within task scope
+- Confirm the type at capture (lifecycle depends on it)
+- Stay within the current stage's scope
+- Record a null decision when a stage has no artefact (never silently skip)
 - Ask when uncertain
 - Prefer simplicity over complexity
 - Follow acceptance criteria strictly

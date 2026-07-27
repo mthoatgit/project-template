@@ -4,35 +4,37 @@ status: template
 
 # <Short title — one line>
 
-> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: idea`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`) and remove this banner. See the `workflow-backlog` skill for the WHY behind the sections below.
+> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: idea`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`) and remove this banner. See the `workflow-backlog` skill for structure and `workflow-lifecycle-featurework` for how this item's stages work.
+
+**Lifecycle:** featurework — see `workflow-lifecycle-featurework`
 
 ## Core
 
-<One paragraph. What the idea is at its essence. Write it the day the idea is captured — do NOT rewrite this later. It is the seed, not the sapling. Ripening happens in the Notes section below.>
+<One paragraph. What the idea is at its essence. Write it the day the idea is captured — do NOT rewrite this later. It is the seed, not the sapling. Design discussion happens later in the per-stage Discussion sub-sections.>
 
 <!--
-Optional section — add when ripening produces multiple threads and Core alone no longer conveys where the design currently stands. Rewritten in-place as the front-runner shifts and open threads evolve. Kept short — a paragraph or a short bullet list, not a re-write of the history in Notes. Remove the header entirely if it stays empty.
+Stage sections are added as the item enters each stage of the featurework lifecycle
+(Stage 1 Concept → Stage 2 Requirements → Stage 3 Architecture → Stage 4 Task-Breakdown → Stage 5 Tests).
+Each stage has:
 
-## Current view
-- Front-runner shape of the design, open threads, what's blocking a promotion.
+## Stage N — <name>
+
+### Discussion
+### YYYY-MM-DD
+<dated notes while working the stage>
+
+### Outcome
+<artefact link with commit hash, OR "not applicable — <reason>" for null decision>
+
+**Approved:** YYYY-MM-DD
+
+See workflow-lifecycle-featurework for each stage's specifics.
 -->
 
-## Notes (chronological)
-
-### YYYY-MM-DD
-
-<First note. What made this worth capturing? What's the immediate context?>
-
 <!--
-Sections below are OPTIONAL. Add them when the item grows into needing
-them. Remove the header entirely if the section stays empty.
-
-## Open questions
-- <specific things that block promotion>
+Optional. Add when this item cross-references other items (splits, follow-up work, dependencies).
+Remove the header entirely if it stays empty.
 
 ## Related
-- [[NNN-other-item]]
-
-## Resolution
-Filled when promoted. Downstream artifact: link to REQ / concept / task.
+- [[NNN-other-item]] — <one-line reason>
 -->

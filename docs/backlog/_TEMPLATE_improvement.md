@@ -4,7 +4,9 @@ status: template
 
 # <Short title — one line>
 
-> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: improvement`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`) and remove this banner. See the `workflow-backlog` skill for the WHY behind the sections below.
+> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: improvement`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`) and remove this banner. See the `workflow-backlog` skill for structure and `workflow-lifecycle-featurework` for how this item's stages work.
+
+**Lifecycle:** featurework — see `workflow-lifecycle-featurework`
 
 ## Current state
 
@@ -19,25 +21,19 @@ status: template
 <Why the change is worth it. What future work benefits.>
 
 <!--
-Optional section — add when ripening produces multiple threads about how to implement. Distinct from the ## Current state day-zero section above: that captures how it works today (frozen); ## Current view captures where the DESIGN of the improvement currently stands (rewritten in-place). Remove the header entirely if it stays empty.
+Stage sections are added as the item enters each stage of the featurework lifecycle
+(Stage 1 Concept → Stage 2 Requirements → Stage 3 Architecture → Stage 4 Task-Breakdown → Stage 5 Tests).
+Each stage has ### Discussion (dated notes) + ### Outcome (artefact link or null decision) + **Approved:** date.
+See workflow-lifecycle-featurework for each stage's specifics.
 
-## Current view
-- Front-runner approach, open threads, what's blocking.
+Note: the `## Current state` day-zero section above captures HOW IT WORKS TODAY (frozen).
+The stage Discussions capture the DESIGN of the improvement (grows as stages work through).
 -->
 
-## Notes (chronological)
-
-### YYYY-MM-DD
-
-<First note. What triggered the capture, any immediate context.>
-
 <!--
-Sections below are OPTIONAL. Add them when the item grows into needing
-them. Remove the header entirely if the section stays empty.
+Optional. Add when this item cross-references other items.
+Remove the header entirely if it stays empty.
 
 ## Related
-- [[NNN-other-item]]
-
-## Resolution
-Filled when done. Link to the closing artifact (task, REQ, commit).
+- [[NNN-other-item]] — <one-line reason>
 -->

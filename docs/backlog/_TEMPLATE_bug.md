@@ -4,40 +4,31 @@ status: template
 
 # <Short title — one line>
 
-> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: bug`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`) and remove this banner. See the `workflow-backlog` skill for the WHY behind the sections below.
+> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: bug`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`) and remove this banner. See the `workflow-backlog` skill for structure and `workflow-lifecycle-bug` for how this item's stages work.
+
+**Lifecycle:** bug — see `workflow-lifecycle-bug`
 
 ## Symptom
 
-<What breaks concretely — examples, error messages, IDs, log snippets.>
-
-## Reproduction
-
-<Steps, environment, or context that surfaces the defect. If not reproducible yet, say so and describe the observation instead.>
-
-## Impact
-
-<What future work suffers, or what silently goes wrong.>
+<What breaks concretely — examples, error messages, IDs, log snippets. No interpretation.>
 
 <!--
-Optional section — add when investigation produces a rolling summary worth keeping visible above the Notes trail. Rewritten in-place as understanding shifts. Remove the header entirely if it stays empty.
+Stage sections are added as the item enters each stage of the bug lifecycle
+(Stage 1 Reproduction → Stage 2 Root cause → Stage 3 Regression test → Stage 4 Fix).
+Each stage has ### Discussion (dated notes) + ### Outcome (artefact link or terminal) + **Approved:** date.
+See workflow-lifecycle-bug for each stage's specifics, Class A vs B rules, and orchestrator interaction.
 
-## Current view
-- Front-runner hypothesis, open threads, what's blocking a fix.
+When Stage 4 (Fix) completes, the bug moves out of the backlog and becomes a B<NN> file under
+docs/tasks/E<N>/ per workflow-lifecycle-bug's output layout.
 -->
 
-## Notes (chronological)
-
-### YYYY-MM-DD
-
-<First note. What triggered the capture, what you already know, first hypothesis.>
-
 <!--
-Sections below are OPTIONAL. Add them when the item grows into needing
-them. Remove the header entirely if the section stays empty.
+Optional. Add when this item cross-references other items — commonly:
+- Follow-up idea/improvement when Root Cause reveals a spec gap
+- Related tasks the bug undermines
+
+Remove the header entirely if it stays empty.
 
 ## Related
-- [[NNN-other-item]]
-
-## Resolution
-Filled when done. Link to the regression test + fix commit.
+- [[NNN-other-item]] — <one-line reason>
 -->
