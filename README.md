@@ -1,6 +1,6 @@
 # project-template
 
-Starter scaffolding for new projects. Combines the phased AI-driven
+Starter scaffolding for new projects. Combines the backlog-driven AI
 workflow conventions, Claude Code settings, and the GitHub Actions
 stubs that delegate to [mthoatgit/workflows](https://github.com/mthoatgit/workflows).
 
@@ -12,83 +12,117 @@ stubs that delegate to [mthoatgit/workflows](https://github.com/mthoatgit/workfl
 2. Add the OAuth secret: **Settings → Secrets and variables → Actions →**
    `CLAUDE_CODE_OAUTH_TOKEN`.
 3. Open the project in your IDE with Claude Code installed.
-4. Run **`/init-project`** — it fills in the root `CLAUDE.md` template
-   (project name, stack, commands), replaces this `README.md` with a
-   real project README, and points you to the Concept Phase. You can
-   also do these steps manually if you prefer.
+4. Run **`/init-project`** — fills the root `CLAUDE.md`, replaces this
+   `README.md` with a real project README, resets `docs/backlog/`, and
+   files **item 001** with your seed idea. You can also do these steps
+   manually if you prefer.
 
-### The phased flow
+Alternatively, from an existing Claude Code session in another project,
+run **`/new-project <name>`** — it clones this template, wipes history,
+and applies `/init-project` to the new directory in one flow.
 
-Each phase ends with explicit user approval before the next begins.
-The templates under `docs/` exist as a visible reference for the
-expected shape — the `workflow-*` skills fill them in.
+### The workflow in one paragraph
 
-| # | Phase | Skill | Where decisions get written | What gets decided |
-|---|---|---|---|---|
-| 0 | **Concept** | `workflow-backlog` (ripening) + `workflow-concept` (artifact) | `docs/concept.md` | Problem, users, what better looks like, rough scope, constraints. **No tech, no Epic list, no KPIs.** Written as a concept output of item 001's compound promotion (typically alongside an initial REQ output). |
-| 1 | **Requirements** | `workflow-requirements` | `docs/specs/README.md` + `docs/specs/epics/E<N>-*.md` | Epic list, per-Epic functional & non-functional requirements (stable IDs **+ Acceptance line each**). No tech. |
-| 1.5 | **Spike** *(optional)* | `workflow-spike` | `spike/<slug>` branch (tagged) + `docs/adr/<NNNN>-*.md` | De-risk one technical question before architecture. Skip unless there's real uncertainty. |
-| 2 | **Architecture** | `workflow-architecture` | `docs/architecture/system-design.md` + `docs/adr/<NNNN>-*.md` | **Tech stack** (incl. `0001-tech-stack`), system design, ADRs. |
-| 3 | **Tasks** | `workflow-tasks` | `docs/tasks/epics/E<N>/T<NN>-*.md` + `docs/tasks/index.md` + Tasks section in each Epic spec | Atomic tasks per Epic, Epic-level + task-level acceptance criteria. |
-| 4 | **Tests** | `workflow-tests` | `docs/tests/epics/E<N>-*.md` + `strategy.md`, `cross-cutting.md`, `e2e.md` | Test plan and scenarios per Epic. |
-| 5 | **Implementation** | `workflow-implementation` | code + commits + PR | One Epic per branch (`epic/<n>-<slug>`), one task per commit, one PR per Epic. |
+Everything starts as a **backlog item** in `docs/backlog/`. Each item's
+type binds it to a **lifecycle** that defines the stages it runs through:
+
+- **featurework** (5 stages) for `idea`, `gap`, `improvement` — Concept → Requirements → Architecture → Task-Breakdown → Tests
+- **bug** (4 stages) for `bug` — Reproduction → Root cause → Regression test → Fix
+- **question** (2 stages) for `question` — Investigation → Answer
+
+Each stage is deliberately entered, has its own approval gate, and
+produces its own commit — **never bundled** with adjacent stages. The
+design conversation for a stage happens inside that stage's
+`### Discussion` sub-section in the item file itself; artefacts
+(`concept.md`, REQs, ADRs, task files, test scenarios, B-files) live in
+their respective `docs/` folders and back-link to the item as their
+`Source`. When all applicable stages complete, the item flips to `done`
+and moves to `docs/backlog/archive/` in the same commit as the final
+stage's output.
+
+Item 001 is a naming convention: `/init-project` files it as the
+project's origin story, its Stage 1 writes the initial `docs/concept.md`,
+and its Stage 3 always produces `ADR-0001` (tech stack) per the
+**founding-ADR rule** — the project-wide architectural commitment.
+
+For the full flow diagram + skill map, see [`docs/workflow-overview.md`](docs/workflow-overview.md).
 
 ### Typical first session
 
 ```text
-/init-project "<name>"            ← One-time bootstrap — CLAUDE.md + README + seed item 001
-/backlog 001                      ← Phase 0 — ripen the seed via the design conversation.
-                                    When ready, the compound promotion produces a concept
-                                    output (docs/concept.md) plus an initial REQ output
-... approve ...
-(workflow-requirements activates) ← Phase 1 — fills docs/specs/README.md + per-Epic spec files
-... approve ...
-/spike "<question>"               ← Phase 1.5 (OPTIONAL) — de-risk a tech question, produces an ADR
-... (skip if no real uncertainty) ...
-(workflow-architecture activates) ← Phase 2 — picks tech stack, fills system-design.md + ADRs
-... approve ...
-(workflow-tasks activates)        ← Phase 3 — task files per Epic
-... approve ...
-(workflow-tests activates)        ← Phase 4 — test scenarios per Epic
-... approve ...
-/start-epic 1                     ← Phase 5 — implement Epic 1
-/ship-epic                        ← Self-review, push, open PR
+/init-project "<name>"            ← Bootstrap — CLAUDE.md + README + docs/backlog/001-<seed-slug>.md
+/backlog 001                      ← Enter Stage 1 (Concept) — design conversation in the item body
+... approve Stage 1, commit ...   ← docs/concept.md written, item Outcome back-links to commit
+                                    Stage 2 (REQ + Epic-Birth) writes docs/specs/epics/E1-*.md
+... approve Stage 2, commit ...
+                                    Stage 3 (Architecture) writes ADR-0001 (founding tech stack)
+... approve Stage 3, commit ...
+                                    Stage 4 (Task-Breakdown) writes docs/tasks/E1/T<NN>-*.md
+... approve Stage 4, commit ...
+                                    Stage 5 (Tests) writes docs/tests/epics/E1-*.md — item archives
+... approve Stage 5, commit ...
+/start-epic 1                     ← Implementation phase — orchestrator-driven TDD loop
+/ship-epic                        ← Self-review + open PR
 ```
+
+Subsequent items follow the same pattern:
+
+- **`/backlog <oneliner>`** — file a new item (type is asked or inferred)
+- **`/backlog <NNN-slug>`** — resume an existing item at its current stage
+- **`/backlog`** — browse open items grouped by type
+
+Cross-item references via `## Related` links carry the graph. When a
+bug's Root Cause reveals a spec gap, a follow-up `idea` / `improvement`
+item is filed and the two back-link.
 
 ## What's inside
 
 ```
 CLAUDE.md                        Project-specific context template (filled by /init-project)
+README.md                        This file (replaced by /init-project)
 .claude/settings.json            Claude Code permissions + model default
 .github/workflows/               Stubs delegating to mthoatgit/workflows@v1
 .gitignore                       Generic ignores + comment block for stack-specific entries
+orchestrator/                    Implementation-phase TDD driver (Ralph Loop + DoD gates)
 docs/
-  concept.md                     Phase 0 — Concept brief template
-  specs/                         Phase 1 — Requirements (Epics + per-Epic specs)
-    README.md                    Index template (Goal, Domain, Tech Stack, Epic Index)
+  workflow-overview.md           Lifecycle diagrams + skill map + Golden Rules
+  concept.md                     Living project overview (Stage 1 of item 001, amended by later items)
+  backlog/                       Universal capture — bugs, ideas, gaps, questions, improvements
+    README.md                    Backlog conventions + priority scheme
+    index.md                     Prose-free item table (data source)
+    _TEMPLATE_bug.md             Type-specific day-zero templates
+    _TEMPLATE_idea.md
+    _TEMPLATE_gap.md
+    _TEMPLATE_question.md
+    _TEMPLATE_improvement.md
+    archive/                     Terminal items (done / dropped / superseded / wont-fix / cant-repro)
+  specs/                         Requirements — Epic files
+    README.md
     epics/_TEMPLATE.md           Epic spec blueprint (copied per Epic)
     cross-cutting/_TEMPLATE.md   Cross-cutting NFRs blueprint (copied per concern)
   architecture/
-    system-design.md             Phase 2 — System design template
-  adr/
-    README.md                    ADR index template
-    _TEMPLATE.md                 ADR blueprint (copied per decision)
-  tasks/
-    index.md                     Phase 3 — Aligned Markdown task table (single source of truth for status)
-    epics/_TEMPLATE.md           Task blueprint (copied per task)
-  tests/
-    README.md                    Phase 4 — Test plan index template
-    strategy.md                  Test strategy template
-    cross-cutting.md             Cross-cutting tests template
-    e2e.md                       End-to-end tests template
-    epics/_TEMPLATE.md           Per-Epic test scenarios blueprint
+    system-design.md             Living system design (amended alongside its driving ADR)
+  adr/                           Architecture decisions
+    README.md
+    _TEMPLATE.md
+  tasks/                         Implementation work items (merged namespace: T<NN> tasks + B<NN> bug fixes)
+    index.md                     Merged status table (Type column distinguishes task vs bug)
+    _TEMPLATE_TASK.md            Task blueprint (feature tasks)
+    _TEMPLATE_BUG.md             B-file blueprint (thin — the orchestrator's fix interface)
+    E<N>/                        Per-Epic folders (created when the Epic is born)
+  tests/                         Test scenarios per Epic + strategy
+    README.md
+    strategy.md
+    cross-cutting.md
+    e2e.md
+    epics/_TEMPLATE.md           Per-Epic test scenarios blueprint (with per-scenario Source column)
 ```
 
 ## Replacing the placeholders
 
 Every template file contains `<PLACEHOLDER>` markers and a header block
 naming the placeholders used in that file. Fill them in (or have a skill
-do it) at the start of the corresponding phase.
+do it) at the corresponding lifecycle stage.
 
 ### Template marker convention
 
@@ -111,8 +145,8 @@ Two flavors of template files exist:
 
 | Flavor | Examples | Lifecycle |
 |---|---|---|
-| **Multi-instance blueprints** (`_TEMPLATE.md`) | `docs/specs/epics/_TEMPLATE.md`, `docs/tasks/epics/_TEMPLATE.md`, `docs/tests/epics/_TEMPLATE.md` | Stay as templates forever. Copied to produce real files (`E1-foo.md`, `T01-bar.md`). The copy inherits the frontmatter; remove it when filling in. |
-| **Single-instance placeholders** | `docs/architecture/system-design.md`, `docs/tests/cross-cutting.md`, `docs/specs/README.md`, etc. | One file at the final path with placeholder content. Frontmatter is removed once the file holds real content. |
+| **Multi-instance blueprints** (`_TEMPLATE_*.md`) | `docs/backlog/_TEMPLATE_idea.md`, `docs/specs/epics/_TEMPLATE.md`, `docs/tasks/_TEMPLATE_TASK.md`, `docs/tests/epics/_TEMPLATE.md` | Stay as templates forever. Copied to produce real files (`E1-foo.md`, `T01-bar.md`, `001-my-slug.md`). The copy inherits the frontmatter; remove it when filling in. |
+| **Single-instance placeholders** | `docs/concept.md`, `docs/architecture/system-design.md`, `docs/tests/cross-cutting.md`, `docs/specs/README.md`, etc. | One file at the final path with placeholder content. Frontmatter is removed once the file holds real content. |
 
 ## Related repositories
 
