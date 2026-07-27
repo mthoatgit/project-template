@@ -4,19 +4,19 @@ status: template
 
 # <Project title>
 
-> **Template file.** Written the first time as a concept output of
-> item 001's compound promotion from `/backlog`. Amended later as a
-> concept output of any backlog-item promotion that changes what the
+> **Template file.** Written the first time by Stage 1 (Concept) of
+> item 001's featurework lifecycle via `/backlog 001`. Amended later
+> by Stage 1 of any backlog item whose lifecycle run changes what the
 > project is, who it's for, what's in scope, or what its constraints
-> are — every concept output lands in its own commit. Drop this block
-> and the YAML frontmatter when the file holds real content.
+> are — every amendment lands in its own commit. Drop this block and
+> the YAML frontmatter when the file holds real content.
 
 **Status:** draft
 **Last-reviewed:** YYYY-MM-DD
 
 ## Change log
 
-<Reverse-chronological list of writes and amendments. One bullet per event: date, one-line reason, source backlog item. Every Concept-Amendment phase step MUST append an entry here.>
+<Reverse-chronological list of writes and amendments. One bullet per event: date, one-line reason, source backlog item. Every Stage 1 (Concept) run that touches this file MUST append an entry here.>
 
 - YYYY-MM-DD — initial write [[001-slug]]
 
