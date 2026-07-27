@@ -25,7 +25,7 @@ Each stage has:
 <dated notes while working the stage>
 
 ### Outcome
-<artefact link with commit hash, OR "not applicable — <reason>" for null decision>
+<artefact link, OR "not applicable — <reason>" for null decision>
 
 **Approved:** YYYY-MM-DD
 
