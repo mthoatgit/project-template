@@ -18,6 +18,8 @@ status: template
 
 **Status:** proposed | accepted | superseded by [ADR <NNNN>](<NNNN>-<slug>.md)
 **Date:** YYYY-MM-DD
+**Source-item:** [[NNN-slug]]
+**Source-REQs:** <REQ-ID>[, <REQ-ID>...]
 
 ## Context
 

@@ -18,6 +18,7 @@ status: template
 > per file.
 
 **Epic:** E<N> — <Epic Name>
+**Source:** [[NNN-slug]]
 
 ## Requirements
 
@@ -35,6 +36,16 @@ promoted straight from a backlog item per the shortcut in
 
 - **<REQ-ID>** — <optional one-line reminder of what the REQ covers>
 - **<REQ-ID>** — <optional one-line reminder>
+
+<!--
+Optional section — add when the task's implementation is constrained by
+one or more ADRs (technology choice, boundary rule, dependency stance).
+Remove the header entirely if no ADR constrains the task.
+
+## Related ADRs
+
+- **ADR-<NNNN>** — <one-line reminder of what the ADR constrains>
+-->
 
 ## Goal
 

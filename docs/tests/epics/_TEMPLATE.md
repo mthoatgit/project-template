@@ -15,6 +15,8 @@ status: template
 > Every scenario must map back to a requirement ID and the task(s) it
 > depends on.
 
+**Source:** [[NNN-slug]]     <!-- Backlog item whose promotion produced the initial test-scenario set. Later append-only additions from other items are marked with an inline HTML comment `<!-- Source: [[MMM-slug]] -->` before their block. -->
+
 Covers <REQ-IDs>.
 
 **Entry-point anchoring:** for every user-observable outcome in this Epic,

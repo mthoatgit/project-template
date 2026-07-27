@@ -28,18 +28,19 @@ can demo it after merge. Required.>
 
 <Bullets with stable IDs (e.g. `CUST-001`, `XFER-007`). IDs never change
 once assigned. Tasks and tests reference IDs, never file paths.
-**Each requirement MUST have an indented `Acceptance:` line** describing
-the observable behavior that proves it — at the same abstraction level
-as the requirement itself (product framing OK, tech stack NOT). Required.
-**Each requirement MUST also carry a `Source:` line** pointing at the
-backlog item it was promoted from, in `[[NNN-slug]]` link syntax.>
+Each REQ carries three required indented fields:
+- **`Acceptance:`** — observable behavior that proves it; product framing OK, tech stack NOT.
+- **`Source:`** — the backlog item it was promoted from, `[[NNN-slug]]` syntax.
+- **`Architecture-impact:`** — either the ADR IDs this REQ produced (e.g. `ADR-0007`), or `none (no ADR)` when the REQ has no architectural consequence. The record that Phase 3 (ADR) was consciously either applied or skipped.>
 
 - **<REQ-ID>** — <one-line requirement>
   **Acceptance:** <observable, testable behavior — no tech stack>
   **Source:** [[NNN-slug]]
+  **Architecture-impact:** none (no ADR)
 - **<REQ-ID>** — <one-line requirement>
   **Acceptance:** <observable behavior>
   **Source:** [[NNN-slug]]
+  **Architecture-impact:** ADR-<NNNN> (<one-line reminder of what the ADR decided>)
 
 ## Non-Functional Requirements
 
@@ -53,6 +54,12 @@ an observable acceptance line.>
 - **<NFR-ID>** — <one-line constraint or quality attribute>
   **Acceptance:** <observable behavior that proves compliance>
   **Source:** [[NNN-slug]]
+  **Architecture-impact:** none (no ADR)  <!-- or ADR-<NNNN> if applicable -->
+
+- **<NFR-ID>** — <one-line constraint or quality attribute>
+  **Acceptance:** <observable behavior that proves compliance>
+  **Source:** [[NNN-slug]]
+  **Architecture-impact:** ADR-<NNNN> (<one-line reminder>)
 
 ## Dependencies
 
