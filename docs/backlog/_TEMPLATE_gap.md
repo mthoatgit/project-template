@@ -18,6 +18,13 @@ status: template
 
 <Impact of leaving it open. What silently degrades or blocks.>
 
+<!--
+Optional section — add when gap-analysis produces a rolling summary worth keeping visible above the Notes trail. Rewritten in-place as understanding shifts. Remove the header entirely if it stays empty.
+
+## Current view
+- Front-runner shape of the fix, open threads, what's blocking.
+-->
+
 ## Notes (chronological)
 
 ### YYYY-MM-DD

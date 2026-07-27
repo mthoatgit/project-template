@@ -19,6 +19,23 @@ status: template
 
 **Epic:** E<N> — <Epic Name>
 
+## Requirements
+
+<REQ-IDs this task implements or contributes to. Required.
+
+REQ IDs are stable and never renumbered — if a REQ later gets
+superseded, its ID stays; this task's reference remains an honest
+record of what it originally implemented, and a new task is created
+for the superseding REQ.
+
+For direct-task shortcuts that bypassed a REQ (small trivial changes
+promoted straight from a backlog item per the shortcut in
+`workflow-requirements` "When to skip the spec entry"), write
+`Direct task from [[NNN-slug]] (no REQ)` instead.>
+
+- **<REQ-ID>** — <optional one-line reminder of what the REQ covers>
+- **<REQ-ID>** — <optional one-line reminder>
+
 ## Goal
 
 <One sentence: what does completing this task achieve. Required.>

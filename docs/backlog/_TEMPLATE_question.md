@@ -14,6 +14,13 @@ status: template
 
 <What triggered it. What's blocked until it's answered.>
 
+<!--
+Optional section — add when investigation produces partial answers or a rolling summary worth keeping visible above the Notes trail. Rewritten in-place as understanding shifts. Remove the header entirely if it stays empty.
+
+## Current view
+- Best guess so far, open threads, what would settle it.
+-->
+
 ## Notes (chronological)
 
 ### YYYY-MM-DD

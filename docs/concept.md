@@ -4,10 +4,12 @@ status: template
 
 # <Project title>
 
-> **Template file.** Filled when item 001 (or, later, a pivot item) is
-> promoted from `/backlog` — the concept is the frozen overview of what
-> the ripening conversation arrived at. Drop this block and the YAML
-> frontmatter when the file holds real content.
+> **Template file.** Written the first time as a concept output of
+> item 001's compound promotion from `/backlog`. Amended later as a
+> concept output of any backlog-item promotion that changes what the
+> project is, who it's for, what's in scope, or what its constraints
+> are — every concept output lands in its own commit. Drop this block
+> and the YAML frontmatter when the file holds real content.
 
 **Status:** draft
 **Last-reviewed:** YYYY-MM-DD

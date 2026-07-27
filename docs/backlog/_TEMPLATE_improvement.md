@@ -18,6 +18,13 @@ status: template
 
 <Why the change is worth it. What future work benefits.>
 
+<!--
+Optional section — add when ripening produces multiple threads about how to implement. Distinct from the ## Current state day-zero section above: that captures how it works today (frozen); ## Current view captures where the DESIGN of the improvement currently stands (rewritten in-place). Remove the header entirely if it stays empty.
+
+## Current view
+- Front-runner approach, open threads, what's blocking.
+-->
+
 ## Notes (chronological)
 
 ### YYYY-MM-DD

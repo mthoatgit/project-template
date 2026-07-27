@@ -26,7 +26,7 @@ Etabliert am 2026-07-10 (Item 001), universal refactored am 2026-07-19 mit Type-
 - **Lifecycle-Exits.**
   - `done` — Item ist gelandet (Code committed **oder** Konvention in Skill / CLAUDE.md verankert). File nach `archive/`, Status flippt im Index, `updated` bumpen.
   - `dropped` — Item wurde überlegt und verworfen (misdiagnosed, YAGNI, überholt). Einzeiler-warum in den Notes anhängen, File nach `archive/`.
-  - `superseded` — Item durch anderes ersetzt. Link zum Nachfolger in den Notes, File nach `archive/`.
+  - `superseded` — Item durch anderes ersetzt. `## Resolution` bekommt `Superseded <YYYY-MM-DD> by [[NNN-slug]]. Reason: <one line>.` (gleiche Slot-Konvention wie `done`). Optional zusätzlicher `### <today>` Notes-Eintrag mit Kontext. File nach `archive/`.
 
 ## Prioritisation
 

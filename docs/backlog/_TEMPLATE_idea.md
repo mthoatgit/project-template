@@ -10,6 +10,13 @@ status: template
 
 <One paragraph. What the idea is at its essence. Write it the day the idea is captured — do NOT rewrite this later. It is the seed, not the sapling. Ripening happens in the Notes section below.>
 
+<!--
+Optional section — add when ripening produces multiple threads and Core alone no longer conveys where the design currently stands. Rewritten in-place as the front-runner shifts and open threads evolve. Kept short — a paragraph or a short bullet list, not a re-write of the history in Notes. Remove the header entirely if it stays empty.
+
+## Current view
+- Front-runner shape of the design, open threads, what's blocking a promotion.
+-->
+
 ## Notes (chronological)
 
 ### YYYY-MM-DD

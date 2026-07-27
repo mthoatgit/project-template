@@ -18,6 +18,13 @@ status: template
 
 <What future work suffers, or what silently goes wrong.>
 
+<!--
+Optional section — add when investigation produces a rolling summary worth keeping visible above the Notes trail. Rewritten in-place as understanding shifts. Remove the header entirely if it stays empty.
+
+## Current view
+- Front-runner hypothesis, open threads, what's blocking a fix.
+-->
+
 ## Notes (chronological)
 
 ### YYYY-MM-DD
