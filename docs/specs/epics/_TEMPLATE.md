@@ -17,7 +17,7 @@ status: template
 **Status:** draft
 **Branch:** `epic/<N>-<slug>`
 **PR title:** `Epic <N>: <Epic Name>`
-**Source:** [[NNN-slug]]     <!-- optional: source backlog item, only if this Epic was born from a /backlog promotion. Remove the line if the Epic emerged during a Phase 1 clustering conversation without a single originating item. -->
+**Source:** [[NNN-slug]]     <!-- source backlog item whose Stage 2 (Requirements + Epic-Birth) created this Epic. Every Epic has an originating item under the current lifecycle model. -->
 
 ## Goal
 
@@ -77,7 +77,7 @@ an observable acceptance line.>
 <Filled in during the Task Breakdown Phase. Links to files in
 `docs/tasks/E<N>/`.>
 
-- [F<NN> — <Feature title>](../../tasks/E<N>/F<NN>-<slug>.md)
+- [T<NN> — <Task title>](../../tasks/E<N>/T<NN>-<slug>.md)
 
 ## Epic-Level Acceptance Criteria
 
