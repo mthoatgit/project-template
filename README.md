@@ -25,7 +25,7 @@ expected shape — the `workflow-*` skills fill them in.
 
 | # | Phase | Skill | Where decisions get written | What gets decided |
 |---|---|---|---|---|
-| 0 | **Concept** | `workflow-concept` | `docs/concept.md` | Problem, users, rough scope, candidate Epics. **No tech.** |
+| 0 | **Concept** | `workflow-backlog` (ripening) + `workflow-concept` (artifact) | `docs/concept.md` | Problem, users, what better looks like, rough scope, constraints. **No tech, no Epic list, no KPIs.** Pure snapshot — produced by promoting a ready `docs/backlog/001-*.md` via the snapshot-to-concept route. |
 | 1 | **Requirements** | `workflow-requirements` | `docs/specs/README.md` + `docs/specs/epics/E<N>-*.md` | Epic list, per-Epic functional & non-functional requirements (stable IDs **+ Acceptance line each**). No tech. |
 | 1.5 | **Spike** *(optional)* | `workflow-spike` | `spike/<slug>` branch (tagged) + `docs/adr/<NNNN>-*.md` | De-risk one technical question before architecture. Skip unless there's real uncertainty. |
 | 2 | **Architecture** | `workflow-architecture` | `docs/architecture/system-design.md` + `docs/adr/<NNNN>-*.md` | **Tech stack** (incl. `0001-tech-stack`), system design, ADRs. |
@@ -36,8 +36,10 @@ expected shape — the `workflow-*` skills fill them in.
 ### Typical first session
 
 ```text
-/init-project "<name>"            ← One-time bootstrap — CLAUDE.md + README
-/concept "<one-line idea>"        ← Phase 0 — conversational, fills docs/concept.md
+/init-project "<name>"            ← One-time bootstrap — CLAUDE.md + README + seed item 001
+/backlog 001                      ← Phase 0 — ripen the seed via the design conversation.
+                                    When ready, promote via the snapshot-to-concept route
+                                    → fills docs/concept.md
 ... approve ...
 (workflow-requirements activates) ← Phase 1 — fills docs/specs/README.md + per-Epic spec files
 ... approve ...

@@ -2,72 +2,51 @@
 status: template
 ---
 
-# <Working title>
+# <Project title>
 
-> **Template file.** Filled during the Concept Phase (Phase 0). Run
-> `/concept` to start the conversation that produces this file. Drop
-> this block and the YAML frontmatter when the brief holds real content.
+> **Template file.** Filled when item 001 (or, later, a pivot item) is
+> promoted from `/backlog` — the concept is the frozen overview of what
+> the ripening conversation arrived at. Drop this block and the YAML
+> frontmatter when the file holds real content.
 
 **Status:** draft
 **Last-reviewed:** YYYY-MM-DD
 
-## Problem
+## In one paragraph
 
-<What's broken or missing today? One paragraph.>
+<What this project is, for whom, and why it exists. A reader landing
+here should understand the shape of the whole thing in ~60 seconds.>
 
-## Users
+## The problem
 
-<Who has this problem? Roles, not personas.>
+<What's broken or missing today. One paragraph.>
+
+## The users
+
+<Roles that have the problem — not personas.>
 
 - <role 1>
 - <role 2>
 
-## Current state
+## What better looks like
 
-<How do they cope today, and what hurts about it?>
+<Desired outcome. Success for the user, in their language. Concrete
+enough that an outside observer could point at reality and say "yes,
+that's it working" — no separate KPI section needed.>
 
-## Desired outcome
+## Scope
 
-<What does success look like for the user?>
-
-## Rough scope
-
-<Behavior-level bullets — what's in. No tech, no acceptance criteria.>
+### In
 
 - <capability>
 - <capability>
 
-## Out of scope (for now)
+### Out (for now)
 
 - <deliberately not doing>
 
 ## Constraints
 
-<Known limits: budget, timeline, regulatory, tech we must use or avoid.>
-
-## Open questions
-
-- <question that becomes assumption or gets answered before Phase 1>
-
-## Candidate Epics
-
-<Natural groupings that will likely become Epics. Names and one-line
-descriptions only — not requirements.>
-
-- **E1 — <Foundation>** — <one-line description>
-- **E2 — <Module>** — <one-line description>
-
-## Success signals
-
-<How we'd know it's working in the world. Qualitative or quantitative.>
-
-## Summary
-
-- **Problem:** <one sentence>
-- **Target user:** <one sentence>
-- **Value:** <one sentence>
-- **Candidate Epics:** <list>
-- **Open questions blocking Phase 1:** <list or "none">
-
-> Approve this concept brief? On approval, we move to Phase 1
-> (Requirements) using `workflow-requirements`.
+<Known limits: budget, timeline, regulatory, tech we must use or avoid.
+Facts about the world the idea lives in — not instructions to downstream
+phases.>

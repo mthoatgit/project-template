@@ -11,7 +11,7 @@ skills, the skills win.
 ```mermaid
 flowchart TD
     Idea(["New idea"]) --> Concept
-    Concept["Phase 0 — Concept<br/>/concept<br/>→ docs/concept.md"]
+    Concept["Phase 0 — Concept<br/>ripen 001 in /backlog<br/>→ snapshot to docs/concept.md"]
     Concept -->|approve| Requirements
     Requirements["Phase 1 — Requirements<br/>→ docs/specs/README.md<br/>→ docs/specs/epics/E&lt;N&gt;-*.md"]
     Requirements -->|approve| RiskCheck{"Technical risk?"}
@@ -78,8 +78,8 @@ to `main` directly — the user always merges.
 
 | Phase | Skill | Command(s) | Primary output |
 |---|---|---|---|
-| 0 — Concept | `workflow-concept` | `/concept` | `docs/concept.md` |
-| 1 — Requirements | `workflow-requirements` | `/new-requirement` (incremental changes) | `docs/specs/README.md`, `docs/specs/epics/E<N>-*.md` |
+| 0 — Concept | `workflow-backlog` (ripening) + `workflow-concept` (artifact) | `/backlog 001` → snapshot promotion | `docs/concept.md` |
+| 1 — Requirements | `workflow-requirements` | always via `/backlog` promotion (1..N REQs per item) — at Phase 1 kick-off just in rapid succession | `docs/specs/README.md`, `docs/specs/epics/E<N>-*.md` |
 | 1.5 — Spike (optional) | `workflow-spike` | `/spike <question>` | `docs/adr/<NNNN>-*.md`, branch `spike/<slug>` |
 | 2 — Architecture | `workflow-architecture` | — | `docs/architecture/system-design.md`, `docs/adr/0001-tech-stack.md` |
 | 3 — Tasks | `workflow-tasks` | — | `docs/tasks/E<N>/T<NN>-*.md`, `docs/tasks/index.md` |

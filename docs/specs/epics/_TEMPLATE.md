@@ -17,6 +17,7 @@ status: template
 **Status:** draft
 **Branch:** `epic/<N>-<slug>`
 **PR title:** `Epic <N>: <Epic Name>`
+**Source:** [[NNN-slug]]     <!-- optional: source backlog item, only if this Epic was born from a /backlog promotion. Remove the line if the Epic emerged during a Phase 1 clustering conversation without a single originating item. -->
 
 ## Goal
 
@@ -29,12 +30,16 @@ can demo it after merge. Required.>
 once assigned. Tasks and tests reference IDs, never file paths.
 **Each requirement MUST have an indented `Acceptance:` line** describing
 the observable behavior that proves it — at the same abstraction level
-as the requirement itself (product framing OK, tech stack NOT). Required.>
+as the requirement itself (product framing OK, tech stack NOT). Required.
+**Each requirement MUST also carry a `Source:` line** pointing at the
+backlog item it was promoted from, in `[[NNN-slug]]` link syntax.>
 
 - **<REQ-ID>** — <one-line requirement>
   **Acceptance:** <observable, testable behavior — no tech stack>
+  **Source:** [[NNN-slug]]
 - **<REQ-ID>** — <one-line requirement>
   **Acceptance:** <observable behavior>
+  **Source:** [[NNN-slug]]
 
 ## Non-Functional Requirements
 
@@ -47,6 +52,7 @@ an observable acceptance line.>
 
 - **<NFR-ID>** — <one-line constraint or quality attribute>
   **Acceptance:** <observable behavior that proves compliance>
+  **Source:** [[NNN-slug]]
 
 ## Dependencies
 
