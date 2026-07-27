@@ -33,6 +33,8 @@ Etabliert am 2026-07-10 (Item 001), universal refactored am 2026-07-19 mit Type-
 
 ## Prioritisation
 
+Backlog-triage priority — a "when to work on this item" signal for the item itself. Not to be confused with priority concepts elsewhere in the project (e.g. spec-level acceptance urgency, ADR-level severity, or external tracker priorities). When reading `priority` in item frontmatter, the scope is always "should we pull this from the backlog next?".
+
 - **P1** — Do next. Something is currently slipping or broken. Fixing prevents ongoing loss.
 - **P2** — Design known, build when convenient. Not urgent.
 - **P3** — Nice to have. Low value or exploratory.

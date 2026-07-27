@@ -19,7 +19,7 @@ status: template
 <!--
 Stage sections are added as the item enters each stage of the question lifecycle
 (Stage 1 Investigation → Stage 2 Answer).
-Each stage has ### Discussion (dated notes) + ### Outcome (findings, spike, or answer) + **Approved:** date.
+Each stage has ### Discussion (with #### YYYY-MM-DD sub-headers for dated notes) + ### Outcome (findings, spike, or answer) + **Approved:** date.
 See workflow-lifecycle-question for each stage's specifics — including when to run /spike vs inline research.
 -->
 

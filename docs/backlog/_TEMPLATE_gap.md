@@ -23,7 +23,7 @@ status: template
 <!--
 Stage sections are added as the item enters each stage of the featurework lifecycle
 (Stage 1 Concept → Stage 2 Requirements → Stage 3 Architecture → Stage 4 Task-Breakdown → Stage 5 Tests).
-Each stage has ### Discussion (dated notes) + ### Outcome (artefact link or null decision) + **Approved:** date.
+Each stage has ### Discussion (with #### YYYY-MM-DD sub-headers for dated notes) + ### Outcome (artefact link or null decision) + **Approved:** date.
 See workflow-lifecycle-featurework for each stage's specifics.
 -->
 

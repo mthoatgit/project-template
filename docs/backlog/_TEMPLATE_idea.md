@@ -20,7 +20,8 @@ Each stage has:
 ## Stage N — <name>
 
 ### Discussion
-### YYYY-MM-DD
+
+#### YYYY-MM-DD
 <dated notes while working the stage>
 
 ### Outcome

@@ -15,7 +15,7 @@ status: template
 <!--
 Stage sections are added as the item enters each stage of the bug lifecycle
 (Stage 1 Reproduction → Stage 2 Root cause → Stage 3 Regression test → Stage 4 Fix).
-Each stage has ### Discussion (dated notes) + ### Outcome (artefact link or terminal) + **Approved:** date.
+Each stage has ### Discussion (with #### YYYY-MM-DD sub-headers for dated notes) + ### Outcome (artefact link or terminal) + **Approved:** date.
 See workflow-lifecycle-bug for each stage's specifics, Class A vs B rules, and orchestrator interaction.
 
 When Stage 4 (Fix) completes, the bug moves out of the backlog and becomes a B<NN> file under
