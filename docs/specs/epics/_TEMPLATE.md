@@ -26,8 +26,9 @@ can demo it after merge. Required.>
 
 ## Functional Requirements
 
-<Bullets with stable IDs in the format `REQ-NNN` (three-digit,
-zero-padded; global counter across all Epic files in `docs/specs/epics/`).
+<Bullets with stable IDs in the format `REQ-NNNN` (four-digit,
+zero-padded; global counter across all Epic files in `docs/specs/epics/`;
+matches ADR-NNNN format for consistency across permanent-reference IDs).
 IDs never change once assigned. Tasks and tests reference IDs, never
 file paths. Each REQ carries three required indented fields:
 - **`Acceptance:`** — observable behavior that proves it; product framing OK, tech stack NOT.
