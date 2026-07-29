@@ -167,6 +167,25 @@ they apply to every project cloned from this template.
   determines the lifecycle for its life. If a type turns out wrong
   (bug misdiagnosed as improvement, question that's really a feature),
   drop the item and refile with the correct type. Cross-link both.
+- **Clarification markers are the anti-hallucination valve.** Whenever
+  a stage's discussion would have to invent an intent-shaped answer,
+  Claude MUST inline a `[NEEDS CLARIFICATION: ...]` marker instead
+  of writing a plausible default. Markers have three states — open,
+  inherited (`→ Stage N`), resolved (`RESOLVED → Stage N: ...`) — and
+  every stage-approval commit lists open markers explicitly. See
+  `workflow-backlog` for syntax and the approval/entry checks.
+- **Backward reach has three cases (A / B / C).** A is inline
+  clarification in the current stage (no prior-stage artefact touched).
+  B is a supersession-in-place on a prior-stage artefact (item stays
+  in current stage). C is a walk-back — item's `stage` frontmatter
+  moves back, a new attempt begins, previous-attempt Discussion/Outcome
+  stay in the file. Decision tree, ceremony, and guards live in
+  `workflow-lifecycle-featurework` (bugs/questions rarely need C —
+  they use A or drop-and-refile).
+- **Frontmatter tracks stage.** Every backlog item carries `stage: <N>`
+  and `stage_attempt: <K>` in its frontmatter, kept in sync with the
+  body's `**Approved:**` lines. This makes "what is in stage N right
+  now?" a grep instead of a scan through 30 files.
 - **Three levels of acceptance criteria, not one:**
   `REQ-AC` (Stage 2 of featurework, behavioral) → `Epic-AC` (Stage 4,
   user-observable) → `Task-AC` (Stage 4, technical). Later levels refine
