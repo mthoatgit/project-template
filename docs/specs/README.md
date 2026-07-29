@@ -30,8 +30,8 @@ docs/concept.md → Constraints. -->
 
 ## Epics
 
-| Epic | Name | File | Covers |
+| Epic | Name | Folder | Covers |
 |---|---|---|---|
-| E1 | <Foundation>    | [epics/E1-<slug>.md](epics/E1-<slug>.md) | <NFR-IDs, capability summary> |
-| E2 | <Module>        | [epics/E2-<slug>.md](epics/E2-<slug>.md) | <REQ-IDs> |
-| E3 | <Module>        | [epics/E3-<slug>.md](epics/E3-<slug>.md) | <REQ-IDs> |
+| E1 | <Foundation>    | [epics/E1-<slug>/](epics/E1-<slug>/) | <NFR-IDs, capability summary> |
+| E2 | <Module>        | [epics/E2-<slug>/](epics/E2-<slug>/) | <REQ-IDs> |
+| E3 | <Module>        | [epics/E3-<slug>/](epics/E3-<slug>/) | <REQ-IDs> |

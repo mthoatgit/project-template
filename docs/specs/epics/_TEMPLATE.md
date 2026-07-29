@@ -5,14 +5,18 @@ status: template
 # E<N> — <Epic Name>
 
 > **Template.** This file defines the canonical structure for every Epic
-> spec in this project. To create a new Epic:
+> overview file in this project. To create a new Epic:
 >
-> 1. Copy this file to `E<N>-<slug>.md` (next free Epic number, kebab-case slug)
-> 2. Fill in placeholders
-> 3. Remove this banner **and any optional sections that don't apply**
-> 4. Commit
+> 1. Create a folder `E<N>-<slug>/` (next free Epic number, kebab-case slug)
+> 2. Copy this file into it as `E<N>-<slug>/E<N>-<slug>.md`
+> 3. Fill in placeholders
+> 4. Remove this banner **and any optional sections that don't apply**
+> 5. Commit
 >
-> Epic IDs are stable — never reused, never renumbered. One Epic per file.
+> Epic IDs are stable — never reused, never renumbered. One Epic per folder.
+> Individual Functional Requirements live in per-REQ files inside the folder
+> (see `_REQ-TEMPLATE.md`); this overview file holds only the index of links
+> to those REQ files, plus Goal / NFRs / Dependencies.
 
 **Status:** draft
 **Branch:** `epic/<N>-<slug>`
@@ -26,32 +30,21 @@ can demo it after merge. Required.>
 
 ## Functional Requirements
 
-<Bullets with stable IDs in the format `REQ-NNNN` (four-digit,
-zero-padded; global counter across all Epic files in `docs/specs/epics/`;
-matches ADR-NNNN format for consistency across permanent-reference IDs).
-IDs never change once assigned. Tasks and tests reference IDs, never
-file paths. Each REQ carries three required indented fields:
-- **`Acceptance:`** — observable behavior that proves it; product framing OK, tech stack NOT.
-- **`Source:`** — the backlog item it was promoted from, `[[NNN-slug]]` syntax.
-- **`Architecture-impact:`** — one of: `pending (see Stage 3)` (Stage 2 defers the decision; Stage 3 back-fills the concrete value), `none (no ADR)` (Stage 2 confident no architecture change needed), or `ADR-<NNNN>` (concrete ADR ID, typically back-filled by Stage 3 in the ADR commit). The record that Stage 3 was consciously either applied or skipped.>
+<Index of links to per-REQ files inside this Epic's folder. Each bullet:
+link to REQ file + REQ ID + one-line title + Architecture-impact tag.
+Full REQ text lives in the per-REQ file (see `_REQ-TEMPLATE.md`), not
+here. Add one bullet per REQ; supersession is annotated in-place with
+strikethrough + "(superseded by REQ-<NNNN>)".>
 
-- **<REQ-ID>** — <one-line requirement, Stage 2 confident no ADR>
-  **Acceptance:** <observable, testable behavior — no tech stack>
-  **Source:** [[NNN-slug]]
-  **Architecture-impact:** none (no ADR)
-- **<REQ-ID>** — <one-line requirement with plausible arch bearing>
-  **Acceptance:** <observable behavior>
-  **Source:** [[NNN-slug]]
-  **Architecture-impact:** pending (see Stage 3)  <!-- Stage 3 back-fills to ADR-<NNNN> or downgrades to none -->
-- **<REQ-ID>** — <one-line requirement, shape after Stage 3 back-fill>
-  **Acceptance:** <observable behavior>
-  **Source:** [[NNN-slug]]
-  **Architecture-impact:** ADR-<NNNN> (<one-line reminder of what the ADR decided>)
+- [**REQ-<NNNN>**](REQ-<NNNN>-<slug>.md) — <one-line title of the requirement> — Architecture-impact: none (no ADR)
+- [**REQ-<NNNN>**](REQ-<NNNN>-<slug>.md) — <one-line title> — Architecture-impact: pending (see Stage 3)
+- [**REQ-<NNNN>**](REQ-<NNNN>-<slug>.md) — <one-line title> — Architecture-impact: ADR-<NNNN> (<one-line reminder>)
 
 ## Non-Functional Requirements
 
 > **Optional section.** Remove entirely if this Epic has no Epic-specific
-> NFRs. Do not invent placeholder NFRs. Cross-cutting NFRs go in
+> NFRs. Do not invent placeholder NFRs. NFRs stay inline in the overview
+> file (not per-file). Cross-cutting NFRs go in
 > `docs/specs/cross-cutting/`, not here.
 
 <Same `Acceptance:` rule as functional requirements — each NFR must have
@@ -79,7 +72,7 @@ an observable acceptance line.>
 <Filled in at Stage 4 (Task-Breakdown) of the featurework lifecycle.
 Links to files in `docs/tasks/E<N>/`.>
 
-- [T<NN> — <Task title>](../../tasks/E<N>/T<NN>-<slug>.md)
+- [T<NN> — <Task title>](../../../tasks/E<N>/T<NN>-<slug>.md)
 
 ## Epic-Level Acceptance Criteria
 
