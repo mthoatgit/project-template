@@ -26,9 +26,10 @@ can demo it after merge. Required.>
 
 ## Functional Requirements
 
-<Bullets with stable IDs (e.g. `CUST-001`, `XFER-007`). IDs never change
-once assigned. Tasks and tests reference IDs, never file paths.
-Each REQ carries three required indented fields:
+<Bullets with stable IDs in the format `REQ-NNN` (three-digit,
+zero-padded; global counter across all Epic files in `docs/specs/epics/`).
+IDs never change once assigned. Tasks and tests reference IDs, never
+file paths. Each REQ carries three required indented fields:
 - **`Acceptance:`** — observable behavior that proves it; product framing OK, tech stack NOT.
 - **`Source:`** — the backlog item it was promoted from, `[[NNN-slug]]` syntax.
 - **`Architecture-impact:`** — one of: `pending (see Stage 3)` (Stage 2 defers the decision; Stage 3 back-fills the concrete value), `none (no ADR)` (Stage 2 confident no architecture change needed), or `ADR-<NNNN>` (concrete ADR ID, typically back-filled by Stage 3 in the ADR commit). The record that Stage 3 was consciously either applied or skipped.>
