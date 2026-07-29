@@ -8,19 +8,19 @@ status: template
 
 **Lifecycle:** featurework — see `workflow-lifecycle-featurework`
 
-## Core
-
-<One paragraph. What the idea is at its essence. Write it the day the idea is captured — do NOT rewrite this later. It is the seed, not the sapling. Design discussion happens later in the per-stage Discussion sub-sections.>
-
 ## Artefacts
 
-<Item-level index of outputs per lifecycle stage. Populated at capture with `pending` for every stage; each stage's bullet is bumped to a clickable Markdown link to the produced artefact (or `not applicable — <reason>` for null Outcomes) in the SAME commit as that stage's `### Outcome` write. See `workflow-lifecycle-featurework` for the bump rule.>
+<Item-level index of outputs per lifecycle stage — sits BEFORE day-zero framing for at-a-glance findability. Each stage bullet starts as `pending` and is bumped in the SAME commit as its `### Outcome` write. Bumped form: nested sub-bullets, one per produced element (files with clickable link + one-line summary; within-file entities like REQ IDs each get a sub-bullet with ID + one-line summary — see `workflow-lifecycle-featurework` for the full format spec).>
 
 - **Stage 1 (Concept):** pending
 - **Stage 2 (Requirements + Epic-Birth):** pending
 - **Stage 3 (Architecture):** pending
 - **Stage 4 (Task-Breakdown):** pending
 - **Stage 5 (Tests):** pending
+
+## Core
+
+<One paragraph. What the idea is at its essence. Write it the day the idea is captured — do NOT rewrite this later. It is the seed, not the sapling. Design discussion happens later in the per-stage Discussion sub-sections.>
 
 <!--
 Stage sections are added as the item enters each stage of the featurework lifecycle
