@@ -20,6 +20,16 @@ status: template
 
 <Why the change is worth it. What future work benefits.>
 
+## Artefacts
+
+<Item-level index of outputs per lifecycle stage. Populated at capture with `pending` for every stage; each stage's bullet is bumped to a clickable Markdown link to the produced artefact (or `not applicable — <reason>` for null Outcomes) in the SAME commit as that stage's `### Outcome` write. See `workflow-lifecycle-featurework` for the bump rule.>
+
+- **Stage 1 (Concept):** pending
+- **Stage 2 (Requirements + Epic-Birth):** pending
+- **Stage 3 (Architecture):** pending
+- **Stage 4 (Task-Breakdown):** pending
+- **Stage 5 (Tests):** pending
+
 <!--
 Stage sections are added as the item enters each stage of the featurework lifecycle
 (Stage 1 Concept → Stage 2 Requirements → Stage 3 Architecture → Stage 4 Task-Breakdown → Stage 5 Tests).
