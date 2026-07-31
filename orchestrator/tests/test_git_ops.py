@@ -59,13 +59,13 @@ def test_git_commit_task_returns_false_on_git_failure(mock_run):  # REQ-21
 @patch("orchestrator.subprocess.run")
 def test_get_completed_task_ids_parses_log(mock_run):  # REQ-22
     mock_run.return_value = MagicMock(returncode=0, stdout=(
-        "abc1234 [orchestrator] T01-alpha — tests pass, design approved\n"
-        "def5678 [orchestrator] T02-beta — tests pass, design approved\n"
+        "abc1234 [orchestrator] TASK-0001-alpha — tests pass, design approved\n"
+        "def5678 [orchestrator] TASK-0002-beta — tests pass, design approved\n"
     ))
 
     ids = get_completed_task_ids("/project")
 
-    assert ids == ["T01-alpha", "T02-beta"]
+    assert ids == ["TASK-0001-alpha", "TASK-0002-beta"]
 
 
 @patch("orchestrator.subprocess.run")
@@ -85,12 +85,12 @@ def test_get_completed_task_ids_empty_when_no_prior_commits(mock_run):  # REQ-22
 def test_get_last_orchestrator_task_id_returns_id(mock_run):  # REQ-22
     mock_run.return_value = MagicMock(
         returncode=0,
-        stdout="abc1234 [orchestrator] T02-beta — tests pass, design approved\n",
+        stdout="abc1234 [orchestrator] TASK-0002-beta — tests pass, design approved\n",
     )
 
     task_id = get_last_orchestrator_task_id("/project")
 
-    assert task_id == "T02-beta"
+    assert task_id == "TASK-0002-beta"
 
 
 @patch("orchestrator.subprocess.run")
@@ -135,13 +135,13 @@ def test_resume_check_no_prior_commits_returns_all(mock_ids):  # REQ-23
 @patch("orchestrator.runner.run_tests")
 @patch("orchestrator.git_ops.get_completed_task_ids")
 def test_resume_check_green_tests_skip_completed(mock_ids, mock_tests):  # REQ-23
-    mock_ids.return_value = ["T01-alpha"]
+    mock_ids.return_value = ["TASK-0001-alpha"]
     mock_tests.return_value = (True, "2 passed")
 
     remaining, context = resume_check(_RESUME_TASKS, "pytest", "/project")
 
     assert len(remaining) == 1
-    assert remaining[0]["id"] == "T02-beta"
+    assert remaining[0]["id"] == "TASK-0002-beta"
     assert context is None
 
 
@@ -150,7 +150,7 @@ def test_resume_check_green_tests_skip_completed(mock_ids, mock_tests):  # REQ-2
 # ─────────────────────────────────────────────────────────────
 
 @patch("orchestrator.git_ops._head_commit_subject",
-       return_value="[orchestrator] T02-beta — tests pass, design approved")
+       return_value="[orchestrator] TASK-0002-beta — tests pass, design approved")
 @patch("orchestrator.git_ops.git_reset_hard")
 @patch("orchestrator.git_ops.get_last_orchestrator_task_id")
 @patch("orchestrator.runner.run_tests")
@@ -158,15 +158,15 @@ def test_resume_check_green_tests_skip_completed(mock_ids, mock_tests):  # REQ-2
 def test_resume_check_failing_tests_resets_and_returns_context(
     mock_ids, mock_tests, mock_last_id, mock_reset, mock_head,
 ):  # REQ-24
-    mock_ids.return_value = ["T01-alpha", "T02-beta"]
+    mock_ids.return_value = ["TASK-0001-alpha", "TASK-0002-beta"]
     mock_tests.return_value = (False, "3 failed in 0.5s")
-    mock_last_id.return_value = "T02-beta"
+    mock_last_id.return_value = "TASK-0002-beta"
     mock_reset.return_value = True
 
     remaining, context = resume_check(_RESUME_TASKS, "pytest", "/project")
 
     mock_reset.assert_called_once_with("/project")
-    assert any(t["id"] == "T02-beta" for t in remaining)
+    assert any(t["id"] == "TASK-0002-beta" for t in remaining)
     assert context is not None
     assert "rolled back" in context.lower()
     assert "3 failed" in context
@@ -188,7 +188,7 @@ def test_resume_check_refuses_to_reset_when_head_is_manual(
     resume run must NOT auto-reset — it should exit with a clear error so
     the user can reconcile the tree manually."""
     import pytest
-    mock_ids.return_value = ["T01-alpha", "T02-beta"]
+    mock_ids.return_value = ["TASK-0001-alpha", "TASK-0002-beta"]
     mock_tests.return_value = (False, "3 failed in 0.5s")
 
     with pytest.raises(SystemExit) as exc:

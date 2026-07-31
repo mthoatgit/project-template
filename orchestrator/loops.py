@@ -11,7 +11,7 @@ import time
 # Module-attribute access (``runner.run_tests``, ``claude.run_claude``, ...)
 # so @patch("orchestrator.runner.run_tests") etc. propagate into these
 # callers — see docs/orchestrator-requirements.md.
-from . import bug_variant, claude, prompts, runner, status
+from . import bug_variant, claude, prompts, runner, status, tasks
 from .config import (
     MAX_ERROR_CHARS, STUCK_STREAK_THRESHOLD,
     MAX_DOCS_CYCLES, MANDATORY_DOC_FILES,
@@ -166,7 +166,6 @@ def critic_loop(
     max_ralph_iterations: int,
     max_critic_iterations: int,
     revert_context: str | None = None,
-    test_doc_content: str | None = None,
     task_index: int = 0,
     total_tasks: int = 1,
     stats_out: dict | None = None,
@@ -214,12 +213,30 @@ def critic_loop(
         print(f"\n  {symbol} {task['id']} — {state_str}  ({elapsed})  [{cycles}]")
         return passed
 
+    # Per-task test discovery (REQ-0008): grep TEST-*.md for **Task:** header.
+    # docs/tests/index.md is a human aggregation and MUST NOT be parsed here.
+    test_docs = tasks.find_test_docs_for_task(task, project_dir)
+    if not test_docs:
+        print(f"  [ERROR] No test specs found for '{task['id']}' —"
+              f" expected at least one docs/tests/TEST-*.md file with"
+              f" **Task:** header containing this task's ID (coverage gap).")
+        return _finish(False, 0, "no test specs (coverage gap)")
+
+    print(f"  [Check] Discovered {len(test_docs)} test spec(s) for '{task['id']}':")
+    for p in test_docs:
+        print(f"          - {p.name}")
+
+    # Concatenate all discovered test-spec contents into a single string that
+    # write_tests_phase() passes to Claude. Separator lets Claude visually
+    # split the specs when multiple TEST files apply to the same task.
+    test_doc_content = "\n\n---\n\n".join(
+        p.read_text(encoding="utf-8") for p in test_docs
+    )
+
     # Write tests once before any implementation attempt (REQ-30)
-    task_test_cmd = test_cmd
-    if test_doc_content is not None:
-        task_test_cmd, ok = write_tests_phase(task, test_cmd, test_doc_content, project_dir)
-        if not ok:
-            return _finish(False, 0, "no tests written")
+    task_test_cmd, ok = write_tests_phase(task, test_cmd, test_doc_content, project_dir)
+    if not ok:
+        return _finish(False, 0, "no tests written")
 
     critic_feedback: str | None = None
     prev_weaknesses: str | None = None

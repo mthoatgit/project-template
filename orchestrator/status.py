@@ -3,8 +3,9 @@
 The merged work-item index (tasks + bugs) has five columns:
     | ID  | Epic | Type | Title | Status |
 
-This module rewrites the Status cell for a given item id (T… or B…).
-It does not care about Type — that dispatch is done upstream in main.py.
+This module rewrites the Status cell for a given item id (TASK-<NNNN>
+or BUG-<NNNN>). It does not care about Type — that dispatch is done
+upstream in main.py.
 """
 import re
 from pathlib import Path
@@ -19,11 +20,12 @@ _STATUS_CELL_WIDTH = STATUS_WIDTH + 2
 
 # A work-item-row Status cell:
 #   |  ID  | Epic | Type | Title | Status |
-# The ID cell may be bare ('T01', 'B01') or slug-suffixed ('T01-foo').
-# Three intermediate cells (Epic, Type, Title) — captured as [^|\n]* runs —
-# then the Status value, then optional trailing padding, then the close pipe.
+# The ID cell may be bare ('TASK-0001', 'BUG-0002') or slug-suffixed
+# ('TASK-0001-foo'). Three intermediate cells (Epic, Type, Title) —
+# captured as [^|\n]* runs — then the Status value, then optional
+# trailing padding, then the close pipe.
 _STATUS_ROW_RE = re.compile(
-    r"(?P<prefix>^\|\s*(?P<id>[TB]\d+)(?:-\S*)?\s*\|[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*)"
+    r"(?P<prefix>^\|\s*(?P<id>(?:TASK|BUG)-\d{4})(?:-\S*)?\s*\|[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*)"
     r"(?P<status>pending|in progress|done|action needed)"
     r"\s*(?P<close>\|)",
     re.MULTILINE,
@@ -34,11 +36,11 @@ def update_task_status(project_dir: str, task_id: str, new_status: str) -> bool:
     """Rewrite the Status cell for ``task_id`` in ``docs/tasks/index.md``.
 
     Matches the row whose ID cell is exactly the item's short ID (e.g.
-    'T01' or 'B01' — matches both bare and slug-suffixed rows). Missing
-    file or unmatched ID → warn and return False; the orchestrator
-    continues regardless (status maintenance is best-effort). The
-    written status is padded to ``STATUS_WIDTH`` so column alignment
-    survives writes.
+    'TASK-0001' or 'BUG-0002' — matches both bare and slug-suffixed
+    rows). Missing file or unmatched ID → warn and return False; the
+    orchestrator continues regardless (status maintenance is best-
+    effort). The written status is padded to ``STATUS_WIDTH`` so
+    column alignment survives writes.
     """
     if new_status not in _STATUS_VALUES:
         raise ValueError(f"invalid status {new_status!r}; expected one of {_STATUS_VALUES}")
@@ -48,7 +50,7 @@ def update_task_status(project_dir: str, task_id: str, new_status: str) -> bool:
         print(f"  [status] {STATUS_REL_PATH.as_posix()} not found — skipping status update")
         return False
 
-    m = re.match(r"^([TB]\d+)", task_id)
+    m = re.match(r"^((?:TASK|BUG)-\d{4})", task_id)
     if not m:
         print(f"  [status] cannot extract numeric ID from '{task_id}' — skipping")
         return False

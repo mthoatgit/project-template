@@ -3,21 +3,28 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-TASK = {"id": "T01-test", "content": "Implement foo", "path": "tasks/T01.md"}
+TASK = {
+    "id": "TASK-0001-test",
+    "content": "Implement foo",
+    "path": "docs/tasks/TASK-0001-test.md",
+    "type": "task",
+    "class_": None,
+    "epic": "E1-foundation",
+}
 
 _RESUME_TASKS = [
-    {"id": "T01-alpha", "content": "task alpha"},
-    {"id": "T02-beta",  "content": "task beta"},
+    {"id": "TASK-0001-alpha", "content": "task alpha"},
+    {"id": "TASK-0002-beta",  "content": "task beta"},
 ]
 
 INDEX_SAMPLE = (
     "# Work Items\n"
     "\n"
-    "| ID  | Epic | Type | Title                  | Status        |\n"
-    "|-----|------|------|------------------------|---------------|\n"
-    "| T01 | E1   | task | Build and dependencies | pending       |\n"
-    "| T02 | E1   | task | Docker compose stack   | pending       |\n"
-    "| B01 | E1   | bug  | Something broke        | pending       |\n"
+    "| ID        | Epic | Type | Title                  | Status        |\n"
+    "|-----------|------|------|------------------------|---------------|\n"
+    "| TASK-0001 | E1   | task | Build and dependencies | pending       |\n"
+    "| TASK-0002 | E1   | task | Docker compose stack   | pending       |\n"
+    "| BUG-0003  | E1   | bug  | Something broke        | pending       |\n"
 )
 
 

@@ -35,7 +35,7 @@ from .config import (
     MAX_ERROR_CHARS, GIT_COMMIT_PREFIX, DEFAULT_TEST_CMD,
     MAX_DOCS_CYCLES, MANDATORY_DOC_FILES,
 )
-from .tasks import load_tasks, find_test_doc
+from .tasks import load_tasks, find_test_docs_for_task
 from .runner import (
     run_tests, extract_failure_count,
     detect_task_test_files, _looks_like_test_file,

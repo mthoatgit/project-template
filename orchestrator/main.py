@@ -114,11 +114,6 @@ def main():
 
 
 def _run(args, task_list, project_dir: str, log_path) -> None:
-    # ── Prerequisite check (REQ-29) ───────────────────────────
-    test_doc = tasks.find_test_doc(args.tasks, project_dir)
-    test_doc_content = test_doc.read_text(encoding="utf-8")
-    print(f"[Check] Test design doc: {test_doc.name} — OK")
-
     # ── Prerequisite check: default test runner exists (REQ-40) ─
     if args.test_cmd == DEFAULT_TEST_CMD and not (Path(project_dir) / "scripts" / "test.py").exists():
         print(
@@ -153,7 +148,6 @@ def _run(args, task_list, project_dir: str, log_path) -> None:
             task, args.test_cmd, project_dir,
             args.max_iterations, args.max_critic_iterations,
             revert_context=revert_context if i == 0 else None,
-            test_doc_content=test_doc_content,
             task_index=i + 1,
             total_tasks=total_tasks,
             stats_out=stats,

@@ -98,10 +98,7 @@ verified.
 
 ## Test writing phase
 
-- **REQ-29** — On startup, extract the Epic ID from the `--tasks` path and
-  search for `docs/tests/epics/<Epic>-*.md` in the project dir. Exit with
-  code 1 and an actionable message if the file is not found or contains
-  `status: template` frontmatter.
+- **REQ-29** — Per-task test-spec discovery: for each task the orchestrator processes, find matching `docs/tests/TEST-*.md` files by grepping the `**Task:**` header for the task's ID (regex `^\*\*Task:\*\* .*<task-id>`). Refuse the task with a coverage-gap message and skip its Ralph loop if zero TEST files match. Discovery runs inside `critic_loop` per task, not once at startup with a single Epic-level test doc. Reads TEST-file headers directly — MUST NOT parse `docs/tests/index.md` (which is a human aggregation, not the primary SoT). See item 003 (Epic E5) in orchestrator-dashboard for the REQ-0008 rationale and `workflow-tests`'s Work-item anchoring section.
 - **REQ-30** — Before each task's first implementation attempt, call Claude
   to write real tests based on the task spec and test design doc. The prompt
   forbids stubs and production code and is language-neutral (no hardcoded

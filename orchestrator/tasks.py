@@ -1,8 +1,20 @@
-"""Task loading (REQ-01..04) and test-design-doc discovery (REQ-29)."""
+"""Task loading (REQ-01..04) and per-task test-spec discovery (REQ-0008).
+
+Per-task test discovery replaced the retired Epic-level ``find_test_doc``
+after Epic E5 (Orchestrator flat-layout support) synced project-template
+to the REQ-0006 flat task-file convention and the three-mode
+verification model. Machines MUST read test-spec metadata from the
+TEST-*.md file headers directly (see workflow-tests "Machine
+discovery" section) — NOT from docs/tests/index.md, which is a
+human aggregation.
+"""
 import json
 import re
 import sys
 from pathlib import Path
+
+
+TASK_ID_RE = re.compile(r"^(TASK|BUG)-\d{4}")
 
 
 def load_tasks(tasks_path: str) -> list[dict]:
@@ -11,12 +23,16 @@ def load_tasks(tasks_path: str) -> list[dict]:
 
     if path.is_dir():
         for f in sorted(path.rglob("*.md")):
-            if "_TEMPLATE" not in f.name:
-                tasks.append({
-                    "id": f.stem,
-                    "content": f.read_text(encoding="utf-8"),
-                    "path": str(f),
-                })
+            if "_TEMPLATE" in f.name:
+                continue
+            # Skip index.md and README.md — scaffolding, not work items.
+            if f.name in ("index.md", "README.md"):
+                continue
+            tasks.append({
+                "id": f.stem,
+                "content": f.read_text(encoding="utf-8"),
+                "path": str(f),
+            })
     elif path.suffix == ".json":
         data = json.loads(path.read_text(encoding="utf-8"))
         tasks = data if isinstance(data, list) else [data]
@@ -29,50 +45,49 @@ def load_tasks(tasks_path: str) -> list[dict]:
             print("[ERROR] PyYAML not installed. Run: pip install pyyaml", file=sys.stderr)
             sys.exit(1)
     else:
-        tasks = [{
+        tasks.append({
             "id": path.stem,
             "content": path.read_text(encoding="utf-8"),
             "path": str(path),
-        }]
+        })
 
     return tasks
 
 
-def find_test_doc(tasks_path: str, project_dir: str) -> "Path":
-    """Find and validate the Epic's test design doc (REQ-29). Exits if missing or template."""
-    epic_id = None
-    for part in Path(tasks_path).parts:
-        if re.match(r"^E\d+", part, re.IGNORECASE):
-            epic_id = part
-            break
+def find_test_docs_for_task(task: dict, project_dir: str) -> list[Path]:
+    """Discover TEST-*.md files whose **Task:** header contains this task's ID.
 
-    if not epic_id:
-        print(
-            f"[ERROR] Cannot determine Epic ID from --tasks path: {tasks_path}\n"
-            f"        Expected a path containing an Epic folder, e.g. docs/tasks/epics/E1/",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    Task-ID is extracted from the task filename stem via regex (TASK|BUG)-\\d{4}.
+    Discovery scans docs/tests/TEST-*.md for the anchored header pattern
+    ``^**Task:** .*<task-id>`` (regex on multiline content).
 
-    test_docs_dir = Path(project_dir) / "docs" / "tests" / "epics"
-    matches = sorted(test_docs_dir.glob(f"{epic_id}-*.md"))
+    Returns list of matching Path objects (sorted). Empty list = coverage gap;
+    caller decides whether to refuse the task (see loops.critic_loop).
+    Machines MUST NOT parse docs/tests/index.md — that file is a human
+    aggregation, not the primary SoT for the mapping (per REQ-0008 and the
+    Work-item anchoring section of docs/tests/strategy.md).
+    """
+    m = TASK_ID_RE.match(task["id"])
+    if not m:
+        return []
+    task_id = m.group(0)
 
-    if not matches:
-        print(
-            f"[ERROR] Test design doc not found: docs/tests/epics/{epic_id}-*.md\n"
-            f"        Complete Phase 4 (test design) before running the orchestrator.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    tests_dir = Path(project_dir) / "docs" / "tests"
+    if not tests_dir.is_dir():
+        return []
 
-    doc = matches[0]
-    content = doc.read_text(encoding="utf-8")
-    if "status: template" in content[:300]:
-        print(
-            f"[ERROR] Test design doc is still a template: {doc.relative_to(project_dir)}\n"
-            f"        Complete Phase 4 (test design) before running the orchestrator.",
-            file=sys.stderr,
-        )
-        sys.exit(1)
-
-    return doc
+    # \b (word boundary) at end guards against TASK-00010 matching a search for
+    # TASK-0001 — impossible under the 4-digit convention but cheap defence.
+    pattern = re.compile(
+        rf"^\*\*Task:\*\* .*{re.escape(task_id)}\b",
+        re.MULTILINE,
+    )
+    matches: list[Path] = []
+    for f in sorted(tests_dir.glob("TEST-*.md")):
+        try:
+            content = f.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        if pattern.search(content):
+            matches.append(f)
+    return matches
