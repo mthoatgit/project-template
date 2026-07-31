@@ -70,9 +70,9 @@ an observable acceptance line.>
 ## Tasks
 
 <Filled in at Stage 4 (Task-Breakdown) of the featurework lifecycle.
-Links to files in `docs/tasks/E<N>/`.>
+Links to files in `docs/tasks/` (flat per REQ-0006 — no per-Epic subdirectory).>
 
-- [T<NN> — <Task title>](../../../tasks/E<N>/T<NN>-<slug>.md)
+- [TASK-<NNNN> — <Task title>](../../../tasks/TASK-<NNNN>-<slug>.md)
 
 ## Epic-Level Acceptance Criteria
 

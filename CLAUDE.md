@@ -82,5 +82,5 @@ Scenario coverage: `docs/tests/README.md`.
 Claude MUST use the orchestrator during the implementation phase; Claude MUST NOT implement tasks manually.
 
 ```bash
-python -m orchestrator --tasks docs/tasks/E<N>/ --test-cmd "<test-cmd>" --project-dir .
+python -m orchestrator --tasks docs/tasks/ --test-cmd "<test-cmd>" --project-dir .
 ```

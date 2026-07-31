@@ -107,15 +107,20 @@ docs/
     _TEMPLATE.md
   tasks/                         Implementation work items (merged namespace: T<NN> tasks + B<NN> bug fixes)
     index.md                     Merged status table (Type column distinguishes task vs bug)
+    README.md                    Flat-layout orientation
     _TEMPLATE_TASK.md            Task blueprint (feature tasks)
-    _TEMPLATE_BUG.md             B-file blueprint (thin — the orchestrator's fix interface)
-    E<N>/                        Per-Epic folders (created when the Epic is born)
-  tests/                         Test scenarios per Epic + strategy
+    _TEMPLATE_BUG.md             BUG-file blueprint (thin — the orchestrator's fix interface)
+    TASK-<NNNN>-*.md             Task work items (flat per REQ-0006, no E<N>/ subdirectory)
+    BUG-<NNNN>-*.md              Bug work items (flat, shared counter with TASK-)
+  tests/                         Test specs — one file per verification atom, three-mode framework
     README.md
-    strategy.md
-    cross-cutting.md
-    e2e.md
-    epics/_TEMPLATE.md           Per-Epic test scenarios blueprint (with per-scenario Source column)
+    strategy.md                  Three-mode framing (behavioral/structural/procedural) + pyramid + CI
+    index.md                     All tests with ID / Epic / Mode / REQ / Task / Status columns
+    _TEMPLATE_BEHAVIORAL.md      Behavioral (pytest / flutter test) test spec blueprint
+    _TEMPLATE_STRUCTURAL.md      Structural (shell / grep) test spec blueprint
+    _TEMPLATE_PROCEDURAL.md      Procedural (human-playbook) test spec blueprint
+    TEST-<NNNN>-*.md             Individual test specs (flat, one per verification atom)
+    cross-cutting/               Tests for NFRs / system-wide concerns without single-Epic owner
 ```
 
 ## Replacing the placeholders

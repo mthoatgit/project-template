@@ -18,8 +18,8 @@ Stage sections are added as the item enters each stage of the bug lifecycle
 Each stage has ### Discussion (with #### YYYY-MM-DD sub-headers for dated notes) + ### Outcome (artefact link or terminal) + **Approved:** date.
 See workflow-lifecycle-bug for each stage's specifics, Class A vs B rules, and orchestrator interaction.
 
-When Stage 4 (Fix) completes, the bug moves out of the backlog and becomes a B<NN> file under
-docs/tasks/E<N>/ per workflow-lifecycle-bug's output layout.
+When Stage 4 (Fix) completes, the bug moves out of the backlog and becomes a BUG-<NNNN> file
+directly under docs/tasks/ (flat per REQ-0006) per workflow-lifecycle-bug's output layout.
 -->
 
 <!--
