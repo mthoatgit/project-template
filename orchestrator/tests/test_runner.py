@@ -152,7 +152,7 @@ def test_looks_like_test_file_true(path):  # REQ-31
     "backend/src/config.py",                     # source
     "frontend/lib/main.dart",                    # Flutter entry
     "frontend/lib/models/task.dart",             # Flutter model
-    "docs/tests/epics/E1-foundation.md",         # docs — not source
+    "docs/tests/TEST-0001-example.md",           # docs — not source
     "src/testing_utils.py",                      # helper, not a test
     "README.md",
 ])
