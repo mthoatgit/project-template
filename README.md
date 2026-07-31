@@ -53,13 +53,13 @@ For the full flow diagram + skill map, see [`docs/workflow-overview.md`](docs/wo
 /init-project "<name>"            ← Bootstrap — CLAUDE.md + README + docs/backlog/001-<seed-slug>.md
 /backlog 001                      ← Enter Stage 1 (Concept) — design conversation in the item body
 ... approve Stage 1, commit ...   ← docs/concept.md written, item Outcome back-links to commit
-                                    Stage 2 (REQ + Epic-Birth) writes docs/specs/epics/E1-*.md
+                                    Stage 2 (REQ + Epic-Birth) writes docs/specs/epics/E1-<slug>/REQ-<NNNN>-*.md
 ... approve Stage 2, commit ...
                                     Stage 3 (Architecture) writes ADR-0001 (founding tech stack)
 ... approve Stage 3, commit ...
-                                    Stage 4 (Task-Breakdown) writes docs/tasks/E1/T<NN>-*.md
+                                    Stage 4 (Task-Breakdown) writes docs/tasks/TASK-<NNNN>-*.md (flat, no E<N>/ subdir)
 ... approve Stage 4, commit ...
-                                    Stage 5 (Tests) writes docs/tests/epics/E1-*.md — item archives
+                                    Stage 5 (Tests) writes docs/tests/TEST-<NNNN>-*.md files (one per verification atom, three-mode) — item archives
 ... approve Stage 5, commit ...
 /start-epic 1                     ← Implementation phase — orchestrator-driven TDD loop
 /ship-epic                        ← Self-review + open PR
@@ -145,8 +145,8 @@ Two flavors of template files exist:
 
 | Flavor | Examples | Lifecycle |
 |---|---|---|
-| **Multi-instance blueprints** (`_TEMPLATE_*.md`) | `docs/backlog/_TEMPLATE_idea.md`, `docs/specs/epics/_TEMPLATE.md`, `docs/tasks/_TEMPLATE_TASK.md`, `docs/tests/epics/_TEMPLATE.md` | Stay as templates forever. Copied to produce real files (`E1-foo.md`, `T01-bar.md`, `001-my-slug.md`). The copy inherits the frontmatter; remove it when filling in. |
-| **Single-instance placeholders** | `docs/concept.md`, `docs/architecture/system-design.md`, `docs/tests/cross-cutting.md`, `docs/specs/README.md`, etc. | One file at the final path with placeholder content. Frontmatter is removed once the file holds real content. |
+| **Multi-instance blueprints** (`_TEMPLATE_*.md`) | `docs/backlog/_TEMPLATE_idea.md`, `docs/specs/epics/_TEMPLATE.md`, `docs/specs/epics/_REQ-TEMPLATE.md`, `docs/tasks/_TEMPLATE_TASK.md`, `docs/tasks/_TEMPLATE_BUG.md`, `docs/tests/_TEMPLATE_BEHAVIORAL.md`, `docs/tests/_TEMPLATE_STRUCTURAL.md`, `docs/tests/_TEMPLATE_PROCEDURAL.md` | Stay as templates forever. Copied to produce real files (`E1-foo/E1-foo.md`, `REQ-0001-bar.md`, `TASK-0001-baz.md`, `TEST-0001-quux.md`, `001-my-slug.md`). The copy inherits the frontmatter; remove it when filling in. |
+| **Single-instance placeholders** | `docs/concept.md`, `docs/architecture/system-design.md`, `docs/specs/README.md`, `docs/tests/README.md`, `docs/tests/strategy.md`, etc. | One file at the final path with placeholder content. Frontmatter is removed once the file holds real content. |
 
 ## Related repositories
 

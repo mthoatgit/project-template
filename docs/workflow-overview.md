@@ -45,8 +45,8 @@ flowchart TD
     S1["Stage 1 — Concept<br/>Discussion + Outcome<br/>artefact: docs/concept.md write/amend<br/>OR null decision"]
     S1 -->|approve| S2["Stage 2 — Requirements<br/>Discussion + Outcome<br/>artefact: REQ(s) in docs/specs/epics/E&lt;N&gt;-*.md<br/>possibly Epic-birth"]
     S2 -->|approve| S3["Stage 3 — Architecture<br/>Discussion + Outcome<br/>artefact: ADR + system-design.md<br/>OR null decision"]
-    S3 -->|approve| S4["Stage 4 — Task-Breakdown<br/>Discussion + Outcome<br/>artefact: T-files in docs/tasks/E&lt;N&gt;/"]
-    S4 -->|approve| S5["Stage 5 — Tests<br/>Discussion + Outcome<br/>artefact: scenarios in docs/tests/epics/E&lt;N&gt;-*.md<br/>item archived on this commit"]
+    S3 -->|approve| S4["Stage 4 — Task-Breakdown<br/>Discussion + Outcome<br/>artefact: TASK-&lt;NNNN&gt;-*.md files flat in docs/tasks/ (no E&lt;N&gt;/ subdir)"]
+    S4 -->|approve| S5["Stage 5 — Tests<br/>Discussion + Outcome<br/>artefact: TEST-&lt;NNNN&gt;-*.md files flat in docs/tests/ (three modes: behavioral / structural / procedural)<br/>item archived on this commit"]
     S5 --> Impl(["Implementation Phase<br/>per Epic — see sub-flow"])
 
     classDef gate fill:#fff3cd,stroke:#d4a017,color:#333;
@@ -110,13 +110,13 @@ flowchart TD
     S1["/start-epic &lt;N&gt;<br/>reads Epic file + tasks<br/>outputs confirmation block"] -->|user confirms go| S2["create branch<br/>epic/&lt;n&gt;-&lt;slug&gt; from main"]
     S2 --> S3["/scaffold &lt;N&gt;<br/>empty skeletons only, no logic<br/>commit: [scaffold] E&lt;N&gt;"]
     S3 --> S4["python -m orchestrator starts"]
-    S4 --> Loop{"next task<br/>T&lt;NN&gt;?"}
+    S4 --> Loop{"next task<br/>TASK-&lt;NNNN&gt;?"}
     Loop -->|yes| Ralph["Ralph Loop<br/>Claude implements + writes tests"]
     Ralph --> RunTests["run test-cmd"]
     RunTests -->|fail| Ralph
     RunTests -->|pass| Critic["Critic-Actor<br/>adversarial design review"]
     Critic -->|rejected| Ralph
-    Critic -->|approved| Commit["commit: feat: &lt;title&gt; (T&lt;NN&gt;)"]
+    Critic -->|approved| Commit["commit: feat: &lt;title&gt; (TASK-&lt;NNNN&gt;)"]
     Commit --> Loop
     Loop -->|no — all done| Ship["/ship-epic"]
     Ship --> Review["verify commit history<br/>self-review acceptance criteria"]
