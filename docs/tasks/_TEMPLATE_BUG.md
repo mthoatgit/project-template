@@ -2,29 +2,23 @@
 status: template
 ---
 
-# B<NN> — <Bug Title>
+# BUG-<NNNN> — <Bug Title>
 
-> **Template.** This file defines the canonical structure for every bug
-> file in this project. To create a new bug file:
+> **Template.** This file defines the canonical structure for every bug file in this project. To create a new bug file:
 >
-> 1. Copy this file to `E<N>/B<NN>-<slug>.md` (next free B-ID from `docs/tasks/index.md`)
-> 2. Fill in header fields, Symptom, Fix approach (from the source bug item's Stage 4)
-> 3. Fix commit SHA fills in when the fix lands (by orchestrator for Class A, by human for Class B)
-> 4. Remove this banner and the `status: template` frontmatter
-> 5. Add a row to `docs/tasks/index.md` with `Type: bug`
+> 1. Copy this file to `BUG-<NNNN>-<slug>.md` directly under `docs/tasks/` — no per-Epic subdirectory, no `cross/`. `NNNN` is the next free four-digit global counter across `docs/tasks/TASK-*` and `docs/tasks/BUG-*` (they share one namespace).
+> 2. Fill in header fields, Symptom, Fix approach (from the source bug item's Stage 4).
+> 3. Fix commit SHA fills in when the fix lands (by orchestrator for Class A, by human for Class B).
+> 4. Remove this banner and the `status: template` frontmatter.
+> 5. Add a row to `docs/tasks/index.md` with `Type: bug`.
 >
-> **Note on content vs source.** This B-file is the orchestrator's
-> interface — enough context for the fix to happen. The substantive
-> Reproduction recipe, full Root Cause analysis, and design discussion
-> live in the source bug item (in `docs/backlog/archive/`) under its
-> Stage 1-4 Discussion + Outcome sub-sections. Do NOT duplicate that
-> content here. This file is intentionally thin.
+> **Note on content vs source.** This BUG-file is the orchestrator's interface — enough context for the fix to happen. The substantive Reproduction recipe, full Root Cause analysis, and design discussion live in the source bug item (in `docs/backlog/archive/`) under its Stage 1-4 Discussion + Outcome sub-sections. Do NOT duplicate that content here. This file is intentionally thin.
 
-**Epic:** <E<N> | cross>
+**Epic:** <E<N>-<slug> OR the literal `none` for cross-Epic / project-wide bugs>
 **Source:** [[NNN-slug]]     <!-- backlog bug item this originated from -->
 **Class:** <A | B>
-**Related Task(s):** <T<NN>, T<NN>>
-**Pinned regression test:** <row-identifier in docs/tests/epics/E<N>-*.md marked with Source [[NNN-slug]]>
+**Related Task(s):** <TASK-<NNNN>, TASK-<NNNN>>
+**Pinned regression test:** <TEST-<NNNN> filed at Stage 3 of the source bug item>
 **Fix commit:** <TBD — filled when fix lands>
 
 ## Symptom

@@ -1,6 +1,6 @@
-# Task Status
+# Work Items
 
-Merged index for tasks (`T<NN>`) and bug fix-artefacts (`B<NN>`). IDs are drawn from disjoint namespaces — a number never appears as both a task and a bug.
+Merged index for tasks (`TASK-<NNNN>`) and bug fix-artefacts (`BUG-<NNNN>`). IDs share ONE global four-digit counter across both types — a task ID and a bug ID never share the same number. See `workflow-tasks` for the full convention.
 
-| ID  | Type | Epic  | Title              | Status        |
-|-----|------|-------|--------------------|---------------|
+| ID        | Epic                            | Type | Title                                                        | Status        |
+|-----------|---------------------------------|------|--------------------------------------------------------------|---------------|

@@ -1,32 +1,19 @@
----
-status: template
----
-
 # Test Plan
 
-> **Template file.** Index of the test plan. The plan is split per Epic
-> to scale with the project. Drop this block once real content exists.
+This project uses a three-mode verification model (Behavioral / Structural / Procedural) — see [`strategy.md`](strategy.md) for definitions and mode-selection guidance. Individual tests live as flat files directly under `docs/tests/`, globally numbered as `TEST-<NNNN>-<slug>.md`.
 
-| File | Content | Epic |
-|---|---|---|
-| [strategy.md](strategy.md) | Test pyramid, layers, "done" definitions, fixtures, CI | — |
-| [epics/E<N>-<slug>.md](epics/E<N>-<slug>.md) | <REQ-IDs> scenarios | E<N> |
-| [cross-cutting.md](cross-cutting.md) | Error handling, OpenAPI, other cross-module checks | — |
-| [e2e.md](e2e.md) | Full-system happy-path flow | <Epic that owns E2E> |
+## Files
 
-## Coverage Matrix (Task → Test Type)
-
-| Task | Test types | Notes |
-|---|---|---|
-| T<NN> | <unit / slice / integration / e2e / none> | <short note> |
-| T<NN> | <unit / slice / integration / e2e / none> | <short note> |
+| File | Content |
+|---|---|
+| [strategy.md](strategy.md) | Verification-mode definitions, mode-selection rule, behavioral test pyramid, "done" per layer, CI integration |
+| [index.md](index.md) | All tests with `Mode / Epic / REQ / Task / Status` columns — the coverage matrix falls out of this table |
+| [cross-cutting/](cross-cutting/) | Tests for NFRs and system-wide concerns that do not belong to a single Epic |
+| `TEST-<NNNN>-<slug>.md` | Individual test files, one per verification atom, flat under `docs/tests/` |
+| `_TEMPLATE_BEHAVIORAL.md` / `_TEMPLATE_STRUCTURAL.md` / `_TEMPLATE_PROCEDURAL.md` | Templates, one per mode |
 
 ## Out of Scope
 
-- <Test category deliberately excluded — e.g. contract tests, perf tests, mutation testing>
-
----
-
-**Approval:** review each Epic file and the cross-cutting / e2e files
-individually. Approval covers the whole plan once all listed files are
-signed off.
+- Performance / load testing (not required at current project scope).
+- Contract testing between components (single-service scope).
+- Mutation testing.
