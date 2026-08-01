@@ -5,7 +5,7 @@ import pytest
 
 from orchestrator import update_task_status
 
-from orchestrator.tests.helpers import _make_index, _row_for
+from helpers import _make_index, _row_for
 
 
 def test_update_task_status_flips_pending_to_in_progress(tmp_path):  # REQ-38

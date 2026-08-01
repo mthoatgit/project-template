@@ -11,7 +11,7 @@ from orchestrator import (
     write_tests_phase,
 )
 
-from orchestrator.tests.helpers import TASK
+from helpers import TASK
 
 
 # ─────────────────────────────────────────────────────────────

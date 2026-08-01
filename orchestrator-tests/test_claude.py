@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from orchestrator import handle_session_limit, parse_reset_time, run_claude
 
-from orchestrator.tests.helpers import _mock_popen
+from helpers import _mock_popen
 
 
 # ─────────────────────────────────────────────────────────────

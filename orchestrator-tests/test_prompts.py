@@ -17,7 +17,7 @@ from orchestrator import (
     FINAL_APPROVAL_CRITERIA,
 )
 
-from orchestrator.tests.helpers import TASK, task_content_present
+from helpers import TASK, task_content_present
 
 
 # ─────────────────────────────────────────────────────────────

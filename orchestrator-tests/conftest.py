@@ -57,7 +57,12 @@ def _stub_find_test_docs_for_task(request: pytest.FixtureRequest, tmp_path: Path
     # the stub so it can call the real find_test_docs_for_task freely.
     module_name = request.node.module.__name__ if hasattr(request.node, "module") else ""
     opt_in = request.node.get_closest_marker("needs_test_docs_stub")
-    if not opt_in and not module_name.endswith(".test_loops"):
+    # Compare on the leaf module name (last dot-separated segment) so this
+    # works whether tests load as `orchestrator.tests.test_loops` (legacy
+    # nested layout) or plain `test_loops` (current flat orchestrator-tests/
+    # on pytest pythonpath).
+    leaf = module_name.rsplit(".", 1)[-1]
+    if not opt_in and leaf != "test_loops":
         yield
         return
 

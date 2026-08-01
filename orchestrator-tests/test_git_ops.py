@@ -13,7 +13,7 @@ from orchestrator import (
     resume_check,
 )
 
-from orchestrator.tests.helpers import _RESUME_TASKS
+from helpers import _RESUME_TASKS
 
 
 # ─────────────────────────────────────────────────────────────

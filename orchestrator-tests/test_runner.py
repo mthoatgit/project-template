@@ -13,7 +13,7 @@ from orchestrator import (
     run_tests,
 )
 
-from orchestrator.tests.helpers import _mock_popen
+from helpers import _mock_popen
 
 
 # ─────────────────────────────────────────────────────────────
