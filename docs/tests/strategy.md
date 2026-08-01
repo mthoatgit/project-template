@@ -20,22 +20,25 @@ status: template
               (HOW)         (proof WHAT holds)
               ↓                  ↑
               └──────────────────┘
-              **Task:** header — direct backlink
-              (convenience, not the only path)
+              **Task:** header — one primary task (the Ralph-Loop anchor)
+              **Also-covers:** header — additional tasks the test observes
+              (informational; the orchestrator ignores it)
 ```
 
 **Metadata in each file (the primary SoT).**
 
 - `docs/tasks/TASK-<NNNN>-*.md` carries a `## Requirements` section listing REQ IDs it implements.
-- `docs/tests/TEST-<NNNN>-*.md` carries two header fields:
-  - `**REQ:**` — the REQs it verifies (the anchor).
-  - `**Task:**` — the task that implemented those REQs (direct backlink, convenience).
+- `docs/tests/TEST-<NNNN>-*.md` carries these header fields:
+  - `**REQ:**` — the REQs it verifies (the anchor). One or more, comma-separated.
+  - `**Task:**` — **exactly ONE** task ID: the *primary* task whose Ralph Loop must green this test.
+  - `**Also-covers:**` — OPTIONAL. Additional task IDs the test exercises as a side effect. Informational only; the orchestrator ignores this field. See `workflow-tests` "Work-item anchoring" for the single-`**Task:**` rationale.
 
 **Relationship cardinality.**
 
 - REQ ↔ Task: many-to-many. One task MAY implement multiple REQs; one REQ MAY be served by multiple tasks.
 - REQ ↔ Test: many-to-many. One REQ MAY have multiple tests (e.g. structural + procedural for the same REQ — see three modes below); one test MAY cover multiple REQs.
-- Task ↔ Test: many-to-many, but in practice usually 1 task → 1..N tests.
+- Task ↔ Test (primary via `**Task:**`): each test has ONE primary task; each task MAY have multiple tests.
+- Task ↔ Test (informational via `**Also-covers:**`): many-to-many, no orchestrator contract.
 
 **Overview files are human aggregations, not SoT.** `docs/tasks/index.md` and `docs/tests/index.md` mirror the metadata that lives in the file headers. They exist for human reading — Coverage-Matrix, status-at-a-glance, filtering. Machines (orchestrator) MUST read from the file headers directly, not from the aggregations (which can drift).
 

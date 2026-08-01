@@ -23,8 +23,9 @@ def main():
         "--tasks", required=True,
         help=(
             "Work-item source: path to a .md file, .json/.yaml file, or a "
-            "directory. Directories are scanned for both T<NN>-*.md (tasks) "
-            "and B<NN>-*.md (bugs); Class B bugs are skipped with a log entry."
+            "directory. Directories are scanned for both TASK-<NNNN>-*.md "
+            "(tasks) and BUG-<NNNN>-*.md (bugs); Class B bugs are skipped "
+            "with a log entry."
         ),
     )
     parser.add_argument(
