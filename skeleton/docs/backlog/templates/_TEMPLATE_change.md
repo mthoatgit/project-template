@@ -4,7 +4,7 @@ status: template
 
 # <Short title — one line>
 
-> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: idea`, `status: raw`, `priority: P<N>`, `created: <today>`, `updated: <today>`, `stage: 1`, `stage_attempt: 1`) and remove this banner. See the `workflow-backlog` skill for structure and `workflow-lifecycle-featurework` for how this item's stages work.
+> **Template file.** Copy to `docs/backlog/<NNN>-<slug>.md` (NNN = highest existing ID + 1, zero-padded to 3 digits; slug in kebab-case). Replace the frontmatter above with the universal item frontmatter (`type: change`, `status: raw`, `created: <today>`, `updated: <today>`, `stage: 1`, `stage_attempt: 1`) and remove this banner. See the `workflow-backlog` skill for structure and `workflow-lifecycle-featurework` for how this item's stages work.
 
 **Lifecycle:** featurework — see `workflow-lifecycle-featurework`
 
@@ -20,7 +20,7 @@ status: template
 
 ## Core
 
-<One paragraph. What the idea is at its essence. Write it the day the idea is captured — do NOT rewrite this later. It is the seed, not the sapling. Design discussion happens later in the per-stage Discussion sub-sections.>
+<One paragraph. What the change is at its essence — a new capability, a missing capability that hurts, or a tweak/refactor to existing behavior. Write it the day the item is captured — do NOT rewrite this later. It is the seed, not the sapling. Design discussion happens later in the per-stage Discussion sub-sections.>
 
 <!--
 Stage sections are added as the item enters each stage of the featurework lifecycle

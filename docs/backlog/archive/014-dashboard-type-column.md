@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P3 · Dashboard doesn't display Type column
@@ -8,3 +9,7 @@ type: improvement
 - **Impact.** Cosmetic; nothing depends on it. Anyone using the dashboard can't visually tell tasks from bugs.
 - **Proposed shape.** Thread `type` through the backend `Task` dataclass + `/api/tasks` response, add a column to the `TaskTable` widget. Small feature, one atomic task.
 - **Source.** 2026-07-09 session — noted while smoke-testing the app.
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

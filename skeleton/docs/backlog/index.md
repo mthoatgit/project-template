@@ -1,2 +1,2 @@
-| ID  | Type | Prio | Title | Status | Stage | Created | Updated | File |
-|-----|------|------|-------|--------|-------|---------|---------|------|
+| ID  | Type | Stage | Status | Title | File | Created |
+|-----|------|-------|--------|-------|------|---------|

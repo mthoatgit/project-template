@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P2 · Diagramm-Skill für Code-Überblick (Packages, Kernprozesse, Entscheidungen)
@@ -16,3 +17,7 @@ type: improvement
   - Entscheidungen sichtbar machen: kein neues Diagrammformat dafür, sondern (a) ADR-Index-Tabelle (analog `docs/tasks/index.md`) mit ID/Status/Datum/Ein-Satz-Zusammenfassung, (b) Querverweise `(siehe ADR-XXX)` direkt im Package-Diagramm / bei Kernprozessen.
   - Kadenz: nicht pro Task neu zeichnen — Refresh-Check am Epic-Ende (wo ohnehin reflektiert wird), sonst on-demand.
 - **Source.** Chat-Session 2026-07-18 (keine Projekt-spezifische Codebasis, generelle Überlegung zur Verständlichkeit von AI-generiertem Code). Noch nicht besprochen: genauer Skill-Name, ob Erweiterung von `workflow-architecture` oder eigener Skill, Trigger-Wortliste.
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

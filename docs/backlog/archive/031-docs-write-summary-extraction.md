@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P3 · Docs-Write-Phase: inhaltliche Summary statt Konstante
@@ -18,3 +19,7 @@ type: improvement
 
   Testing: neuer Unit-Test in `test_loops.py` der prüft dass die extrahierte Summary im Progress-Log auftaucht wenn Actor-Antwort einen sinnvollen Inhalt hat.
 - **Source.** Chat-Session 2026-07-19 nach E2E-Run. Nutzer nach Vorschlag heuristisch-vs-konstant: „mir reicht erstmal dieses docs updated aber schreibe mal einen backlog item für das thema das können wir uns dann später anschauen" — explizite Deferral, konstante Version bleibt als Minimum drin.
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

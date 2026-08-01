@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P2 · Option-H E2E-Run Follow-ups (Beobachtungen aus dem hello-028 Test)
@@ -39,3 +40,7 @@ type: improvement
 10. **JSON-in-Text hat 4/4 Gate-Calls sauber geparst.** Sample size 1, aber positives Signal für Variante A aus 028. Bei größerer Nutzung wird's Failures geben — dann relevant wie robust unser Fallback zu „design"-Default wirklich ist.
 
 - **Source.** E2E-Run 2026-07-19 vormittags gegen `hello-028` im scratchpad. Logs unter `hello-028/logs/orchestrator-2026-07-19-08-30.{log,progress.log}`, Commits `0b2e1fa` (T01) + `e771ebf` (T02). Nutzer-Aussage nach Beobachtungs-Report: „erstelle mal ein backlog item mit allen punkten damit wir es nicht verlieren und dann lass uns oben anfangen" — nach Retraction von #1 wird die Fix-Reihenfolge zu: #2 (deny rules) → #3 (docs-write silence) → #7 (docs-rerun retry) → dann Kleinkram.
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

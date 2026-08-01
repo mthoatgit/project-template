@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P2 · `orchestrator-requirements.md` beschreibt Post-028 Verhalten inkonsistent
@@ -19,3 +20,7 @@ type: improvement
 
   Extra: neue REQs für die drei Gates selbst hinzufügen (REQ-42 = Struktur-Check, REQ-43 = Docs-Write mit Escape, REQ-44 = Final-Approval mit 3-Way + Cycle-Guardrail) UND ins REQ-Doc reinschreiben dass CLI-Flag `--max-critic-iterations` historischer Name für Design-Cycle-Ceiling ist (siehe [[030-option-h-e2e-followups]] #4 Fix).
 - **Source.** Bei der Umbenennung `[critic: N cycle]` → `[design: N cycle]` in Item 030 #4 aufgefallen: `docs/orchestrator-requirements.md` referenziert das alte Verhalten wörtlich. Ironisch: genau die Art Doku-Drift die der Docs-Write Gate (Item 028) verhindern soll — hätte er beim Bau von Option-H schon existiert, wäre die Drift beim Merge aufgefallen.
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

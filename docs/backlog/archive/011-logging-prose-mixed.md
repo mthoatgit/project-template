@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P2 · Logging is prose-mixed, hard to reconstruct retrospectively
@@ -13,3 +14,7 @@ type: improvement
   - **Timestamps on every internal marker** — enables wall-clock reconstruction and correlates with external signals.
   - **Collapse repeated test output** — keep first + last iteration's test dump verbatim, elide the middle with a count marker so 500 identical lines become one.
 - **Source.** 2026-07-09 session — user: "der orchestrator läuft getrennt von meiner wahrnehmung und daher brauche ich retrospektiv die möglichkeit zusammen mit dir besser fehler zu finden."
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

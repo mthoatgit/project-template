@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P1 · Stale `docs/tasks/epics/` + `docs/tasks/backlog.md` Referenzen in Commands & Skills
@@ -10,3 +11,7 @@ type: improvement
 - **Impact.** Jeder dieser Commands/Skills weist Claude in einer laufenden Session an, Dateien im **falschen Pfad** anzulegen oder zu lesen. `/new-requirement` würde eine neue Task-Datei unter `docs/tasks/epics/E<N>/` erzeugen statt `docs/tasks/E<N>/` und in einer nicht mehr existierenden `docs/tasks/backlog.md` referenzieren; `/scaffold` würde den Orchestrator mit dem falschen `--tasks`-Pfad starten und failed; `/start-epic` und `/ship-epic` würden Task-Files nicht finden. Wirkt still, bis ein Nutzer den Command real triggert — dann bricht der Workflow an der Ausführung, nicht am Reviewer. Item 022 Nebenfund hat 2 dieser Files bereits vorgezeichnet; heute kam bei Prüfung von `/new-requirement` (User-Frage: "ist mein Prozess für neue Requirements vorbereitet") die vollständige Liste ans Licht.
 - **Proposed shape.** Ein Sweep in `~/.claude/`: pro File `docs/tasks/epics/E<N>/` → `docs/tasks/E<N>/` und `docs/tasks/backlog.md` → `docs/tasks/index.md`, keine strukturellen Änderungen. Ein Commit pro logischem Bucket (`commands`, `skills`), damit die Diffs klein bleiben. Als Reflect-Schritt: nachprüfen ob es noch andere Item-021-Nachwehen gibt (z.B. `docs/tasks/index.md` vs. altes `backlog.md`-Wording an anderen Stellen). **Zeitpunkt: kann direkt gemacht werden, unabhängig von Item 022** — der Path-1-Hook aus 022 sync't nur `workflow-overview.md`, nicht die Sources selbst; dieser Fix ist unabhängig und blockiert nicht.
 - **Source.** Session 2026-07-14 bei User-Frage zur Requirements-Change-Prozedur nach Template-Adoption. Reproduzierbar via: `grep -rn "docs/tasks/epics\|docs/tasks/backlog" ~/.claude/commands/ ~/.claude/skills/ ~/.claude/CLAUDE.md ~/.claude/rules/`. Item 022 hatte den Teilfund (`start-epic.md`, `ship-epic.md`) bereits als "eigenes P2-Backlog-Item" vorgesehen — hier auf P1 hochgezogen weil User explizit "extrem hoher priorität" gesagt hat und der Blast-Radius (5 Commands + 3 Skills) den Workflow beim ersten Trigger bricht.
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

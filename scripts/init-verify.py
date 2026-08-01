@@ -5,12 +5,11 @@ fill rounds keep glossing.
 Invoked by /init-project step 6 (after CLAUDE.md, README.md, item 001, and
 docs/backlog/index.md have been written by the agent). Two jobs:
 
-1. AUTOFIX four known scaffold-time misses whose correct value is knowable:
+1. AUTOFIX known scaffold-time misses whose correct value is knowable:
    - CLAUDE.md ``--test-cmd "<test-cmd>"`` -> ``--test-cmd "python scripts/test.py"``
-   - item 001 ``priority: P<n>`` -> ``priority: P1`` (per /init-project step 5 MUST)
    - item 001 date-only ``created`` / ``updated`` -> ``YYYY-MM-DD 00:00``
    - docs/backlog/index.md row 001 Stage cell bare ``1`` -> ``1 - Concept``
-     plus date-only timestamps and Priority in the same row
+     plus date-only timestamps in the same row
 
 2. HARD-FAIL on residual template markers or missing structural content
    the agent must have written by hand:
@@ -122,12 +121,6 @@ def _check_item_001(item: Path, fixes: list[str], errors: list[str]) -> None:
     txt = item.read_text(encoding="utf-8")
     orig = txt
 
-    # Autofix: priority P<n> -> P1
-    new = re.sub(r"^priority: P\d+\s*$", "priority: P1", txt, flags=re.MULTILINE)
-    if new != txt:
-        fixes.append(f"{item.name}: priority -> P1 (init-project step 5 MUST)")
-        txt = new
-
     # Autofix: date-only created/updated -> YYYY-MM-DD 00:00
     def _add_time(m: re.Match[str]) -> str:
         return f"{m.group(1)}: {m.group(2)} 00:00"
@@ -179,30 +172,26 @@ def _check_index(target: Path, fixes: list[str], errors: list[str]) -> None:
     lines = txt.split("\n")
 
     for i, line in enumerate(lines):
-        # Header expected: ID | Type | Prio | Title | Status | Stage | Created | Updated | File
-        # 001 row (leading `|`) — split gives ['', ' 001 ', ' idea ', ...]
+        # Header expected: ID | Type | Stage | Status | Title | File | Created
+        # 001 row (leading `|`) — split gives ['', ' 001 ', ' change ', ...]
         if not re.match(r"^\|\s*001\s*\|", line):
             continue
         parts = line.split("|")
-        if len(parts) < 10:
+        if len(parts) < 9:
             errors.append(
                 f"docs/backlog/index.md: 001 row has {len(parts)} pipe-fields, "
-                f"expected 10 (leading + trailing empties + 9 columns)"
+                f"expected 9 (leading + trailing empties + 7 columns)"
             )
             continue
 
-        # Positions: parts[0]='', [1]=ID, [2]=Type, [3]=Prio, [4]=Title, [5]=Status,
-        #            [6]=Stage, [7]=Created, [8]=Updated, [9]=File, [10]=''
-        # Priority -> P1
-        if parts[3].strip() != "P1":
-            parts[3] = " P1 "
-            fixes.append("docs/backlog/index.md: 001 row Priority -> P1")
+        # Positions: parts[0]='', [1]=ID, [2]=Type, [3]=Stage, [4]=Status,
+        #            [5]=Title, [6]=File, [7]=Created, [8]=''
 
         # Stage cell -> `1 - Concept`
-        stage_cell = parts[6].strip()
+        stage_cell = parts[3].strip()
         if stage_cell != "1 - Concept":
             if stage_cell in ("1", "1 -", "1 Concept"):
-                parts[6] = " 1 - Concept "
+                parts[3] = " 1 - Concept "
                 fixes.append('docs/backlog/index.md: 001 row Stage -> "1 - Concept"')
             else:
                 errors.append(
@@ -210,8 +199,8 @@ def _check_index(target: Path, fixes: list[str], errors: list[str]) -> None:
                     f'expected `1 - Concept`'
                 )
 
-        # Timestamps -> YYYY-MM-DD HH:MM
-        for idx, label in ((7, "Created"), (8, "Updated")):
+        # Timestamps -> YYYY-MM-DD HH:MM (Created only under new format)
+        for idx, label in ((7, "Created"),):
             cell = parts[idx].strip()
             if re.fullmatch(r"\d{4}-\d{2}-\d{2}", cell):
                 parts[idx] = f" {cell} 00:00 "

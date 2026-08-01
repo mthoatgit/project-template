@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P1 · Regression scenarios not appended to Epic test docs
@@ -8,3 +9,7 @@ type: improvement
 - **Impact.** Documentation drift from reality. Someone reading only the E3 test doc sees old coverage; someone reading only the code doesn't know the rationale for the scenario. Same failure class as Root Cause — orchestrator skips artifacts that aren't automatically verifiable.
 - **Proposed shape.** Reproducer step (`write_tests_phase` for bugs) must append the scenario row to the Epic test file *before* writing the actual test code, using the same append-only convention as Phase 4. If the append doesn't happen or the target file doesn't exist, the item bails to `action needed`.
 - **Source.** 2026-07-09 orchestrator run against B01+B02 — spotted the gap while verifying the fixes.
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

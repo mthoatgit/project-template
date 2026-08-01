@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P2 · Definition-of-Done-Checkpoints im Implementation-Loop — Impl → Test → Docs
@@ -196,3 +197,7 @@ Jedes neue Gate ist single-purpose, hat binäres oder 3-Way-Verdict, hat einen k
 - **Feedback-Weiterleitung:** wenn Phase 4 `route_to="design"` sagt, wie kommt die `reason` als sinnvoller Prompt-Context in Ralph? Existierendes Ralph-Feedback-Muster wiederverwenden.
 - **Interaktion mit Struktur-Mustern:** wenn Muster 1 (Generation) für API-Referenz eingeführt wird, entfällt `docs/api.md` als Mandatory. Reihenfolge Muster-Einführung ↔ Loop-Umbau durchdenken.
 - **Ein Committed-Flag pro Phase im Log:** damit man beim Debug erkennt an welchem Gate ein Task gescheitert wäre / weitergeleitet wurde. Nice-to-have.
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

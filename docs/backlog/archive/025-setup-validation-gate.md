@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P2 · Setup-Validation-Gate vor Orchestrator-Start (README + check-env.py + Skill-Hooks)
@@ -20,3 +21,7 @@ type: improvement
   - **Ebenen-Rollenverteilung sauber halten:** Skript = Enforcement-Gate. AI (bei Task/Bug-Schreiben) = Discovery/Vorschlag. AI-Discovery *während* der Implementierung = Sicherheitsnetz für das, was durch Architecture/Tasks/Bugs durchgerutscht ist, nicht die primäre Quelle.
   - **Explizit ausgeschlossen:** keine LLM-Prüfung *im* Check-Loop (Determinismus + Latenz + Offline-Bruch). Keine separate `docs/prerequisites.md`-Datei (würde nur dritte Quelle der Wahrheit erzeugen — Prosa im README + Code in `check-env.py` reicht).
 - **Source.** Chat-Session 2026-07-18 in `orchestrator-dashboard`. Trigger war Bug B04 (Backend cannot be started as documented) — dort reine Fix-Arbeit, die systemische Frage "wie fangen wir sowas beim nächsten Projekt schon vor der ersten Reibung" landet hier. Naming `start-implementation.py` bewusst gewählt (nicht `run-orchestrator.py`), weil es sich mit der Phasen-Sprache des Workflows deckt; Kollision mit dem `start-epic`-Skill semantisch ok (eins ist Skill, das andere ist Script).
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

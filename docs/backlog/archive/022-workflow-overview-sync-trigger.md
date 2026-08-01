@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P1 · Workflow-overview.md driftet unbemerkt — Sync-Trigger unreliable
@@ -65,3 +66,7 @@ exit 0
 **Nicht vergessen (Nebenfund):**
 - `~/.claude/commands/start-epic.md` (Zeile 14) und `~/.claude/commands/ship-epic.md` (Zeile 17) verweisen noch auf gedroppten `docs/tasks/epics/E<N>/T<NN>-*.md` Pfad — sind selbst stale und werden **von keinem Sync-Mechanismus abgedeckt** (weder aktuell noch Path 1 — der syncht ja nur `workflow-overview.md`, nicht die commands selbst). Kein Blocker für Path-1-Install, aber gehört ins gleiche Konsistenz-Gefühl. Entweder in derselben Session mitfixen (2-min Edit) oder eigenes P2-Backlog-Item.
 - Diese Datei nach Umsetzung: Status `done`, Move nach `topics/archive/`, README-Callout entfernen.
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.

@@ -1,5 +1,6 @@
 ---
 type: improvement
+status: dropped
 ---
 
 # P3 · Tool-Use / Function-Calling für Orchestrator-Reviewer statt JSON-in-Text
@@ -17,3 +18,7 @@ type: improvement
 - **Source.** Chat-Session 2026-07-19 im Anschluss an die Option-H-Umsetzungs-Planung. Nutzer-Zitate:
   - „variante b klingt sehr robust und scheint mir die bessere lösung zu sein richtig? falls ja dann erstelle nochmal eine backlog item dafür damit wir uns im anschluss anschauen können. wir bleiben erstmal bei variante a" — Auslöser, expliziter Aufschub.
   Verwandt: 028 (Option-H-Pipeline, in Umsetzung — bleibt bei JSON-in-Text bis dieses Item angegangen wird).
+
+## Dropped
+
+**Dropped 2026-08-01.** Reason: backlog reset after the skeleton/ restructure (034) — not evaluated individually.
