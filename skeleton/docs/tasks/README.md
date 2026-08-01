@@ -1,6 +1,6 @@
 # Work Items
 
-Task and bug files live flat directly under `docs/tasks/`, per REQ-0006 of Epic E4 (`docs/specs/epics/E4-fresh-project-seed-migration/REQ-0006-flat-task-file-naming.md`). There are no per-Epic subdirectories and no `cross/` subdirectory.
+Task and bug files live flat directly under `docs/tasks/`. There are no per-Epic subdirectories and no `cross/` subdirectory — Epic ownership is expressed via each file's `**Epic:**` header field, not by folder placement.
 
 ## Layout
 
@@ -23,7 +23,7 @@ docs/tasks/
 
 ## Epic ownership
 
-Every task and bug file carries an `**Epic:**` header field. The value MUST be either an Epic ID (e.g. `E4-fresh-project-seed-migration`) or the literal `none` — the latter for cross-Epic or project-wide work items that do not sit under any single Epic. `docs/tasks/index.md`'s `Epic` column mirrors this field and is the primary Epic-navigation surface.
+Every task and bug file carries an `**Epic:**` header field. The value MUST be either an Epic ID (e.g. `E1-<slug>`) or the literal `none` — the latter for cross-Epic or project-wide work items that do not sit under any single Epic. `docs/tasks/index.md`'s `Epic` column mirrors this field and is the primary Epic-navigation surface.
 
 ## Templates
 

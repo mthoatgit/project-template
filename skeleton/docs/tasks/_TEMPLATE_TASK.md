@@ -12,7 +12,7 @@ status: template
 > 4. Add a row to `docs/tasks/index.md` with `Type: task`.
 > 5. Commit.
 >
-> Task IDs are stable — never reused, never renumbered. One task per file. All task and bug files live flat directly under `docs/tasks/` per REQ-0006; there are no `E<N>/` or `cross/` subdirectories.
+> Task IDs are stable — never reused, never renumbered. One task per file. All task and bug files live flat directly under `docs/tasks/`; there are no `E<N>/` or `cross/` subdirectories. Epic ownership is expressed via the `**Epic:**` header field.
 
 **Epic:** <E<N>-<slug> OR the literal `none` for cross-Epic / project-wide tasks>
 **Source:** [[NNN-slug]]

@@ -18,8 +18,8 @@ bruno/
 
 # --- Stack-specific entries ---
 
-# Python (the orchestrator package itself is Python — these apply here and
-# get carried into every project spawned from the template)
+# Python — the orchestrator (bundled at ./orchestrator/) is stdlib-Python,
+# and any Python code this project adds picks up the same ignores.
 __pycache__/
 *.pyc
 *.pyo

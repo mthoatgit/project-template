@@ -27,17 +27,13 @@ status: template
 
 ## Commands
 
-Claude MUST use these commands for build, test, run, and lint:
+Once the tech stack is chosen (Stage 3), Claude MUST use these commands for build, test, run, and lint. Until then each line is a TBD stub — fill by replacing `<...>` placeholders (or the whole `TBD` line) with the real command:
 
 ```bash
-# Build
-<build command>
-# Test
-<test command>
-# Run locally
-<run command>
-# Lint / format
-<lint command>
+# Build:    <build command>
+# Test:     <test command>
+# Run:      <run command>
+# Lint/fmt: <lint command>
 ```
 
 ## Verification

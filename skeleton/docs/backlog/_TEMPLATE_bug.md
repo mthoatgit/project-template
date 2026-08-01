@@ -19,7 +19,7 @@ Each stage has ### Discussion (with #### YYYY-MM-DD sub-headers for dated notes)
 See workflow-lifecycle-bug for each stage's specifics, Class A vs B rules, and orchestrator interaction.
 
 When Stage 4 (Fix) completes, the bug moves out of the backlog and becomes a BUG-<NNNN> file
-directly under docs/tasks/ (flat per REQ-0006) per workflow-lifecycle-bug's output layout.
+directly under docs/tasks/ (flat layout) per workflow-lifecycle-bug's output layout.
 -->
 
 <!--
