@@ -15,28 +15,26 @@ commit — never grouped, never auto-skipped. Every artefact produced carries
 a Source pointer back to the item; the item's Stage sections accumulate
 pointers to every artefact it produced.
 
-## The three lifecycles
+## The two lifecycles
 
 ```mermaid
 flowchart TD
     Capture(["Capture in /backlog<br/>type + day-zero framing"])
     Capture --> TypeCheck{"Type?"}
-    TypeCheck -->|idea/gap/improvement| FW["Featurework<br/>5 stages"]
+    TypeCheck -->|change| FW["Featurework<br/>5 stages"]
     TypeCheck -->|bug| Bug["Bug<br/>4 stages"]
-    TypeCheck -->|question| Q["Question<br/>2 stages"]
     FW --> ArchivedFW(["Item archived"])
     Bug --> ArchivedBug(["Item archived"])
-    Q --> ArchivedQ(["Item archived"])
 
     classDef gate fill:#fff3cd,stroke:#d4a017,color:#333;
     classDef doc fill:#eef2ff,stroke:#6366f1,color:#333;
     classDef terminal fill:#dcfce7,stroke:#16a34a,color:#333;
     class TypeCheck gate;
-    class FW,Bug,Q doc;
-    class Capture,ArchivedFW,ArchivedBug,ArchivedQ terminal;
+    class FW,Bug doc;
+    class Capture,ArchivedFW,ArchivedBug terminal;
 ```
 
-## Featurework lifecycle (idea / gap / improvement)
+## Featurework lifecycle (change)
 
 Skill: `workflow-lifecycle-featurework`. Five stages, ordered, each deliberately entered.
 
@@ -86,23 +84,6 @@ Test-first regression discipline: Stage 3 (regression test, RED) always
 comes before Stage 4 (fix, flips to GREEN). Class B bugs skip the
 orchestrator in Stage 4 and are manually implemented.
 
-## Question lifecycle
-
-Skill: `workflow-lifecycle-question`. Two stages, short flow.
-
-```mermaid
-flowchart TD
-    Q1["Stage 1 — Investigation<br/>Discussion + Outcome<br/>inline research in item<br/>OR /spike branch"]
-    Q1 -->|approve| Q2["Stage 2 — Answer<br/>Discussion + Outcome<br/>inline resolution<br/>OR ADR from spike<br/>OR follow-up item filed<br/>question archived on this commit"]
-
-    classDef gate fill:#fff3cd,stroke:#d4a017,color:#333;
-    classDef doc fill:#eef2ff,stroke:#6366f1,color:#333;
-    class Q1,Q2 doc;
-```
-
-If Stage 1 chose the spike route, its outcome is the spike branch + closing
-ADR (per `workflow-spike`). Stage 2 references that ADR as the answer.
-
 ## Implementation Sub-Flow (per Epic — for featurework items after Stage 5)
 
 ```mermaid
@@ -145,15 +126,14 @@ constrained by the pinned regression test from Stage 3.
 | Skill | Role |
 |---|---|
 | `workflow-backlog` | Universal capture and cross-cutting item conventions (types, universal frontmatter, item structure, design-conversation principles, cross-item references) |
-| `workflow-lifecycle-featurework` | 5-stage lifecycle for idea / gap / improvement |
+| `workflow-lifecycle-featurework` | 5-stage lifecycle for change |
 | `workflow-lifecycle-bug` | 4-stage lifecycle for bug |
-| `workflow-lifecycle-question` | 2-stage lifecycle for question |
 | `workflow-concept` | Artefact spec for `docs/concept.md` (used at Stage 1 of featurework) |
 | `workflow-requirements` | Artefact spec for REQ entries + Epic files (used at Stage 2 of featurework) |
-| `workflow-architecture` | Artefact spec for ADR + `docs/architecture/system-design.md` (used at Stage 3 of featurework, sometimes at Stage 1 of question via spike) |
+| `workflow-architecture` | Artefact spec for ADR + `docs/architecture/system-design.md` (used at Stage 3 of featurework) |
 | `workflow-tasks` | Artefact spec for task files (used at Stage 4 of featurework and Stage 4 of bug) |
 | `workflow-tests` | Artefact spec for test-scenario files (used at Stage 5 of featurework and Stage 3 of bug) |
-| `workflow-spike` | Artefact spec for spike branches + closing ADRs (used at Stage 1 of question when investigation route is spike) |
+| `workflow-spike` | Artefact spec for spike branches + closing ADRs (optional Phase 1.5 between Stage 2 and Stage 3 when a technical assumption needs de-risking) |
 | `workflow-epics` | Epic naming/sizing conventions used across all featurework lifecycles |
 | `workflow-implementation` | Orchestrator + Git workflow for turning task/bug files into merged code |
 | `workflow-new-project` | Scaffold flow for creating a fresh downstream project from project-template |
@@ -165,8 +145,8 @@ they apply to every project cloned from this template.
 
 - **Type is immutable.** Once an item is filed with a type, that type
   determines the lifecycle for its life. If a type turns out wrong
-  (bug misdiagnosed as improvement, question that's really a feature),
-  drop the item and refile with the correct type. Cross-link both.
+  (bug misdiagnosed as change), drop the item and refile with the
+  correct type. Cross-link both.
 - **Clarification markers are the anti-hallucination valve.** Whenever
   a stage's discussion would have to invent an intent-shaped answer,
   Claude MUST inline a `[NEEDS CLARIFICATION: ...]` marker instead
@@ -180,8 +160,8 @@ they apply to every project cloned from this template.
   in current stage). C is a walk-back — item's `stage` frontmatter
   moves back, a new attempt begins, previous-attempt Discussion/Outcome
   stay in the file. Decision tree, ceremony, and guards live in
-  `workflow-lifecycle-featurework` (bugs/questions rarely need C —
-  they use A or drop-and-refile).
+  `workflow-lifecycle-featurework` (bugs rarely need C — they use A
+  or drop-and-refile).
 - **Frontmatter tracks stage.** Every backlog item carries `stage: <N>`
   and `stage_attempt: <K>` in its frontmatter, kept in sync with the
   body's `**Approved:**` lines. This makes "what is in stage N right

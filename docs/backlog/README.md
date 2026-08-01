@@ -12,7 +12,7 @@ Etabliert am 2026-07-10 (Item 001), universal refactored am 2026-07-19 mit Type-
 
 - **Types.** Zwei: `bug`, `change`. Jeder Type hat eigenes Template (`templates/_TEMPLATE_<type>.md`) mit typ-spezifischen Capture-Fragen. Migrated items aus der pre-refactor Ära (und archivierte Items aus der 5-Typen-Ära: `idea`/`gap`/`improvement`/`question`) behalten ihren historischen `type`-Wert unverändert — kein rückwirkendes Umschreiben.
 - **Ein File pro Item.** Format `<NNN>-<slug>.md` für aktive Items, `archive/<NNN>-<slug>.md` für done/dropped/superseded. IDs stabil ab Vergabe (globaler Zähler über alle Types, kein Renumbering). Slug in kebab-case und trägt das Topic-Keyword für Grep.
-- **Universal frontmatter.** Neue Items tragen `type`, `status`, `priority`, `created`, `updated`, `stage`, `stage_attempt` als YAML-Frontmatter. `stage` startet bei `1` und wandert per Stage-Approval (bzw. Walk-back) mit; `stage_attempt` zählt die Versuche pro Stage. Migrierte Items tragen minimal nur `type` — historische Ausnahme.
+- **Universal frontmatter.** Neue Items tragen `type`, `status`, `created`, `updated`, `stage`, `stage_attempt` als YAML-Frontmatter. `stage` startet bei `1` und wandert per Stage-Approval (bzw. Walk-back) mit; `stage_attempt` zählt die Versuche pro Stage. Migrierte Items tragen minimal nur `type` — historische Ausnahme.
 - **Timestamps.** Jede Zeile im Index trägt nur `Created`. Das Item-Frontmatter trägt zusätzlich `updated` — wird bei jedem inhaltlichen Edit (inkl. Status-Flip) gebumpt, aber nicht in den Index gespiegelt.
 - **Stage column.** Der Index trägt eine `Stage`-Spalte im Format `N - <Name>` (z.B. `1 - Concept`, `2 - Requirements`), die frontmatter `stage` spiegelt + den Stage-Namen aus dem Lifecycle-Skill. Bumpt im selben Commit wie das Frontmatter-`stage`-Bump. Migrierte Items ohne `stage`-Feld zeigen `—`.
 - **Artefacts-Sektion im Item.** Jedes featurework-Item trägt eine `## Artefacts`-Sektion zwischen day-zero framing und der ersten Stage-Sektion. Sie indiziert die Outputs per Stage: `pending` beim Anlegen, wird beim jeweiligen Stage-Outcome-Write mit einem Markdown-Link auf das Artefakt (oder `not applicable — <reason>`) gebumpt. Bump ridet den Stage-Approval-Commit — kein separater. Optional für bug. Details in `workflow-backlog` SoT.
@@ -32,14 +32,6 @@ Etabliert am 2026-07-10 (Item 001), universal refactored am 2026-07-19 mit Type-
   - `superseded` — Item durch anderes ersetzt. `## Related` bekommt `Superseded <YYYY-MM-DD> by [[NNN-slug]]. Reason: <one line>.` File nach `archive/`.
   - `wont-fix` — bug-only. Bug entschieden nicht zu fixen. Reason im Bug-File. File nach `archive/`.
   - `cant-repro` — bug-only. Stage 1 (Reproduction) endete ohne Reproducer. File nach `archive/`.
-
-## Prioritisation
-
-Backlog-triage priority — a "when to work on this item" signal for the item itself. Not to be confused with priority concepts elsewhere in the project (e.g. spec-level acceptance urgency, ADR-level severity, or external tracker priorities). When reading `priority` in item frontmatter, the scope is always "should we pull this from the backlog next?".
-
-- **P1** — Do next. Something is currently slipping or broken. Fixing prevents ongoing loss.
-- **P2** — Design known, build when convenient. Not urgent.
-- **P3** — Nice to have. Low value or exploratory.
 
 ## Sortierung in `index.md`
 
