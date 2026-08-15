@@ -29,3 +29,11 @@ This is the test `TEST-0002` cannot be. That one greps for strings and will pass
 Step 2's insistence on a fresh session is the load-bearing part of the procedure. A session that has already discussed this Epic knows the answer and will produce it regardless of what the file says, which would make the test pass while proving nothing.
 
 A human reader may substitute for the session in step 3. The judgement is the same: two questions, answered from one file, without prior knowledge of this machine's layout.
+
+### Attempted 2026-08-15 — not verifiable by the session that built this
+
+A project was scaffolded from `skeleton/` into a scratch directory and the mechanical half held: it contained no orchestrator source, its `CLAUDE.md` carried the `## Implementation` section verbatim, and the loop ran against it from the shared installation.
+
+The judgement this test exists for was not made, and this session cannot make it. Step 2 requires a reader with no prior knowledge, and the session that wrote the section knows the answer to both questions regardless of what the file says — which is precisely the failure mode the Notes above warn about. Recording a pass here would have made the spec worthless in the one case it was written for.
+
+What remains is one `/new-project`, one fresh session, two questions. Until then this stays `pending`, and `REQ-0002`'s promise — that the loop is *findable*, not merely runnable — is asserted by `TEST-0002` at the level of strings only.
