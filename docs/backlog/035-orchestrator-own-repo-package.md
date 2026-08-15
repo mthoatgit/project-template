@@ -3,7 +3,7 @@ type: change
 status: in-progress
 created: 2026-08-01
 updated: 2026-08-15
-stage: 2
+stage: 3
 stage_attempt: 1
 ---
 
@@ -15,7 +15,15 @@ stage_attempt: 1
 
 - **Stage 1 (Concept):**
   - [docs/concept.md](../concept.md) — initial write. Frames `project-template` as a supplier of structure that executes nothing, owning neither the orchestrator (`~/dev/orchestrator`) nor the workflow skills and commands (`dotfiles-claude`).
-- **Stage 2 (Requirements + Epic-Birth):** pending
+- **Stage 2 (Requirements + Epic-Birth):**
+  - [docs/specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md](../specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md) — Epic born. Carries the decision that its cross-repository requirements ship as procedural work rather than in this Epic's PR.
+  - [REQ-0001](../specs/epics/E1-orchestrator-extraction/REQ-0001-scaffold-ships-no-orchestrator.md) — the scaffold ships no orchestrator.
+  - [REQ-0002](../specs/epics/E1-orchestrator-extraction/REQ-0002-scaffolded-project-states-execution.md) — a scaffolded project states how its tasks are executed.
+  - [REQ-0003](../specs/epics/E1-orchestrator-extraction/REQ-0003-report-missing-installation.md) — scaffolding reports a missing shared installation.
+  - [REQ-0004](../specs/epics/E1-orchestrator-extraction/REQ-0004-no-orchestrator-artefacts-retained.md) — `project-template` retains no orchestrator artefacts.
+  - [REQ-0005](../specs/epics/E1-orchestrator-extraction/REQ-0005-devendor-existing-projects.md) — projects that already vendored the loop are de-vendored.
+  - [REQ-0006](../specs/epics/E1-orchestrator-extraction/REQ-0006-commands-drop-bundled-assumptions.md) — the workflow commands do not instruct on a bundled orchestrator.
+  - [docs/specs/README.md](../specs/README.md) — requirements root: goal, domain, out-of-scope, Epic index.
 - **Stage 3 (Architecture):** pending
 - **Stage 4 (Task-Breakdown):** pending
 - **Stage 5 (Tests):** pending
@@ -77,5 +85,29 @@ Item entered Stage 1. Trigger was a backlog review at session start: items 001..
 ### Outcome
 
 `docs/concept.md` written (initial write — the file did not exist; items 001..034 were retro-documented without one).
+
+**Approved:** 2026-08-15
+
+## Stage 2 — Requirements + Epic-Birth
+
+### Discussion
+
+#### 2026-08-15
+
+**Epic-birth, because there is nothing to join.** Root `docs/specs/` did not exist — items 001..034 were retro-documented without ever producing a requirement — so this stage creates the requirements tree, the first Epic, and starts the `REQ-NNNN` counter at `0001`. `E1-orchestrator-extraction` is therefore this project's founding Epic in fact as well as in numbering.
+
+**The decomposition, and why it is six rather than four.** Stage 1's scope produced six behaviours that stand independently: the scaffold stops shipping the loop (`REQ-0001`), a scaffolded project says how its tasks get executed and where the engine lives (`REQ-0002`), `/new-project` reports a missing shared installation (`REQ-0003`), this repository stops retaining loop source, tests, build config, and the legacy requirements document (`REQ-0004`), the five already-vendored projects are de-vendored (`REQ-0005`), and the two dead passages in the workflow commands go (`REQ-0006`).
+
+Two pairs look mergeable and are not. `REQ-0001` and `REQ-0004` are both deletions, but the first governs what downstream *inherits* and the second what this repository *keeps*; the scaffold can be clean while the root still holds a test suite for code that lives elsewhere, so satisfying one says nothing about the other. `REQ-0003` and `REQ-0006` both land in `dotfiles-claude` and both touch `/new-project`, but one adds a check and the other removes dead text, with nothing shared in their acceptance.
+
+**Structural problem: half this Epic cannot be in its own pull request.** `workflow-epics` binds an Epic to one branch and one PR, and that model assumes a single repository. `REQ-0005` delivers into five separate project repositories and `REQ-0003`/`REQ-0006` into `dotfiles-claude`, so three of six requirements describe commits no PR of this Epic can contain. Three shapes were weighed: one Epic with those three carried as procedural work; a split into `E1` (here) and `E2` (elsewhere); and keeping only the local three here while filing items in each target repository. The split was rejected because `E2` would have inherited the identical problem — it moves the boundary rather than resolving it. Per-repo items were rejected as the most bookkeeping for the least gain, and because `dotfiles-claude` has no backlog to file into. **Decision: one Epic, with the cross-repository requirements carried as procedural work items and verified by procedural TEST specs at Stage 5** — the mode `workflow-tests` already defines for verification that is not a code assertion. The Epic's PR carries this repository's diff; the procedural specs carry the proof that the rest happened.
+
+**Architecture-impact assignments.** Five of the six are `none (no ADR)`: the consumption mechanism was already decided by the orchestrator's `ADR-0003`, and deletions plus documentation wording force no architectural decision here. `REQ-0003` is left `pending (see Stage 3)` — where the availability check lives, what it examines, and how it behaves when the installation is absent are genuine design questions rather than settled ones.
+
+**Note for Stage 3, recorded now.** Root `docs/adr/` does not exist, so the founding-ADR rule in `workflow-lifecycle-featurework` applies: Stage 3 MUST produce `ADR-0001` (tech stack) regardless of what the REQs demand, and is not allowed to null-decide while the directory is empty. Post-extraction that ADR describes a project with no runtime, which is unusual but not empty — files only, Markdown as the medium, no build step, and a deliberate dependency on two repositories it does not version.
+
+### Outcome
+
+`REQ-0001`..`REQ-0006` in `docs/specs/epics/E1-orchestrator-extraction/`. Epic `E1-orchestrator-extraction` born; `docs/specs/README.md` and the Epic index written for the first time.
 
 **Approved:** 2026-08-15
