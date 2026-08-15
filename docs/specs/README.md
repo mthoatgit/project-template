@@ -20,4 +20,4 @@ Developer tooling — project scaffolding and workflow supply.
 
 | Epic | Name | Folder | Covers |
 |---|---|---|---|
-| E1 | Orchestrator extraction | [epics/E1-orchestrator-extraction/](epics/E1-orchestrator-extraction/) | REQ-0001..REQ-0006 — remove the loop from the scaffold, replace it with a reference to the shared installation, and de-vendor the projects that already hold a copy |
+| E1 | Orchestrator extraction | [epics/E1-orchestrator-extraction/](epics/E1-orchestrator-extraction/) | REQ-0001..REQ-0007 — remove the loop from the scaffold, replace it with a reference to the shared installation, and de-vendor the project that already holds a copy |

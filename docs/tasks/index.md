@@ -8,5 +8,4 @@
 | TASK-0004 | E1-orchestrator-extraction | task | Rewrite project-template's self-description                              | pending       |
 | TASK-0005 | E1-orchestrator-extraction | task | Add the availability check to /new-project                               | pending       |
 | TASK-0006 | E1-orchestrator-extraction | task | Drop the bundled-orchestrator instructions from the scaffolding commands | pending       |
-| TASK-0007 | E1-orchestrator-extraction | task | De-vendor the four uniform downstream projects                           | pending       |
 | TASK-0008 | E1-orchestrator-extraction | task | De-vendor orchestrator-dashboard                                         | pending       |

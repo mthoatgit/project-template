@@ -21,8 +21,9 @@ stage_attempt: 1
   - [REQ-0002](../specs/epics/E1-orchestrator-extraction/REQ-0002-scaffolded-project-states-execution.md) — a scaffolded project states how its tasks are executed.
   - [REQ-0003](../specs/epics/E1-orchestrator-extraction/REQ-0003-report-missing-installation.md) — scaffolding reports a missing shared installation.
   - [REQ-0004](../specs/epics/E1-orchestrator-extraction/REQ-0004-no-orchestrator-artefacts-retained.md) — `project-template` retains no orchestrator artefacts.
-  - [REQ-0005](../specs/epics/E1-orchestrator-extraction/REQ-0005-devendor-existing-projects.md) — projects that already vendored the loop are de-vendored.
+  - [REQ-0005](../specs/epics/E1-orchestrator-extraction/REQ-0005-devendor-existing-projects.md) — projects that already vendored the loop are de-vendored. Superseded by `REQ-0007` on 2026-08-15.
   - [REQ-0006](../specs/epics/E1-orchestrator-extraction/REQ-0006-commands-drop-bundled-assumptions.md) — the workflow commands do not instruct on a bundled orchestrator.
+  - [REQ-0007](../specs/epics/E1-orchestrator-extraction/REQ-0007-devendor-the-dashboard.md) — the one project that vendored the loop is de-vendored. Supersedes `REQ-0005`.
   - [docs/specs/README.md](../specs/README.md) — requirements root: goal, domain, out-of-scope, Epic index.
 - **Stage 3 (Architecture):**
   - [ADR-0001](../adr/0001-tech-stack.md) — files only, and a standing dependency on two sibling repositories. Founding ADR; produced under the founding-ADR rule rather than by a REQ.
@@ -36,7 +37,7 @@ stage_attempt: 1
   - [TASK-0004](../tasks/TASK-0004-rewrite-self-description.md) — rewrite this project's self-description.
   - [TASK-0005](../tasks/TASK-0005-availability-check-in-new-project.md) — availability check in `/new-project` (`dotfiles-claude`).
   - [TASK-0006](../tasks/TASK-0006-drop-bundled-orchestrator-instructions.md) — drop the bundled-orchestrator instructions from the scaffolding commands (`dotfiles-claude`).
-  - [TASK-0007](../tasks/TASK-0007-devendor-four-uniform-projects.md) — de-vendor the four uniform downstream projects.
+  - `TASK-0007` — de-vendor the four uniform downstream projects. Retired unimplemented on 2026-08-15; ID burned, not reused.
   - [TASK-0008](../tasks/TASK-0008-devendor-orchestrator-dashboard.md) — de-vendor `orchestrator-dashboard`, the exception.
   - [E1 overview](../specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md) — Tasks, Implementation note (E1 is implemented manually), and Epic-Level Acceptance Criteria appended; Status flipped to `approved`.
 - **Stage 5 (Tests):** pending
@@ -165,8 +166,18 @@ Two pairs look mergeable and are not. `REQ-0001` and `REQ-0004` are both deletio
 
 **Stage 5 preflight.** Every task has a plausible primary-anchored TEST: structural specs asserting tree state and document content for `TASK-0001` through `TASK-0004` and `TASK-0006`, procedural specs for `TASK-0005`, `TASK-0007` and `TASK-0008` where the verification is a run rather than an assertion. No task is infrastructure in the sense `workflow-tasks` warns about — none produces internal wiring with no observable surface — so neither the unit-test path nor the merge-into-consumer path applies.
 
+#### 2026-08-15 (later — scope narrowed, Case B)
+
+**Four of the five vendored projects turned out to be disposable.** Asked to confirm the retrofit list before Stage 5 anchored tests to it, the user's answer removed most of the work rather than refining it — *"i dont care about these projects dice roller kitchen inventory palette picker and wordfreq there were just examples u can delete them"*. They were test beds for exercising the workflow, not projects anyone depends on. Checked before acting: none had a remote, so deletion was unrecoverable; `wordfreq` carried five commits on an unmerged Epic branch and `dice-roller` three uncommitted files. The user confirmed with those facts in hand, and all four directories were deleted. `orchestrator-dashboard` stays — it is a real tool, not an example.
+
+**This is a Case B supersession, not a walk-back.** Running the decision tree: the resolution does require changing a prior-stage artefact, since `REQ-0005` names five projects by name. It consists of superseding one REQ with a narrower one, and Stage 4's Discussion still holds with that change — the reasoning about the dashboard being the awkward case, and the whole implementation-mode decision, are untouched. So `REQ-0005` is annotated `superseded`, `REQ-0007` is written covering the dashboard alone, and the item's stage does not move.
+
+**What remains is not a smaller version of the same job.** The four were the mechanically uniform ones and the survivor is the exception, so the requirement went from "four routine repositories plus one awkward one" to "the awkward one". `TASK-0007` is retired unimplemented; its ID is burned rather than reused, and the next task filed here is `TASK-0009`. `TASK-0008` continues unchanged in substance, with its references to "the other four" corrected.
+
+**Housekeeping done in the same pass.** `~/dev/project-template/orchestrator/` existed as a directory of `__pycache__` leftovers from the pre-`skeleton/` layout — untracked, gitignored, no source files. Removed, because `TASK-0003`'s acceptance asks whether the repository contains an orchestrator module and stale bytecode would have made that question ambiguous to answer.
+
 ### Outcome
 
-`TASK-0001`..`TASK-0008` in `docs/tasks/`. Tasks section, Implementation note and Epic-Level Acceptance Criteria appended to `docs/specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md`, whose Status flips to `approved`. `docs/tasks/index.md`, `README.md` and both templates written for the first time.
+`TASK-0001`..`TASK-0006` and `TASK-0008` in `docs/tasks/`. `TASK-0007` retired unimplemented the same day when its `REQ-0005` was superseded; ID burned, not reused. Tasks section, Implementation note and Epic-Level Acceptance Criteria appended to `docs/specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md`, whose Status flips to `approved`. `docs/tasks/index.md`, `README.md` and both templates written for the first time.
 
 **Approved:** 2026-08-15

@@ -1,7 +1,8 @@
 # REQ-0005 — Projects that already vendored the loop are de-vendored
 
 **Epic:** E1-orchestrator-extraction
-**Status:** active
+**Status:** superseded
+**Superseded by:** REQ-0007
 **Source:** [[035-orchestrator-own-repo-package]]
 **Architecture-impact:** none (no ADR)
 

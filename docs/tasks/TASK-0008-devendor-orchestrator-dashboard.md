@@ -5,7 +5,7 @@
 
 ## Requirements
 
-- **REQ-0005** — projects that already vendored the loop are de-vendored; this requirement names the dashboard as the exception needing separate care.
+- **REQ-0007** — the one project that vendored the loop is de-vendored, and it is the awkward case.
 
 ## Goal
 
@@ -15,11 +15,11 @@ The dashboard stops carrying its own copy of the loop without disturbing the dif
 
 ## Steps
 
-- Read the project first. It differs from the other four in three ways, and the third is the one that matters: its vendored copy carries twelve modules where the others carry fourteen, it holds an older `orchestrator/tests/` layout plus its own root `pytest.ini`, and it *consumes the loop's output* — it reads `docs/tasks/index.md` from the projects it reports on. That third relationship is not vendoring and MUST survive.
-- Establish whether its own test suite depends on the vendored copy before deleting anything. The other four have no such entanglement; this one has a `pytest.ini` at the root and tests of its own, and the answer decides whether this is a deletion or a deletion plus a repair.
+- Read the project first. Three things distinguish it, and the third is the one that matters: its vendored copy carries twelve modules where the real source carries fourteen, it holds an older `orchestrator/tests/` layout plus its own root `pytest.ini`, and it *consumes the loop's output* — it reads `docs/tasks/index.md` from the projects it reports on. That third relationship is not vendoring and MUST survive.
+- Establish whether its own test suite depends on the vendored copy before deleting anything. It has a `pytest.ini` at the root and tests of its own, and the answer decides whether this is a deletion or a deletion plus a repair.
 - Delete `orchestrator/` including its nested `tests/`.
 - Decide what happens to the root `pytest.ini` based on the previous step — if it exists only to run the vendored copy's tests it goes, and if it also configures the dashboard's own suite it stays and is trimmed.
-- Rewrite `CLAUDE.md`. Its references differ from the other four: rather than only an `## Implementation` block, it describes itself in terms of `orchestrator.py` and carries comments about the orchestrator's default `--test-cmd`. Correct the ones that imply it contains the loop; leave the ones describing what it reads.
+- Rewrite `CLAUDE.md`. Rather than only an `## Implementation` block, it describes itself in terms of `orchestrator.py` and carries comments about the orchestrator's default `--test-cmd`. Correct the ones that imply it contains the loop; leave the ones describing what it reads.
 - Verify the dashboard still reports correctly on at least one driven project afterwards.
 
 ## Acceptance Criteria
