@@ -8,6 +8,14 @@ status: template
 > Global rules live in `~/.claude/CLAUDE.md`; project-specific rules go here.
 > Remove this banner and the YAML frontmatter once filled.
 >
+> **Two kinds of angle-bracket text below, and they are treated
+> differently.** A `<placeholder>` sitting where a value belongs gets
+> REPLACED with that value. A `<...>` block on its own line that explains
+> what a section is for gets DELETED — it is guidance for whoever fills
+> the file, not content for the finished one. Neither may survive into a
+> real project; `init-verify.py` only catches a couple of them by name,
+> so the rest is a reading job.
+>
 > **Writing style for this file:** see `~/.claude/rules/claude-md-style.md`.
 
 ## What this project is

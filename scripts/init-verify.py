@@ -6,7 +6,7 @@ Invoked by /init-project step 6 (after CLAUDE.md, README.md, item 001, and
 docs/backlog/index.md have been written by the agent). Two jobs:
 
 1. AUTOFIX known scaffold-time misses whose correct value is knowable:
-   - CLAUDE.md ``--test-cmd "<test-cmd>"`` -> ``--test-cmd "python scripts/test.py"``
+   - CLAUDE.md and README.md ``--test-cmd "<test-cmd>"`` -> ``"python scripts/test.py"``
    - item 001 date-only ``created`` / ``updated`` -> ``YYYY-MM-DD 00:00``
    - docs/backlog/index.md row 001 Stage cell bare ``1`` -> ``1 - Concept``
      plus date-only timestamps in the same row
@@ -94,6 +94,19 @@ def _check_readme(target: Path, fixes: list[str], errors: list[str]) -> None:
         errors.append("README.md: file missing")
         return
     txt = f.read_text(encoding="utf-8")
+    orig = txt
+
+    # Autofix: <test-cmd> placeholder. The README carries the same
+    # Implementation block as CLAUDE.md, so it inherits the same
+    # placeholder and needs the same substitution.
+    new_txt = re.sub(
+        r'--test-cmd\s+"<test-cmd>"',
+        '--test-cmd "python scripts/test.py"',
+        txt,
+    )
+    if new_txt != txt:
+        fixes.append('README.md: --test-cmd "<test-cmd>" -> "python scripts/test.py"')
+        txt = new_txt
 
     if "status: template" in txt:
         errors.append("README.md: still has `status: template` frontmatter")
@@ -119,6 +132,9 @@ def _check_readme(target: Path, fixes: list[str], errors: list[str]) -> None:
             "README.md: `## Implementation` does not say where the orchestrator "
             "lives - it must name `~/dev/orchestrator` as its source"
         )
+
+    if txt != orig:
+        f.write_text(txt, encoding="utf-8")
 
 
 def _find_item_001(target: Path, errors: list[str]) -> Path | None:
