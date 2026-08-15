@@ -15,7 +15,7 @@ Three of the six requirements deliver changes into repositories this Epic's pull
 
 - [**REQ-0001**](REQ-0001-scaffold-ships-no-orchestrator.md) — The scaffold ships no orchestrator. — Architecture-impact: none (no ADR)
 - [**REQ-0002**](REQ-0002-scaffolded-project-states-execution.md) — A scaffolded project states how its tasks are executed. — Architecture-impact: none (no ADR)
-- [**REQ-0003**](REQ-0003-report-missing-installation.md) — Scaffolding reports a missing shared installation. — Architecture-impact: pending (see Stage 3)
+- [**REQ-0003**](REQ-0003-report-missing-installation.md) — Scaffolding reports a missing shared installation. — Architecture-impact: ADR-0002 (console-script resolution, scaffold-time only, per-venv blind spot accepted)
 - [**REQ-0004**](REQ-0004-no-orchestrator-artefacts-retained.md) — `project-template` retains no orchestrator artefacts. — Architecture-impact: none (no ADR)
 - [**REQ-0005**](REQ-0005-devendor-existing-projects.md) — Projects that already vendored the loop are de-vendored. — Architecture-impact: none (no ADR)
 - [**REQ-0006**](REQ-0006-commands-drop-bundled-assumptions.md) — The workflow commands do not instruct on a bundled orchestrator. — Architecture-impact: none (no ADR)

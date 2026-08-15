@@ -9,6 +9,7 @@ The canonical structure lives in [`_TEMPLATE.md`](_TEMPLATE.md).
 | # | Title | Status | Date |
 |---|---|---|---|
 | [0001](0001-tech-stack.md) | Files only, and a standing dependency on two sibling repositories | accepted | 2026-08-15 |
+| [0002](0002-availability-check.md) | Availability is asserted by resolving the console script, and only at scaffold time | accepted | 2026-08-15 |
 
 ## Conventions
 

@@ -3,7 +3,7 @@
 **Epic:** E1-orchestrator-extraction
 **Status:** active
 **Source:** [[035-orchestrator-own-repo-package]]
-**Architecture-impact:** pending (see Stage 3)
+**Architecture-impact:** ADR-0002 (console-script resolution, scaffold-time only, per-venv blind spot accepted)
 
 `/new-project` MUST determine whether the shared orchestrator installation is available on the machine, and MUST report to the user when it is not, naming what is missing and how to obtain it.
 

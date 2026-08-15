@@ -3,7 +3,7 @@ type: change
 status: in-progress
 created: 2026-08-01
 updated: 2026-08-15
-stage: 3
+stage: 4
 stage_attempt: 1
 ---
 
@@ -24,7 +24,11 @@ stage_attempt: 1
   - [REQ-0005](../specs/epics/E1-orchestrator-extraction/REQ-0005-devendor-existing-projects.md) — projects that already vendored the loop are de-vendored.
   - [REQ-0006](../specs/epics/E1-orchestrator-extraction/REQ-0006-commands-drop-bundled-assumptions.md) — the workflow commands do not instruct on a bundled orchestrator.
   - [docs/specs/README.md](../specs/README.md) — requirements root: goal, domain, out-of-scope, Epic index.
-- **Stage 3 (Architecture):** pending
+- **Stage 3 (Architecture):**
+  - [ADR-0001](../adr/0001-tech-stack.md) — files only, and a standing dependency on two sibling repositories. Founding ADR; produced under the founding-ADR rule rather than by a REQ.
+  - [ADR-0002](../adr/0002-availability-check.md) — availability asserted by resolving the console script, at scaffold time only. Grounds `REQ-0003`.
+  - [docs/architecture/system-design.md](../architecture/system-design.md) — initial write, riding `ADR-0001`'s commit. Records the `skeleton/`-versus-root line and the three-repository boundary.
+  - `REQ-0001`, `REQ-0002`, `REQ-0004`, `REQ-0005`, `REQ-0006` — confirmed `none (no ADR)`.
 - **Stage 4 (Task-Breakdown):** pending
 - **Stage 5 (Tests):** pending
 
@@ -129,3 +133,9 @@ Two pairs look mergeable and are not. `REQ-0001` and `REQ-0004` are both deletio
 **The other five REQs confirm as `none`.** `REQ-0001`, `REQ-0004` and `REQ-0005` are deletions; `REQ-0002` and `REQ-0006` are documentation wording. None forces a technology choice, a boundary rule, or a dependency stance that `ADR-0001` does not already cover, and the consumption mechanism itself was decided in the orchestrator's `ADR-0003` rather than here.
 
 **`system-design.md` written alongside `ADR-0001`, not deferred.** The architectural picture is not going to get clearer than it is now, and the one thing a newcomer must understand before touching anything — the line between `skeleton/` and the root, and which side a given file is on — had no home in any document. It rides `ADR-0001`'s commit per the coupling rule in `workflow-architecture`.
+
+### Outcome
+
+`ADR-0001` in `docs/adr/0001-tech-stack.md` (founding — files only, and a standing dependency on `~/dev/orchestrator` and `dotfiles-claude`), with `docs/architecture/system-design.md` written in the same commit. `ADR-0002` in `docs/adr/0002-availability-check.md` grounding `REQ-0003`, whose `Architecture-impact` is back-filled from `pending` in that ADR's commit. `REQ-0001`, `REQ-0002`, `REQ-0004`, `REQ-0005` and `REQ-0006` confirmed as `none (no ADR)`.
+
+**Approved:** 2026-08-15
