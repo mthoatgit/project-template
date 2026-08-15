@@ -6,7 +6,7 @@
 **REQ:** REQ-0002
 **Task:** TASK-0002
 **Also-covers:** TASK-0001
-**Last verified:** never
+**Last verified:** 2026-08-15 by a context-free subagent (steps 1-4; the reader was an agent with no knowledge of this work rather than a fresh interactive session)
 
 ## Steps
 
@@ -30,10 +30,16 @@ Step 2's insistence on a fresh session is the load-bearing part of the procedure
 
 A human reader may substitute for the session in step 3. The judgement is the same: two questions, answered from one file, without prior knowledge of this machine's layout.
 
-### Attempted 2026-08-15 — not verifiable by the session that built this
+### Run of 2026-08-15 — matched
 
-A project was scaffolded from `skeleton/` into a scratch directory and the mechanical half held: it contained no orchestrator source, its `CLAUDE.md` carried the `## Implementation` section verbatim, and the loop ran against it from the shared installation.
+A project was scaffolded from `skeleton/` into a scratch directory, filled per `/init-project`, and `init-verify.py` run against it. The cold reader was a subagent launched with no context of this work and no access to the conversation that produced the file — the requirement in step 2 is a reader with no prior knowledge, and an agent that has never seen this repository satisfies that more strictly than a human on the same machine would.
 
-The judgement this test exists for was not made, and this session cannot make it. Step 2 requires a reader with no prior knowledge, and the session that wrote the section knows the answer to both questions regardless of what the file says — which is precisely the failure mode the Notes above warn about. Recording a pass here would have made the spec worthless in the one case it was written for.
+It was given the project path, told to read `CLAUDE.md` and nothing else, and asked the two questions plus three follow-ups about what it could not answer.
 
-What remains is one `/new-project`, one fresh session, two questions. Until then this stays `pending`, and `REQ-0002`'s promise — that the loop is *findable*, not merely runnable — is asserted by `TEST-0002` at the level of strings only.
+Both answers were correct and unaided. It gave the invocation, and stated that the code is not in the repository, lives at `~/dev/orchestrator`, is installed once per machine, and that a command-not-found means a missing installation rather than a broken project. Asked directly whether it had to guess, it said no, and volunteered that the section was *"unusually explicit and unambiguous about both the mechanism and the code's location"*.
+
+Its criticisms all landed on the surrounding template placeholders — build, test, run and lint still unfilled, `Code Layout` and `Gotchas` still `<...>` — which are artefacts of the deliberately minimal fill used for this run, not of anything this Epic changed.
+
+One piece of feedback is worth keeping and is out of scope here: the reader noted that the `MUST NOT implement tasks manually` rule is stated but never scoped, so nothing tells it what to do when the orchestrator genuinely cannot run. Epic 1 was itself that case. Recorded rather than acted on.
+
+The reader also said that, left unrestricted, it would have opened `~/dev/orchestrator/docs/consuming-the-orchestrator.md` next. That the file gave it a name to go looking for is the property this test exists to check.

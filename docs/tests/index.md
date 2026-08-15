@@ -9,4 +9,4 @@
 | TEST-0006 | E1-orchestrator-extraction | structural | REQ-0006 | TASK-0006 | The scaffolding commands carry no bundled-orchestrator instructions | passing       |
 | TEST-0005 | E1-orchestrator-extraction | procedural | REQ-0003 | TASK-0005 | A missing installation is reported without failing the scaffold     | passing       |
 | TEST-0007 | E1-orchestrator-extraction | procedural | REQ-0007 | TASK-0008 | The dashboard is de-vendored and still reports                      | passing       |
-| TEST-0008 | E1-orchestrator-extraction | procedural | REQ-0002 | TASK-0002 | A scaffolded project explains its own execution to a cold reader    | pending       |
+| TEST-0008 | E1-orchestrator-extraction | procedural | REQ-0002 | TASK-0002 | A scaffolded project explains its own execution to a cold reader    | passing       |

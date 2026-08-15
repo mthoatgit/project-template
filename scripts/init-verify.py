@@ -102,6 +102,24 @@ def _check_readme(target: Path, fixes: list[str], errors: list[str]) -> None:
     if "<Project Name>" in txt:
         errors.append("README.md: `<Project Name>` placeholder still unfilled")
 
+    # The README must keep the Implementation section that names the
+    # orchestrator and states it lives outside this repository. CLAUDE.md
+    # carries the same facts for Claude, but a human opens README.md first,
+    # and since the extraction no orchestrator/ directory remains in the
+    # project to stumble over. Step 4 instructs this; history says the
+    # instruction alone is not enough, which is why the script exists.
+    if "## Implementation" not in txt:
+        errors.append(
+            "README.md: missing the `## Implementation` section - it must name "
+            "the orchestrator invocation and state the loop is installed, not "
+            "part of this repo (see /init-project step 4)"
+        )
+    elif "~/dev/orchestrator" not in txt:
+        errors.append(
+            "README.md: `## Implementation` does not say where the orchestrator "
+            "lives - it must name `~/dev/orchestrator` as its source"
+        )
+
 
 def _find_item_001(target: Path, errors: list[str]) -> Path | None:
     backlog = target / "docs" / "backlog"
