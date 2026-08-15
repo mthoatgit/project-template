@@ -1,6 +1,6 @@
 ---
 type: change
-status: in-progress
+status: done
 created: 2026-08-01
 updated: 2026-08-15
 stage: 5
@@ -40,7 +40,16 @@ stage_attempt: 1
   - `TASK-0007` — de-vendor the four uniform downstream projects. Retired unimplemented on 2026-08-15; ID burned, not reused.
   - [TASK-0008](../tasks/TASK-0008-devendor-orchestrator-dashboard.md) — de-vendor `orchestrator-dashboard`, the exception.
   - [E1 overview](../specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md) — Tasks, Implementation note (E1 is implemented manually), and Epic-Level Acceptance Criteria appended; Status flipped to `approved`.
-- **Stage 5 (Tests):** pending
+- **Stage 5 (Tests):**
+  - [TEST-0001](../tests/TEST-0001-skeleton-holds-no-orchestrator.md) — structural. The scaffold holds no orchestrator.
+  - [TEST-0002](../tests/TEST-0002-scaffold-claude-md-names-engine.md) — structural. The scaffold's `CLAUDE.md` names the engine and its home.
+  - [TEST-0003](../tests/TEST-0003-no-orchestrator-artefacts-retained.md) — structural. This repository retains no orchestrator artefacts.
+  - [TEST-0004](../tests/TEST-0004-self-description-claims-nothing.md) — structural. The self-description claims no ownership of the loop.
+  - [TEST-0005](../tests/TEST-0005-availability-check-reports.md) — procedural. A missing installation is reported without failing the scaffold.
+  - [TEST-0006](../tests/TEST-0006-commands-carry-no-bundled-instructions.md) — structural. The scaffolding commands carry no bundled-orchestrator instructions.
+  - [TEST-0007](../tests/TEST-0007-dashboard-devendored-and-intact.md) — procedural. The dashboard is de-vendored and still reports.
+  - [TEST-0008](../tests/TEST-0008-scaffolded-project-is-legible.md) — procedural. A scaffolded project explains its own execution to a cold reader.
+  - [docs/tests/strategy.md](../tests/strategy.md) — CI Integration section filled honestly: no runner, no merge gate, structural checks run by hand at end-of-Epic review.
 
 ## Core
 
@@ -179,5 +188,31 @@ Two pairs look mergeable and are not. `REQ-0001` and `REQ-0004` are both deletio
 ### Outcome
 
 `TASK-0001`..`TASK-0006` and `TASK-0008` in `docs/tasks/`. `TASK-0007` retired unimplemented the same day when its `REQ-0005` was superseded; ID burned, not reused. Tasks section, Implementation note and Epic-Level Acceptance Criteria appended to `docs/specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md`, whose Status flips to `approved`. `docs/tasks/index.md`, `README.md` and both templates written for the first time.
+
+**Approved:** 2026-08-15
+
+## Stage 5 — Tests
+
+### Discussion
+
+#### 2026-08-15
+
+**No behavioral specs, and that is the correct outcome rather than a shortfall.** `ADR-0001` commits this project to no runtime and no test suite, so there is nothing whose input-to-output semantics could be asserted. `workflow-tests` anticipates exactly this: "not null" means artefacts in one of the three modes, not pytest scenarios specifically. Five structural specs and three procedural ones satisfy Stage 5 fully.
+
+**Where the split falls, and why it is not simply "in-repo versus cross-repo".** The first guess was structural for the four tasks landing here and procedural for the three landing elsewhere. That is nearly right and wrong in two places. `TASK-0006` edits `dotfiles-claude` yet is entirely structural — the claim is about text in two command files, and `grep` settles it from any repository. `TASK-0002` edits only `skeleton/` yet needs both modes, because its requirement promises something `grep` cannot reach.
+
+**`REQ-0002` is the one requirement that genuinely admits two modes.** Its acceptance is that *a session reading only `CLAUDE.md` can name the command and say where the code lives, without prior knowledge*. `TEST-0002` greps for the strings and will pass on any file containing them in any arrangement. `TEST-0008` opens a fresh session in a scaffolded project and asks two questions. Only the second tests the actual promise. This matters more here than the two-file rule usually implies: de-vendoring removes evidence rather than capability, so the project runs identically whether or not a reader can find the loop, and a legibility failure is invisible to every mechanical check in the Epic. `TEST-0008`'s insistence on a *fresh* session is the load-bearing step — a session that has discussed this Epic already knows the answer and would produce it regardless of what the file says.
+
+**Two structural specs assert non-changes, deliberately.** `TEST-0002` checks that `<test-cmd>` survives, because `/init-project` fills that placeholder and a rewrite resolving it silently would break scaffolding in a way nothing else catches. `TEST-0006` pins `scaffold.md` against `dotfiles-claude`'s HEAD at Stage 4 close, because `/scaffold` invokes `python -m orchestrator` and looks like it needs fixing — it does not, that form resolves from the installed package, and the check exists to stop a well-meaning edit.
+
+**Verifying deletion needed a pinned commit.** `TEST-0003` asserts that `docs/orchestrator-requirements.md` is gone *and* that the copy in the orchestrator repository matches what was deleted. After the deletion there is nothing left here to compare against, so the diff is taken against `a5b44d1` — the last commit in which the file existed. It also checks the untracked `orchestrator/` bytecode path, since a tracked-files-only check would have missed it.
+
+**`TEST-0004`'s third assertion is the one that earns the file.** Its first two checks reject known-stale strings and require the new ones, which any careful rewrite satisfies by construction. The third extracts every repository-relative path named in `CLAUDE.md` and `README.md` and asserts each exists. That catches the failure which actually recurs here — a tree diagram describing a layout that drifted — and both documents currently carry such diagrams naming paths this Epic deletes.
+
+**Coverage checked, not assumed.** Both invariants were run rather than reasoned about. Every live REQ has at least one spec; every task has at least one spec naming it as primary anchor. `REQ-0005` has no coverage and needs none — it is superseded, and `REQ-0007` carries the live promise. `TASK-0007` does not appear, having been retired before Stage 5 opened.
+
+### Outcome
+
+`TEST-0001`..`TEST-0008` in `docs/tests/` — five structural, three procedural, no behavioral. `docs/tests/` created with its README, `strategy.md`, index, and all three mode templates. Item archived.
 
 **Approved:** 2026-08-15
