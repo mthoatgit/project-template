@@ -18,8 +18,9 @@ bruno/
 
 # --- Stack-specific entries ---
 
-# Python (the orchestrator package itself is Python — these apply here and
-# get carried into every project spawned from the template)
+# Python — nothing here is Python any more, but a Python tool run from this
+# directory still leaves caches behind, and these rules are carried into every
+# project spawned from the template.
 __pycache__/
 *.pyc
 *.pyo
