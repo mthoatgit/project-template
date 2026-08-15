@@ -18,8 +18,8 @@ bruno/
 
 # --- Stack-specific entries ---
 
-# Python — the orchestrator (bundled at ./orchestrator/) is stdlib-Python,
-# and any Python code this project adds picks up the same ignores.
+# Python — applies to any Python this project adds, and to the caches a
+# Python tool run from here leaves behind.
 __pycache__/
 *.pyc
 *.pyo
