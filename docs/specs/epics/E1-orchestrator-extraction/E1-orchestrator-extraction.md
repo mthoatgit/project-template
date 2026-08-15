@@ -39,7 +39,7 @@ Only TASK-0001 through TASK-0004 land in this repository and therefore in this E
 
 This Epic is implemented manually rather than by the orchestrator, and it is the only Epic for which that is true by design.
 
-TASK-0003 deletes `pytest.ini` and `orchestrator-tests/` — this repository's entire test infrastructure — and [ADR 0001](../../../adr/0001-tech-stack.md) then commits the project to having none, with correctness established by inspection. The orchestrator refuses a task whose `--test-cmd` target does not exist and hard-aborts a task with no primary-anchored TEST file, so the Epic that removes the test infrastructure cannot be driven by a loop requiring it. Stage 5 therefore produces structural specs for the in-repository tasks and procedural specs for the cross-repository ones, all verified by inspection.
+TASK-0003 deletes `pytest.ini` and `orchestrator-tests/` — this repository's entire test infrastructure — and [ADR 0003](../../../adr/0003-medium-and-dependencies.md) then commits the project to having none, with correctness established by inspection. The orchestrator refuses a task whose `--test-cmd` target does not exist and hard-aborts a task with no primary-anchored TEST file, so the Epic that removes the test infrastructure cannot be driven by a loop requiring it. Stage 5 therefore produces structural specs for the in-repository tasks and procedural specs for the cross-repository ones, all verified by inspection.
 
 The rest of the ceremony is unchanged: the Epic has its branch, its pull request, and its end-of-Epic self-review.
 

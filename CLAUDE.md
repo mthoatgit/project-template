@@ -2,7 +2,7 @@
 
 ## What this project is
 
-`project-template` is the scaffold every new project on this machine starts from, and the place the phased workflow itself is developed. It supplies structure — a directory shape, document templates, shared configuration — and executes nothing. See `docs/concept.md`.
+`project-template` is the scaffold every new project on this machine starts from, and the place the phased workflow itself is developed. It supplies structure — a directory shape, document templates, shared configuration — and holds no product, no build step and no test runner. See `docs/concept.md`.
 
 **Dual-nature layout.** Every file is on one side of a line, and which side decides who owns it:
 
@@ -13,12 +13,12 @@ When editing downstream-facing content, edit under `skeleton/`. When developing 
 
 ## Tech Stack
 
-Authoritative source: `docs/architecture/system-design.md` + `docs/adr/0001-tech-stack.md`.
+Authoritative source: `docs/architecture/system-design.md` + `docs/adr/0003-medium-and-dependencies.md`.
 
 | Layer | Choice |
 |---|---|
 | Medium | Markdown documents, directory structure, configuration files |
-| Runtime | None — nothing here executes as a product |
+| Runtime | None — no product, no build, no runner |
 | Build / packaging | None |
 | Test suite | None — verification is by inspection |
 | Task execution | `~/dev/orchestrator`, installed once per machine |
@@ -34,11 +34,11 @@ python scripts/init-verify.py <target-project-dir>
 
 ## Verification
 
-Claude MUST establish correctness by inspection, not by a test runner — see `docs/adr/0001-tech-stack.md`.
+Claude MUST establish correctness by inspection, not by a test runner — see `docs/adr/0003-medium-and-dependencies.md`.
 
 - Structural test specs under `docs/tests/` carry runnable `## Verified by` blocks. Claude MUST run the blocks belonging to the work at hand before declaring a task done.
 - Procedural specs require a human or a fresh session; Claude MUST NOT mark them verified on its own inference.
-- There is no aggregate runner and no merge gate. A structural check fails only when someone runs it — the cost side of ADR-0001, named in its Consequences.
+- There is no aggregate runner and no merge gate. A structural check fails only when someone runs it — the cost side of ADR-0003, named in its Consequences.
 
 Coverage: `docs/tests/index.md`.
 
@@ -62,7 +62,7 @@ Full structure: `docs/architecture/system-design.md`.
 
 - Files under `skeleton/` are what downstream projects inherit. Adding one there means every new project gets it from then on.
 - Files at root stay here. Downstream projects do NOT inherit them.
-- Claude MUST NOT add runtime code, a test suite, or a build step — ADR-0001. Anything that must execute belongs in another repository and is depended on, not carried.
+- Claude MUST NOT add runtime code, a test suite, or a build step — ADR-0003. Executable tooling MAY exist only as a scaffold-time helper invoked from outside this repository against a target project; `scripts/init-verify.py` is the one such helper. Anything that must execute as part of a product belongs in another repository and is depended on, not carried.
 
 ## Gotchas
 

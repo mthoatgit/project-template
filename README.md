@@ -24,7 +24,7 @@ project-template/
 
 `/new-project` copies `skeleton/.` into the target directory and runs `/init-project` fill logic (project name, seed item 001). project-template develops itself using the same phased workflow — items live in the ROOT `docs/backlog/`, and its REQs / ADRs / tasks / tests file at root too.
 
-Nothing here executes. Tasks are implemented by an orchestrator that lives in its own repository at `~/dev/orchestrator`, installed once per machine and shared by every project — see [`docs/adr/0001-tech-stack.md`](docs/adr/0001-tech-stack.md).
+There is no product here, no build step and no test runner. Tasks are implemented by an orchestrator that lives in its own repository at `~/dev/orchestrator`, installed once per machine and shared by every project — see [`docs/adr/0003-medium-and-dependencies.md`](docs/adr/0003-medium-and-dependencies.md).
 
 ## Getting Started (downstream)
 

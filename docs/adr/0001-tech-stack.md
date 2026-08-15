@@ -1,6 +1,6 @@
 # ADR 0001 — Files only, and a standing dependency on two sibling repositories
 
-**Status:** accepted
+**Status:** superseded by [ADR 0003](0003-medium-and-dependencies.md)
 **Date:** 2026-08-15
 **Source-item:** [[035-orchestrator-own-repo-package]]
 **Source-REQs:** none — founding ADR, produced under the founding-ADR rule rather than by a requirement. `REQ-0004` removes the last of the code this decision records the absence of.

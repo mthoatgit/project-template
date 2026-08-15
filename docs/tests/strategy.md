@@ -108,10 +108,10 @@ Procedural tests never execute in CI. Their pass/fail is recorded in the test fi
 
 ## CI Integration
 
-This project has no test runner and no CI test job, which follows from [ADR 0001](../adr/0001-tech-stack.md) — no runtime code, no test suite, no build step. That is not an omission to be filled in later; a suite asserting the shape of a directory of Markdown templates would verify their form rather than their usefulness, and usefulness is the property that matters here.
+This project has no test runner and no CI test job, which follows from [ADR 0003](../adr/0003-medium-and-dependencies.md) — no product, no test suite, no build step. That is not an omission to be filled in later; a suite asserting the shape of a directory of Markdown templates would verify their form rather than their usefulness, and usefulness is the property that matters here.
 
 - **Behavioral** — not used. Nothing in this repository executes, so there is no input-to-output semantics to assert.
 - **Structural** — each test's `## Verified by` block is runnable as-is and is executed by hand when the test is checked. There is no aggregate runner and no merge gate; the commands are the specification of what "correct" means, and running them is a step in the end-of-Epic self-review.
 - **Procedural** — never CI, here or anywhere. Verified by a human, with the result recorded in each file's `**Last verified:**` field.
 
-A structural test in this project therefore fails loudly only when someone runs it. That is the cost side of ADR 0001 and is named in its Consequences: nothing here is mechanically verified, and a broken template or stale instruction is discovered by the next person to scaffold.
+A structural test in this project therefore fails loudly only when someone runs it. That is the cost side of ADR 0003 and is named in its Consequences: nothing here is mechanically verified, and a broken template or stale instruction is discovered by the next person to scaffold.

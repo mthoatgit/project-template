@@ -2,7 +2,7 @@
 
 ## Overview
 
-`project-template` is a document repository, not a program. It supplies structure — a directory shape, a set of Markdown templates, and configuration files — that new projects start from, and it is maintained through the same workflow it hands out. Nothing in it executes. The load-bearing trade-off, recorded in [ADR 0001](../adr/0001-tech-stack.md), is that anything which must run lives in a sibling repository and is depended on rather than carried: correctness here is established by reading the scaffolded result, not by a test suite.
+`project-template` is a document repository, not a program. It supplies structure — a directory shape, a set of Markdown templates, and configuration files — that new projects start from, and it is maintained through the same workflow it hands out. It holds no product, no build step and no test runner; the one executable file, `scripts/init-verify.py`, is a scaffold-time helper invoked from outside against a target project. The load-bearing trade-off, recorded in [ADR 0003](../adr/0003-medium-and-dependencies.md), is that anything which must run as a product lives in a sibling repository and is depended on rather than carried: correctness here is established by reading the scaffolded result, not by a test suite.
 
 The one structural idea worth understanding before anything else is the split between `skeleton/` and the repository root. `skeleton/` is a pristine mirror of what a downstream project starts with, copied verbatim; the root is this project's own artefacts, which no downstream project inherits. Every file in the repository is on one side of that line, and which side it is on determines who it belongs to.
 
@@ -12,12 +12,12 @@ The one structural idea worth understanding before anything else is the split be
 
 | Layer | Choice | ADR |
 |---|---|---|
-| Medium | Markdown documents, directory structure, configuration files | 0001 |
-| Runtime | None — nothing here executes | 0001 |
-| Build / packaging | None | 0001 |
-| Test suite | None — verification is by inspection of the scaffolded result | 0001 |
-| Task execution | `~/dev/orchestrator`, one shared installation, consumed per its ADR 0003 | 0001 |
-| Workflow skills + commands | `dotfiles-claude`, shared across every project on the machine | 0001 |
+| Medium | Markdown documents, directory structure, configuration files | 0003 |
+| Runtime | None — no product, no build, no runner. Scaffold-time helpers only | 0003 |
+| Build / packaging | None | 0003 |
+| Test suite | None — verification is by inspection of the scaffolded result | 0003 |
+| Task execution | `~/dev/orchestrator`, one shared installation, consumed per **that project's** ADR 0003 | 0003 |
+| Workflow skills + commands | `dotfiles-claude`, shared across every project on the machine | 0003 |
 
 ---
 
@@ -52,7 +52,7 @@ The one structural idea worth understanding before anything else is the split be
                                         └──────────────────────┘
 ```
 
-The three boxes at the top are separate git repositories. None is versioned with the others, and no commit in any of them describes the whole — see ADR 0001's Consequences.
+The three boxes at the top are separate git repositories. None is versioned with the others, and no commit in any of them describes the whole — see ADR 0003's Consequences.
 
 ---
 
