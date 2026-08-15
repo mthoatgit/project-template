@@ -3,7 +3,7 @@ type: change
 status: in-progress
 created: 2026-08-01
 updated: 2026-08-15
-stage: 4
+stage: 5
 stage_attempt: 1
 ---
 
@@ -29,7 +29,16 @@ stage_attempt: 1
   - [ADR-0002](../adr/0002-availability-check.md) — availability asserted by resolving the console script, at scaffold time only. Grounds `REQ-0003`.
   - [docs/architecture/system-design.md](../architecture/system-design.md) — initial write, riding `ADR-0001`'s commit. Records the `skeleton/`-versus-root line and the three-repository boundary.
   - `REQ-0001`, `REQ-0002`, `REQ-0004`, `REQ-0005`, `REQ-0006` — confirmed `none (no ADR)`.
-- **Stage 4 (Task-Breakdown):** pending
+- **Stage 4 (Task-Breakdown):**
+  - [TASK-0001](../tasks/TASK-0001-remove-orchestrator-from-skeleton.md) — remove the vendored orchestrator from the scaffold.
+  - [TASK-0002](../tasks/TASK-0002-scaffold-claude-md-names-engine.md) — state the execution engine in the scaffolded project's `CLAUDE.md`.
+  - [TASK-0003](../tasks/TASK-0003-remove-own-orchestrator-artefacts.md) — remove this project's own orchestrator artefacts.
+  - [TASK-0004](../tasks/TASK-0004-rewrite-self-description.md) — rewrite this project's self-description.
+  - [TASK-0005](../tasks/TASK-0005-availability-check-in-new-project.md) — availability check in `/new-project` (`dotfiles-claude`).
+  - [TASK-0006](../tasks/TASK-0006-drop-bundled-orchestrator-instructions.md) — drop the bundled-orchestrator instructions from the scaffolding commands (`dotfiles-claude`).
+  - [TASK-0007](../tasks/TASK-0007-devendor-four-uniform-projects.md) — de-vendor the four uniform downstream projects.
+  - [TASK-0008](../tasks/TASK-0008-devendor-orchestrator-dashboard.md) — de-vendor `orchestrator-dashboard`, the exception.
+  - [E1 overview](../specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md) — Tasks, Implementation note (E1 is implemented manually), and Epic-Level Acceptance Criteria appended; Status flipped to `approved`.
 - **Stage 5 (Tests):** pending
 
 ## Core
@@ -137,5 +146,27 @@ Two pairs look mergeable and are not. `REQ-0001` and `REQ-0004` are both deletio
 ### Outcome
 
 `ADR-0001` in `docs/adr/0001-tech-stack.md` (founding — files only, and a standing dependency on `~/dev/orchestrator` and `dotfiles-claude`), with `docs/architecture/system-design.md` written in the same commit. `ADR-0002` in `docs/adr/0002-availability-check.md` grounding `REQ-0003`, whose `Architecture-impact` is back-filled from `pending` in that ADR's commit. `REQ-0001`, `REQ-0002`, `REQ-0004`, `REQ-0005` and `REQ-0006` confirmed as `none (no ADR)`.
+
+**Approved:** 2026-08-15
+
+## Stage 4 — Task-Breakdown
+
+### Discussion
+
+#### 2026-08-15
+
+**Eight tasks, and where the seams are.** `REQ-0001` and `REQ-0002` each produce one task, both operating on `skeleton/`. `REQ-0004` splits in two: `TASK-0003` deletes and `TASK-0004` rewrites the self-description that described what was deleted. They are separable because their failure modes differ — a stale `CLAUDE.md` claiming 164 tests is a quieter wrong than a directory that should not exist — and because `TASK-0004` only makes sense once `TASK-0003` has run, which a single task would have hidden as an internal ordering. `REQ-0003` and `REQ-0006` produce one task each in `dotfiles-claude`. `REQ-0005` produces two: four repositories where the work is mechanically identical, and `orchestrator-dashboard`, which is not.
+
+**Why the dashboard is its own task.** It differs from the other four in three ways and the third is load-bearing. Its vendored copy carries twelve modules where the others carry fourteen; it holds an older `orchestrator/tests/` layout plus a root `pytest.ini`; and it *consumes the loop's output*, reading `docs/tasks/index.md` from the projects it reports on. That third relationship is not vendoring and must survive the deletion. Folding it into the uniform group would have put a task with an open question — does its own suite depend on the vendored copy? — behind four that have none.
+
+**Four repositories in one task, deliberately.** `TASK-0007` covers `dice-roller`, `kitchen-inventory`, `palette-picker` and `wordfreq` as a single work item producing one commit in each. Four near-identical task files would have added bookkeeping without adding clarity, and the per-project variation is small enough to enumerate in the steps: three different `--test-cmd` values, one unfilled placeholder, and `wordfreq`'s stale `--tasks docs/tasks/E1/` path predating the flat layout, which gets corrected in the same pass.
+
+**The implementation-mode problem, surfaced here rather than at `/start-epic`.** `TASK-0003` deletes this repository's entire test infrastructure, and `ADR-0001` commits the project to having none. The orchestrator refuses a task whose `--test-cmd` target is missing and hard-aborts a task with no primary-anchored TEST, so the Epic that removes the test infrastructure cannot be driven by a loop that requires it. Three options were weighed: manual implementation with structural and procedural specs; adding a minimal `scripts/test.py` so the loop could drive E1 normally; and deferring the question to a separate item. The second was rejected because it reverses `ADR-0001`'s no-test-suite commitment and would be a Case B supersession rather than an addition. The third leaves the implementation path undefined for the next Epic at no real saving. **Decision: E1 is implemented manually**, with the branch, pull request and end-of-Epic self-review unchanged. Recorded in the Epic overview under `## Implementation note`, because a reader of the Epic needs it more than a reader of this item does.
+
+**Stage 5 preflight.** Every task has a plausible primary-anchored TEST: structural specs asserting tree state and document content for `TASK-0001` through `TASK-0004` and `TASK-0006`, procedural specs for `TASK-0005`, `TASK-0007` and `TASK-0008` where the verification is a run rather than an assertion. No task is infrastructure in the sense `workflow-tasks` warns about — none produces internal wiring with no observable surface — so neither the unit-test path nor the merge-into-consumer path applies.
+
+### Outcome
+
+`TASK-0001`..`TASK-0008` in `docs/tasks/`. Tasks section, Implementation note and Epic-Level Acceptance Criteria appended to `docs/specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md`, whose Status flips to `approved`. `docs/tasks/index.md`, `README.md` and both templates written for the first time.
 
 **Approved:** 2026-08-15
