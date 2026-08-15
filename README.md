@@ -41,9 +41,8 @@ Alternatively, from an existing Claude Code session in another project, run **`/
 
 Everything starts as a **backlog item** in `docs/backlog/`. Each item's type binds it to a **lifecycle** that defines the stages it runs through:
 
-- **featurework** (5 stages) for `idea`, `gap`, `improvement` — Concept → Requirements → Architecture → Task-Breakdown → Tests
+- **featurework** (5 stages) for `change` — Concept → Requirements → Architecture → Task-Breakdown → Tests
 - **bug** (4 stages) for `bug` — Reproduction → Root cause → Regression test → Fix
-- **question** (2 stages) for `question` — Investigation → Answer
 
 Each stage is deliberately entered, has its own approval gate, and produces its own commit — **never bundled** with adjacent stages. The design conversation for a stage happens inside that stage's `### Discussion` sub-section in the item file itself; artefacts (`concept.md`, REQs, ADRs, task files, test scenarios) live in their respective `docs/` folders and back-link to the item as their `Source`. When all applicable stages complete, the item flips to `done` and moves to `docs/backlog/archive/` in the same commit as the final stage's output.
 
