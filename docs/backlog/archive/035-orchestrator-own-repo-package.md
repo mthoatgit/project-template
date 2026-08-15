@@ -14,42 +14,42 @@ stage_attempt: 1
 ## Artefacts
 
 - **Stage 1 (Concept):**
-  - [docs/concept.md](../concept.md) — initial write. Frames `project-template` as a supplier of structure that executes nothing, owning neither the orchestrator (`~/dev/orchestrator`) nor the workflow skills and commands (`dotfiles-claude`).
+  - [docs/concept.md](../../concept.md) — initial write. Frames `project-template` as a supplier of structure that executes nothing, owning neither the orchestrator (`~/dev/orchestrator`) nor the workflow skills and commands (`dotfiles-claude`).
 - **Stage 2 (Requirements + Epic-Birth):**
-  - [docs/specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md](../specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md) — Epic born. Carries the decision that its cross-repository requirements ship as procedural work rather than in this Epic's PR.
-  - [REQ-0001](../specs/epics/E1-orchestrator-extraction/REQ-0001-scaffold-ships-no-orchestrator.md) — the scaffold ships no orchestrator.
-  - [REQ-0002](../specs/epics/E1-orchestrator-extraction/REQ-0002-scaffolded-project-states-execution.md) — a scaffolded project states how its tasks are executed.
-  - [REQ-0003](../specs/epics/E1-orchestrator-extraction/REQ-0003-report-missing-installation.md) — scaffolding reports a missing shared installation.
-  - [REQ-0004](../specs/epics/E1-orchestrator-extraction/REQ-0004-no-orchestrator-artefacts-retained.md) — `project-template` retains no orchestrator artefacts.
-  - [REQ-0005](../specs/epics/E1-orchestrator-extraction/REQ-0005-devendor-existing-projects.md) — projects that already vendored the loop are de-vendored. Superseded by `REQ-0007` on 2026-08-15.
-  - [REQ-0006](../specs/epics/E1-orchestrator-extraction/REQ-0006-commands-drop-bundled-assumptions.md) — the workflow commands do not instruct on a bundled orchestrator.
-  - [REQ-0007](../specs/epics/E1-orchestrator-extraction/REQ-0007-devendor-the-dashboard.md) — the one project that vendored the loop is de-vendored. Supersedes `REQ-0005`.
-  - [docs/specs/README.md](../specs/README.md) — requirements root: goal, domain, out-of-scope, Epic index.
+  - [docs/specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md](../../specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md) — Epic born. Carries the decision that its cross-repository requirements ship as procedural work rather than in this Epic's PR.
+  - [REQ-0001](../../specs/epics/E1-orchestrator-extraction/REQ-0001-scaffold-ships-no-orchestrator.md) — the scaffold ships no orchestrator.
+  - [REQ-0002](../../specs/epics/E1-orchestrator-extraction/REQ-0002-scaffolded-project-states-execution.md) — a scaffolded project states how its tasks are executed.
+  - [REQ-0003](../../specs/epics/E1-orchestrator-extraction/REQ-0003-report-missing-installation.md) — scaffolding reports a missing shared installation.
+  - [REQ-0004](../../specs/epics/E1-orchestrator-extraction/REQ-0004-no-orchestrator-artefacts-retained.md) — `project-template` retains no orchestrator artefacts.
+  - [REQ-0005](../../specs/epics/E1-orchestrator-extraction/REQ-0005-devendor-existing-projects.md) — projects that already vendored the loop are de-vendored. Superseded by `REQ-0007` on 2026-08-15.
+  - [REQ-0006](../../specs/epics/E1-orchestrator-extraction/REQ-0006-commands-drop-bundled-assumptions.md) — the workflow commands do not instruct on a bundled orchestrator.
+  - [REQ-0007](../../specs/epics/E1-orchestrator-extraction/REQ-0007-devendor-the-dashboard.md) — the one project that vendored the loop is de-vendored. Supersedes `REQ-0005`.
+  - [docs/specs/README.md](../../specs/README.md) — requirements root: goal, domain, out-of-scope, Epic index.
 - **Stage 3 (Architecture):**
-  - [ADR-0001](../adr/0001-tech-stack.md) — files only, and a standing dependency on two sibling repositories. Founding ADR; produced under the founding-ADR rule rather than by a REQ.
-  - [ADR-0002](../adr/0002-availability-check.md) — availability asserted by resolving the console script, at scaffold time only. Grounds `REQ-0003`.
-  - [docs/architecture/system-design.md](../architecture/system-design.md) — initial write, riding `ADR-0001`'s commit. Records the `skeleton/`-versus-root line and the three-repository boundary.
+  - [ADR-0001](../../adr/0001-tech-stack.md) — files only, and a standing dependency on two sibling repositories. Founding ADR; produced under the founding-ADR rule rather than by a REQ.
+  - [ADR-0002](../../adr/0002-availability-check.md) — availability asserted by resolving the console script, at scaffold time only. Grounds `REQ-0003`.
+  - [docs/architecture/system-design.md](../../architecture/system-design.md) — initial write, riding `ADR-0001`'s commit. Records the `skeleton/`-versus-root line and the three-repository boundary.
   - `REQ-0001`, `REQ-0002`, `REQ-0004`, `REQ-0005`, `REQ-0006` — confirmed `none (no ADR)`.
 - **Stage 4 (Task-Breakdown):**
-  - [TASK-0001](../tasks/TASK-0001-remove-orchestrator-from-skeleton.md) — remove the vendored orchestrator from the scaffold.
-  - [TASK-0002](../tasks/TASK-0002-scaffold-claude-md-names-engine.md) — state the execution engine in the scaffolded project's `CLAUDE.md`.
-  - [TASK-0003](../tasks/TASK-0003-remove-own-orchestrator-artefacts.md) — remove this project's own orchestrator artefacts.
-  - [TASK-0004](../tasks/TASK-0004-rewrite-self-description.md) — rewrite this project's self-description.
-  - [TASK-0005](../tasks/TASK-0005-availability-check-in-new-project.md) — availability check in `/new-project` (`dotfiles-claude`).
-  - [TASK-0006](../tasks/TASK-0006-drop-bundled-orchestrator-instructions.md) — drop the bundled-orchestrator instructions from the scaffolding commands (`dotfiles-claude`).
+  - [TASK-0001](../../tasks/TASK-0001-remove-orchestrator-from-skeleton.md) — remove the vendored orchestrator from the scaffold.
+  - [TASK-0002](../../tasks/TASK-0002-scaffold-claude-md-names-engine.md) — state the execution engine in the scaffolded project's `CLAUDE.md`.
+  - [TASK-0003](../../tasks/TASK-0003-remove-own-orchestrator-artefacts.md) — remove this project's own orchestrator artefacts.
+  - [TASK-0004](../../tasks/TASK-0004-rewrite-self-description.md) — rewrite this project's self-description.
+  - [TASK-0005](../../tasks/TASK-0005-availability-check-in-new-project.md) — availability check in `/new-project` (`dotfiles-claude`).
+  - [TASK-0006](../../tasks/TASK-0006-drop-bundled-orchestrator-instructions.md) — drop the bundled-orchestrator instructions from the scaffolding commands (`dotfiles-claude`).
   - `TASK-0007` — de-vendor the four uniform downstream projects. Retired unimplemented on 2026-08-15; ID burned, not reused.
-  - [TASK-0008](../tasks/TASK-0008-devendor-orchestrator-dashboard.md) — de-vendor `orchestrator-dashboard`, the exception.
-  - [E1 overview](../specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md) — Tasks, Implementation note (E1 is implemented manually), and Epic-Level Acceptance Criteria appended; Status flipped to `approved`.
+  - [TASK-0008](../../tasks/TASK-0008-devendor-orchestrator-dashboard.md) — de-vendor `orchestrator-dashboard`, the exception.
+  - [E1 overview](../../specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md) — Tasks, Implementation note (E1 is implemented manually), and Epic-Level Acceptance Criteria appended; Status flipped to `approved`.
 - **Stage 5 (Tests):**
-  - [TEST-0001](../tests/TEST-0001-skeleton-holds-no-orchestrator.md) — structural. The scaffold holds no orchestrator.
-  - [TEST-0002](../tests/TEST-0002-scaffold-claude-md-names-engine.md) — structural. The scaffold's `CLAUDE.md` names the engine and its home.
-  - [TEST-0003](../tests/TEST-0003-no-orchestrator-artefacts-retained.md) — structural. This repository retains no orchestrator artefacts.
-  - [TEST-0004](../tests/TEST-0004-self-description-claims-nothing.md) — structural. The self-description claims no ownership of the loop.
-  - [TEST-0005](../tests/TEST-0005-availability-check-reports.md) — procedural. A missing installation is reported without failing the scaffold.
-  - [TEST-0006](../tests/TEST-0006-commands-carry-no-bundled-instructions.md) — structural. The scaffolding commands carry no bundled-orchestrator instructions.
-  - [TEST-0007](../tests/TEST-0007-dashboard-devendored-and-intact.md) — procedural. The dashboard is de-vendored and still reports.
-  - [TEST-0008](../tests/TEST-0008-scaffolded-project-is-legible.md) — procedural. A scaffolded project explains its own execution to a cold reader.
-  - [docs/tests/strategy.md](../tests/strategy.md) — CI Integration section filled honestly: no runner, no merge gate, structural checks run by hand at end-of-Epic review.
+  - [TEST-0001](../../tests/TEST-0001-skeleton-holds-no-orchestrator.md) — structural. The scaffold holds no orchestrator.
+  - [TEST-0002](../../tests/TEST-0002-scaffold-claude-md-names-engine.md) — structural. The scaffold's `CLAUDE.md` names the engine and its home.
+  - [TEST-0003](../../tests/TEST-0003-no-orchestrator-artefacts-retained.md) — structural. This repository retains no orchestrator artefacts.
+  - [TEST-0004](../../tests/TEST-0004-self-description-claims-nothing.md) — structural. The self-description claims no ownership of the loop.
+  - [TEST-0005](../../tests/TEST-0005-availability-check-reports.md) — procedural. A missing installation is reported without failing the scaffold.
+  - [TEST-0006](../../tests/TEST-0006-commands-carry-no-bundled-instructions.md) — structural. The scaffolding commands carry no bundled-orchestrator instructions.
+  - [TEST-0007](../../tests/TEST-0007-dashboard-devendored-and-intact.md) — procedural. The dashboard is de-vendored and still reports.
+  - [TEST-0008](../../tests/TEST-0008-scaffolded-project-is-legible.md) — procedural. A scaffolded project explains its own execution to a cold reader.
+  - [docs/tests/strategy.md](../../tests/strategy.md) — CI Integration section filled honestly: no runner, no merge gate, structural checks run by hand at end-of-Epic review.
 
 ## Core
 
