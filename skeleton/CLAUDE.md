@@ -75,8 +75,10 @@ Scenario coverage: `docs/tests/README.md`.
 
 ## Implementation
 
-Claude MUST use the orchestrator during the implementation phase; Claude MUST NOT implement tasks manually.
+Tasks are executed by the orchestrator. Claude MUST use it during the implementation phase; Claude MUST NOT implement tasks manually.
 
 ```bash
-python -m orchestrator --tasks docs/tasks/ --test-cmd "<test-cmd>" --project-dir .
+orchestrator --tasks docs/tasks/ --test-cmd "<test-cmd>" --project-dir .
 ```
+
+The orchestrator is **installed, not part of this repository** — there is no copy of it here and nothing to set up per project. Its source lives at `~/dev/orchestrator`, installed once per machine with `pip install -e`, and every project on the machine runs that same installation. If the command above is not found, the installation is missing rather than the project being broken; `~/dev/orchestrator/docs/consuming-the-orchestrator.md` says how to obtain it.

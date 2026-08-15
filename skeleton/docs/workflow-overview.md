@@ -90,7 +90,7 @@ orchestrator in Stage 4 and are manually implemented.
 flowchart TD
     S1["/start-epic &lt;N&gt;<br/>reads Epic file + tasks<br/>outputs confirmation block"] -->|user confirms go| S2["create branch<br/>epic/&lt;n&gt;-&lt;slug&gt; from main"]
     S2 --> S3["/scaffold &lt;N&gt;<br/>empty skeletons only, no logic<br/>commit: [scaffold] E&lt;N&gt;"]
-    S3 --> S4["python -m orchestrator starts"]
+    S3 --> S4["orchestrator starts<br/>(installed, not in this repo)"]
     S4 --> Loop{"next task<br/>TASK-&lt;NNNN&gt;?"}
     Loop -->|yes| Ralph["Ralph Loop<br/>Claude implements + writes tests"]
     Ralph --> RunTests["run test-cmd"]
