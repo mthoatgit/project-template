@@ -2,71 +2,82 @@
 
 ## What this project is
 
-`project-template` is the shared scaffold for every new project (`/new-project`). It is itself a maintained project: skills, orchestrator, commands, templates, workflow documentation all evolve here and propagate to downstream projects via the phased workflow.
+`project-template` is the scaffold every new project on this machine starts from, and the place the phased workflow itself is developed. It supplies structure — a directory shape, document templates, shared configuration — and executes nothing. See `docs/concept.md`.
 
-**Dual-nature layout (added in the `skeleton/` restructure):**
+**Dual-nature layout.** Every file is on one side of a line, and which side decides who owns it:
 
-- **`skeleton/`** — everything under this folder is what a fresh downstream project starts with. `/new-project` copies `skeleton/*` into the target and runs `/init-project` fill logic. Treat `skeleton/` as the read-only pristine mirror.
-- **Root (`./`)** — project-template's own artifacts: this `CLAUDE.md`, `README.md`, `docs/` (project-template's real backlog + specs + tasks + tests + ADRs about ITSELF), `pytest.ini`, `orchestrator-tests/`.
+- **`skeleton/`** — what a fresh downstream project starts with. `/new-project` copies `skeleton/.` wholesale and runs `/init-project` fill logic. Treat it as the pristine mirror.
+- **Root (`./`)** — project-template's own artefacts: this file, `README.md`, and `docs/` holding its real concept, backlog, REQs, ADRs, tasks and tests about ITSELF.
 
-When you edit downstream-facing content, edit under `skeleton/`. When you develop project-template itself (backlog item → REQ → task → test → orchestrator implementation), the work lives at root — mirroring the same folder shape that downstream projects use.
+When editing downstream-facing content, edit under `skeleton/`. When developing project-template itself, the work lives at root — mirroring the folder shape downstream projects use.
 
 ## Tech Stack
 
+Authoritative source: `docs/architecture/system-design.md` + `docs/adr/0001-tech-stack.md`.
+
 | Layer | Choice |
 |---|---|
-| Language / runtime | Python 3.11+ |
-| Test framework | pytest (dev-only; runs against `orchestrator-tests/` with `pythonpath = skeleton orchestrator-tests`) |
-| Storage | Files only — no runtime dependencies |
-| Build tool | None (`python -m orchestrator` via `PYTHONPATH=skeleton`) |
+| Medium | Markdown documents, directory structure, configuration files |
+| Runtime | None — nothing here executes as a product |
+| Build / packaging | None |
+| Test suite | None — verification is by inspection |
+| Task execution | `~/dev/orchestrator`, installed once per machine |
+| Workflow skills + commands | `dotfiles-claude`, shared across every project |
 
 ## Commands
 
-```bash
-# Test project-template's own orchestrator suite
-pytest
+There is no build, no test, and no run command. The one executable file is a scaffold-time helper invoked by `/init-project`, never run against this repository:
 
-# Invoke the orchestrator on a downstream project (from inside that project's dir)
-python -m orchestrator --tasks docs/tasks/ --project-dir .
+```bash
+python scripts/init-verify.py <target-project-dir>
 ```
 
 ## Verification
 
-- `pytest` — 164 tests covering the orchestrator's Ralph Loop, DoD gates, per-task test discovery, status transitions, and helper modules.
+Claude MUST establish correctness by inspection, not by a test runner — see `docs/adr/0001-tech-stack.md`.
+
+- Structural test specs under `docs/tests/` carry runnable `## Verified by` blocks. Claude MUST run the blocks belonging to the work at hand before declaring a task done.
+- Procedural specs require a human or a fresh session; Claude MUST NOT mark them verified on its own inference.
+- There is no aggregate runner and no merge gate. A structural check fails only when someone runs it — the cost side of ADR-0001, named in its Consequences.
+
+Coverage: `docs/tests/index.md`.
 
 ## Dev Environment
 
-- Python 3.11+ on PATH.
-- Windows-first — but Bash-tool + PowerShell both work.
-- Skills live in `~/.claude/skills/` (in the sibling `dotfiles-claude` repo). Commands live in `~/.claude/commands/`. Editing those affects EVERY project on this machine, not just project-template.
+- Python 3.11+ on PATH — for `scripts/init-verify.py` and for the orchestrator's installation, not for anything in this repository.
+- The orchestrator MUST be installed (`pip install -e ~/dev/orchestrator`) for any project scaffolded from here to be implementable.
+- Windows-first; Bash tool and PowerShell both work.
 
 ## Code Layout
 
-- `skeleton/` — downstream mirror. `skeleton/orchestrator/` is the canonical orchestrator source; `skeleton/docs/` holds the pristine template files (`_TEMPLATE_*.md`, template-frontmatter placeholders); `skeleton/.claude/`, `skeleton/.github/` etc. are the shared config that lands in every new project.
-- `docs/backlog/` — project-template's own backlog (items 001..033 about workflow / orchestrator / skills evolution).
-- `docs/` — placeholder for project-template's own REQs / tasks / tests / ADRs as they get filed via the workflow (all currently empty; grows as `/backlog` items reach Stage 2+).
-- `orchestrator-tests/` — pytest suite for the orchestrator. Not shipped downstream.
-- `pytest.ini` — testpaths + pythonpath config for the orchestrator test suite. Not shipped downstream.
+- `skeleton/` — the downstream mirror. `skeleton/docs/` holds the pristine templates (`_TEMPLATE_*.md`, placeholder files); `skeleton/.claude/`, `skeleton/.github/`, `skeleton/.gitignore` are the shared config every new project inherits.
+- `docs/concept.md` — what this project is.
+- `docs/backlog/` — project-template's own backlog; `archive/` holds items 001..035.
+- `docs/specs/`, `docs/adr/`, `docs/architecture/`, `docs/tasks/`, `docs/tests/` — its own REQs, decisions, system design, work items and test specs.
+- `scripts/init-verify.py` — post-write autofix and hard-check for `/init-project`. Runs against a target project at scaffold time.
+
+Full structure: `docs/architecture/system-design.md`.
 
 ## Conventions
 
-- Runtime code MUST stay stdlib-only. Test suite MAY use pytest features.
-- Files under `skeleton/` are what downstream projects inherit. Adding a new template file there means every new project gets it going forward.
-- Files at repo root (outside `skeleton/`) stay in project-template. Downstream projects do NOT inherit them.
-- `pytest.ini`, `orchestrator-tests/`, and this `CLAUDE.md` are examples of root-only files (project-template's maintainer artifacts).
+- Files under `skeleton/` are what downstream projects inherit. Adding one there means every new project gets it from then on.
+- Files at root stay here. Downstream projects do NOT inherit them.
+- Claude MUST NOT add runtime code, a test suite, or a build step — ADR-0001. Anything that must execute belongs in another repository and is depended on, not carried.
 
 ## Gotchas
 
-- `pytest` at the repo root runs against `orchestrator-tests/` — NOT against any downstream project. To test a downstream project's own code, `cd` into it first.
-- The `~/.claude/` directory (skills + commands + memory) is a SEPARATE git repo (`dotfiles-claude`). Committing here does not commit skill/command edits.
-- Legacy commits from before the `skeleton/` restructure have `orchestrator/` at the repo root. `git log --follow orchestrator/` (or the equivalent for skeleton/orchestrator/) preserves the history across the rename.
+- Three repositories must stay in agreement and none is versioned with the others: this one, `~/dev/orchestrator`, and `dotfiles-claude` (which is `~/.claude/`, holding skills and commands). Committing here does not commit skill or command edits, and no single commit describes a working whole.
+- Nothing reaches a project after it is scaffolded. There is no update channel; anything that must change afterwards has to live outside the scaffold.
+- Legacy commits from before the `skeleton/` restructure have `orchestrator/` at the repo root, and commits before Epic 1 have the loop's source in-tree. `git log --follow` preserves history across both moves.
 
 ## Implementation
 
-For project-template's OWN self-improvement work (any of the 33 backlog items), the same phased workflow applies: `/backlog <NNN>` → Stage 1..5 → `/start-epic` → orchestrator loop. The orchestrator runs against project-template's OWN `docs/tasks/` (root, NOT `skeleton/docs/tasks/`).
+Tasks are executed by the orchestrator. Claude MUST use it during the implementation phase; Claude MUST NOT implement tasks manually.
 
 ```bash
-python -m orchestrator --tasks docs/tasks/ --project-dir .
+orchestrator --tasks docs/tasks/ --project-dir .
 ```
 
-(With `pythonpath = skeleton` already set for this repo, the orchestrator module resolves correctly from root.)
+The orchestrator is **installed, not part of this repository** — its source lives at `~/dev/orchestrator`. See `~/dev/orchestrator/docs/consuming-the-orchestrator.md`.
+
+Epic 1 is the exception and MUST NOT be taken as precedent: it removed this project's test infrastructure, which the orchestrator requires in order to run, so it was implemented manually. Any Epic after it that has no test command has the same problem and MUST resolve it deliberately rather than by repeating the exception — see the `## Implementation note` in `docs/specs/epics/E1-orchestrator-extraction/E1-orchestrator-extraction.md`.

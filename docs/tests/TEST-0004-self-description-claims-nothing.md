@@ -24,9 +24,11 @@ for f in CLAUDE.md README.md; do
   grep -q '~/dev/orchestrator' "$f" || { echo "FAIL: $f does not name the loop's home"; exit 1; }
 done
 
-# 3. Every repo-relative path named in either document exists.
+# 3. Every repo-relative path named in either document exists. Placeholder
+#    paths are excluded: the match stops at the '<' of a token like
+#    docs/backlog/001-<seed-slug>.md, leaving a fragment ending in '-'.
 grep -ohE '(^|[ `(])(skeleton|docs|scripts)/[A-Za-z0-9_./-]*' CLAUDE.md README.md \
-  | sed -E 's/^[ `(]//' | sed 's#/$##' | sort -u \
+  | sed -E 's/^[ `(]//' | sed 's#/$##' | grep -vE '\-$' | sort -u \
   | while read -r p; do
       test -e "$p" || { echo "FAIL: documented path does not exist: $p"; exit 1; }
     done

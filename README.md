@@ -6,7 +6,7 @@ stubs that delegate to [mthoatgit/workflows](https://github.com/mthoatgit/workfl
 
 ## Dual-nature layout
 
-Everything a downstream project starts with lives under [`skeleton/`](skeleton/). Everything at the repo root outside `skeleton/` is project-template's own project (its `CLAUDE.md`, backlog, orchestrator tests, etc.) — those files do NOT propagate downstream.
+Everything a downstream project starts with lives under [`skeleton/`](skeleton/). Everything at the repo root outside `skeleton/` is project-template's own project — its `CLAUDE.md`, its concept, its backlog, its REQs and ADRs and tests about itself. Those files do NOT propagate downstream.
 
 ```
 project-template/
@@ -14,17 +14,17 @@ project-template/
 │   ├── CLAUDE.md          (template)
 │   ├── README.md          (template)
 │   ├── .claude/, .github/, .gitignore, .gitattributes
-│   ├── orchestrator/      ← the canonical orchestrator source
 │   └── docs/              ← templates + shared workflow reference
 │
 ├── CLAUDE.md              ← project-template's own maintainer context
 ├── README.md              ← this file
-├── docs/                  ← project-template's OWN backlog + (future) REQs/tasks/tests/ADRs
-├── orchestrator-tests/    ← pytest suite for the orchestrator
-└── pytest.ini             ← testpaths + pythonpath config for `pytest`
+├── docs/                  ← its OWN concept, backlog, specs, ADRs, tasks, tests
+└── scripts/               ← init-verify.py, the /init-project post-write check
 ```
 
-`/new-project` copies `skeleton/*` into the target directory and runs `/init-project` fill logic (project name, seed item 001). project-template develops itself using the same phased workflow — items live in the ROOT `docs/backlog/` (not `skeleton/docs/backlog/`), REQs / tasks / tests / ADRs also file at root.
+`/new-project` copies `skeleton/.` into the target directory and runs `/init-project` fill logic (project name, seed item 001). project-template develops itself using the same phased workflow — items live in the ROOT `docs/backlog/`, and its REQs / ADRs / tasks / tests file at root too.
+
+Nothing here executes. Tasks are implemented by an orchestrator that lives in its own repository at `~/dev/orchestrator`, installed once per machine and shared by every project — see [`docs/adr/0001-tech-stack.md`](docs/adr/0001-tech-stack.md).
 
 ## Getting Started (downstream)
 
@@ -77,13 +77,12 @@ skeleton/                          Everything copied into new downstream project
 ├── .claude/settings.json           Claude Code permissions + model default
 ├── .github/workflows/              CI stubs delegating to mthoatgit/workflows@v1
 ├── .gitignore, .gitattributes      Generic ignores + line-ending normalization
-├── orchestrator/                   Implementation-phase TDD driver (Ralph Loop + DoD gates)
 └── docs/
     ├── workflow-overview.md        Lifecycle diagrams + skill map + Golden Rules
     ├── concept.md                  Living project overview (Stage 1 of item 001)
-    ├── backlog/                    Universal capture — bugs, ideas, gaps, questions, improvements
-    │   ├── README.md, index.md, _TEMPLATE_*.md, archive/
-    ├── specs/                      Requirements — Epic files
+    ├── backlog/                    Universal capture — bugs and changes
+    │   ├── README.md, index.md, templates/, archive/
+    ├── specs/                      Requirements — Epic folders + per-REQ files
     │   ├── README.md
     │   ├── epics/_TEMPLATE.md, _REQ-TEMPLATE.md
     │   └── cross-cutting/_TEMPLATE.md
@@ -96,9 +95,8 @@ skeleton/                          Everything copied into new downstream project
 
 CLAUDE.md                          project-template's own maintainer context
 README.md                          this file
-docs/                              project-template's own docs (backlog + future REQs/tasks/tests/ADRs)
-orchestrator-tests/                pytest suite for the orchestrator (root-only, not in skeleton)
-pytest.ini                         testpaths + pythonpath config for the orchestrator tests
+docs/                              its own concept, backlog, specs, adr, architecture, tasks, tests
+scripts/init-verify.py             post-write autofix + hard-check run by /init-project
 ```
 
 ## Replacing the placeholders (downstream)
@@ -112,3 +110,4 @@ Template files are signalled by (1) `status: template` YAML frontmatter and (2) 
 
 - [mthoatgit/workflows](https://github.com/mthoatgit/workflows) — reusable GitHub Actions workflows (pinned via `@v1` in the stubs here).
 - [mthoatgit/dotfiles-claude](https://github.com/mthoatgit/dotfiles-claude) — the `~/.claude/` skills + commands + rules that this template's workflow depends on.
+- [mthoatgit/orchestrator](https://github.com/mthoatgit/orchestrator) — the task-execution loop. Installed once per machine at `~/dev/orchestrator` and shared by every project; never vendored into one.
