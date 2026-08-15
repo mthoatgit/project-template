@@ -1,8 +1,8 @@
 # E1 — Orchestrator extraction
 
-**Status:** approved
-**Branch:** `epic/1-orchestrator-extraction`
-**PR title:** `Epic 1: Orchestrator extraction`
+**Status:** merged
+**Branch:** `epic/1-orchestrator-extraction` — fast-forwarded into `main` on 2026-08-15 without a pull request, by the user's decision. Each task commit is preserved on `main`; the `/ship-epic` self-review and Reflect step were not run.
+**PR title:** `Epic 1: Orchestrator extraction` (never opened)
 **Source:** [[035-orchestrator-own-repo-package]]
 
 ## Goal
