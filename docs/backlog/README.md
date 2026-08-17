@@ -36,3 +36,18 @@ Etabliert am 2026-07-10 (Item 001), universal refactored am 2026-07-19 mit Type-
 ## Sortierung in `index.md`
 
 Nach ID aufsteigend. Es tauchen nur nicht-terminale Items auf (`raw` / `in-progress`) — sobald der Status auf einen Terminal-Wert kippt, verschwindet die Zeile im selben Commit wie der Archive-Move.
+
+## Scope-Grenze: was NICHT hierher gehört
+
+Dieser Backlog ist für Meta-Arbeit am Template selbst. Ein Item, das eine
+**Skill**, einen **Slash-Command**, eine **Rule** oder `~/.claude/CLAUDE.md`
+ändert, gehört nicht hierher, sondern in den Backlog des `dotfiles-claude`
+Repos unter `~/.claude/docs/backlog/`. Dort liegen die Dateien, die das Item
+anfassen will; ein Downstream-Projekt, das eine Skill nur konsumiert, ist
+nicht ihr Owner.
+
+Die IDs **036, 037 und 038 sind hier verbrannt** und werden nie neu vergeben.
+Sie wurden am 2026-08-17 nach `dotfiles-claude` verschoben, weil alle drei auf
+`~/.claude/`-Pfade zeigten — Item 036 auf `~/.claude/CLAUDE.md`, Item 037 auf
+drei `skills/workflow-*`-Verzeichnisse, Item 038 auf `skills/workflow-spike/`.
+Der nächste Item hier ist **039**.

@@ -1,4 +1,2 @@
 | ID  | Type   | Stage            | Status      | Title                                                                                | File                                                    | Created    |
 |-----|--------|------------------|-------------|--------------------------------------------------------------------------------------|---------------------------------------------------------|------------|
-| 036 | change | 1 - Concept      | raw         | Codify the prepare-present-confirm interaction style (recommendation-first, visual state) | [→](036-codify-prepare-present-confirm-style.md)       | 2026-08-16 |
-| 037 | change | 1 - Concept      | raw         | Featurework item stays in-progress through implementation, not just through Stage 5      | [→](037-item-stays-in-progress-through-implementation.md) | 2026-08-16 |
